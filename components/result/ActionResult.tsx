@@ -17,7 +17,7 @@ export default function ActionResult({ action, onComplete, onReset }: Props) {
         <h2 className="font-mono text-base font-bold leading-snug text-white">
           {action.title}
         </h2>
-        <span className="shrink-0 rounded border border-[#00ffb4]/40 px-2 py-0.5 font-mono text-xs text-[#00ffb4]">
+        <span className="shrink-0 rounded border border-neon/40 px-2 py-0.5 font-mono text-xs text-neon">
           {action.category.toUpperCase()}
         </span>
       </div>
@@ -30,9 +30,9 @@ export default function ActionResult({ action, onComplete, onReset }: Props) {
         {action.steps.map((step) => (
           <div
             key={step.order}
-            className="flex gap-3 rounded border border-zinc-800 bg-[#0d0d12] px-4 py-3"
+            className="flex gap-3 rounded border border-zinc-800 bg-surface px-4 py-3"
           >
-            <span className="font-mono text-xs text-[#00ffb4]">
+            <span className="font-mono text-xs text-neon">
               {String(step.order).padStart(2, "0")}
             </span>
             <span className="font-mono text-sm text-zinc-300">
@@ -55,7 +55,7 @@ export default function ActionResult({ action, onComplete, onReset }: Props) {
         </button>
         <button
           onClick={onComplete}
-          className="min-h-[44px] flex-1 rounded bg-[#00ffb4] font-mono text-sm font-bold text-black transition-opacity hover:opacity-90"
+          className="min-h-[44px] flex-1 rounded bg-neon font-mono text-sm font-bold text-black transition-opacity hover:opacity-90"
         >
           COMPLETE ✓
         </button>

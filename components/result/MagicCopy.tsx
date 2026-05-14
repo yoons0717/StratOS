@@ -16,14 +16,14 @@ export default function MagicCopy({ text }: Props) {
   }
 
   return (
-    <div className="rounded border border-zinc-700 bg-[#0d0d12]">
+    <div className="rounded border border-zinc-700 bg-surface">
       <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
-        <span className="font-mono text-xs tracking-widest text-[#00ffb4]">
+        <span className="font-mono text-xs tracking-widest text-neon">
           MAGIC_COPY
         </span>
         <button
           onClick={handleCopy}
-          className="min-h-[44px] rounded px-3 font-mono text-xs text-zinc-400 transition-colors hover:text-[#00ffb4]"
+          className="min-h-[44px] rounded px-3 font-mono text-xs text-zinc-400 transition-colors hover:text-neon"
         >
           {copied ? "COPIED ✓" : "COPY"}
         </button>

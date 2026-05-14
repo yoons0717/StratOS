@@ -24,7 +24,7 @@ export default function StepLevel({ selected, onSelect }: Props) {
           onClick={() => onSelect(opt.value)}
           className={`min-h-[44px] rounded px-4 py-3 text-left font-mono text-sm transition-colors ${
             selected === opt.value
-              ? "border border-[#00ffb4] bg-[#00ffb4]/10 text-[#00ffb4]"
+              ? "border border-neon bg-neon/10 text-neon"
               : "border border-zinc-700 text-zinc-500 hover:border-zinc-500"
           }`}
         >

@@ -6,6 +6,7 @@ import { useStratosStore } from "@/store";
 import { generateAction } from "@/lib/api";
 import ActionInput from "@/components/input/ActionInput";
 import ActionResult from "@/components/result/ActionResult";
+import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 import type { GeneratedAction } from "@/types";
 
 type ViewState = "idle" | "loading" | "result" | "error";
@@ -52,14 +53,13 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col bg-[#0a0a0f] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-      {/* scanline overlay */}
-      <div className="scanline pointer-events-none fixed inset-0" />
+    <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+      <ScanlineOverlay />
 
       <div className="relative flex flex-1 flex-col px-4 py-6">
         {/* header */}
         <div className="mb-6 flex items-center justify-between font-mono text-xs">
-          <span className="tracking-widest text-[#00ffb4]">STRATOS_OS</span>
+          <span className="tracking-widest text-neon">STRATOS_OS</span>
           <span className="text-zinc-600">오늘 행동 1개</span>
         </div>
 
@@ -68,7 +68,7 @@ export default function Home() {
             <div className="mb-4">
               <div className="font-mono text-lg font-bold text-white">
                 INPUT_SITUATION
-                <span className="animate-pulse text-[#00ffb4]">_</span>
+                <span className="animate-pulse text-neon">_</span>
               </div>
               <div className="mt-1 font-mono text-xs text-zinc-600">
                 지금 상황을 그대로 적어줘
@@ -80,7 +80,7 @@ export default function Home() {
 
         {view === "loading" && (
           <div className="flex flex-1 flex-col items-center justify-center gap-4">
-            <div className="font-mono text-xs tracking-widest text-[#00ffb4]">
+            <div className="font-mono text-xs tracking-widest text-neon">
               ANALYZING_INPUT
               <span className="animate-pulse">...</span>
             </div>
@@ -91,7 +91,7 @@ export default function Home() {
               {([0, 1, 2] as const).map((i) => (
                 <div
                   key={i}
-                  className={`delay-${i} h-1 w-1 rounded-full bg-[#00ffb4]`}
+                  className={`delay-${i} h-1 w-1 rounded-full bg-neon`}
                 />
               ))}
             </div>

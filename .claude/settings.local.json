@@ -8,7 +8,8 @@
       "Bash(npm install *)",
       "Bash(git *)",
       "Bash(npx vitest *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)"
     ]
   }
 }

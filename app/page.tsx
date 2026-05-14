@@ -7,6 +7,7 @@ import { generateAction } from "@/lib/api";
 import ActionInput from "@/components/input/ActionInput";
 import ActionResult from "@/components/result/ActionResult";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import Link from "next/link";
 import type { GeneratedAction } from "@/types";
 
 type ViewState = "idle" | "loading" | "result" | "error";
@@ -56,11 +57,17 @@ export default function Home() {
     <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <ScanlineOverlay />
 
-      <div className="relative flex flex-1 flex-col px-4 py-6">
+      <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
         {/* header */}
-        <div className="mb-6 flex items-center justify-between font-mono text-xs">
-          <span className="tracking-widest text-neon">STRATOS_OS</span>
-          <span className="text-zinc-600">오늘 행동 1개</span>
+        <div className="mb-6 flex items-center justify-between">
+          <span className="font-mono text-xs tracking-widest text-neon">STRATOS_OS</span>
+          <Link
+            href="/settings"
+            className="flex min-h-[44px] items-center px-1 font-mono text-base text-zinc-600 transition-colors hover:text-zinc-400"
+            aria-label="settings"
+          >
+            ⚙
+          </Link>
         </div>
 
         {view === "idle" && (

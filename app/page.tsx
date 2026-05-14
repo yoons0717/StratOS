@@ -8,7 +8,7 @@ import ActionInput from "@/components/input/ActionInput";
 import ActionResult from "@/components/result/ActionResult";
 import type { GeneratedAction } from "@/types";
 
-type ViewState = "idle" | "loading" | "result";
+type ViewState = "idle" | "loading" | "result" | "error";
 
 export default function Home() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function Home() {
       setResult(action);
       setView("result");
     } catch {
-      setView("idle");
+      setView("error");
     }
   }
 
@@ -101,6 +101,33 @@ export default function Home() {
                   style={{ animation: `pulse 1s ease-in-out ${i * 0.2}s infinite` }}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+        {view === "error" && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-6">
+            <div className="text-center">
+              <div className="font-mono text-xs tracking-widest text-red-400">
+                EXECUTION_FAILED
+              </div>
+              <div className="mt-2 max-w-xs text-center font-mono text-xs text-zinc-600">
+                &quot;{lastInput}&quot;
+              </div>
+            </div>
+            <div className="flex w-full gap-3">
+              <button
+                onClick={handleReset}
+                className="min-h-[44px] flex-1 rounded border border-zinc-700 font-mono text-sm text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+              >
+                NEW →
+              </button>
+              <button
+                onClick={() => handleSubmit(lastInput)}
+                className="min-h-[44px] flex-1 rounded border border-red-400/40 font-mono text-sm text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
+              >
+                RETRY ↺
+              </button>
             </div>
           </div>
         )}

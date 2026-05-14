@@ -99,4 +99,43 @@ describe("Home page", () => {
 
     expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
+
+  it("shows error state when API call fails", async () => {
+    const { generateAction } = await import("@/lib/api");
+    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
+
+    render(<Home />);
+    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText(/EXECUTION_FAILED/i)).toBeInTheDocument()
+    );
+  });
+
+  it("retries the same input when RETRY is clicked after error", async () => {
+    const { generateAction } = await import("@/lib/api");
+    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
+
+    render(<Home />);
+    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    await waitFor(() => screen.getByText(/EXECUTION_FAILED/i));
+    await userEvent.click(screen.getByRole("button", { name: /RETRY/i }));
+
+    expect(vi.mocked(generateAction)).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns to input view when NEW is clicked after error", async () => {
+    const { generateAction } = await import("@/lib/api");
+    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
+
+    render(<Home />);
+    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    await waitFor(() => screen.getByText(/EXECUTION_FAILED/i));
+    await userEvent.click(screen.getByRole("button", { name: /NEW/i }));
+
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
 });

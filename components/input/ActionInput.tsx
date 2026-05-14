@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Button from "@/components/ui/Button";
 
 interface Props {
   onSubmit: (input: string) => void;
@@ -25,13 +26,13 @@ export default function ActionInput({ onSubmit, isLoading }: Props) {
         rows={4}
         className="w-full resize-none rounded border border-zinc-700 bg-surface px-4 py-3 font-mono text-sm text-white placeholder:text-zinc-600 focus:border-neon focus:outline-none"
       />
-      <button
+      <Button
         onClick={handleSubmit}
         disabled={!value.trim() || isLoading}
-        className="min-h-[44px] w-full rounded bg-neon font-mono text-sm font-bold text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+        className="w-full"
       >
         {isLoading ? "PROCESSING..." : "EXECUTE →"}
-      </button>
+      </Button>
     </div>
   );
 }

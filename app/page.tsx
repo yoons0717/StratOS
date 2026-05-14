@@ -7,6 +7,7 @@ import { generateAction } from "@/lib/api";
 import ActionInput from "@/components/input/ActionInput";
 import ActionResult from "@/components/result/ActionResult";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import Button from "@/components/ui/Button";
 import Link from "next/link";
 import type { GeneratedAction } from "@/types";
 
@@ -116,12 +117,9 @@ export default function Home() {
               </div>
             </div>
             <div className="flex w-full gap-3">
-              <button
-                onClick={handleReset}
-                className="min-h-[44px] flex-1 rounded border border-zinc-700 font-mono text-sm text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
-              >
+              <Button variant="ghost" onClick={handleReset} className="flex-1">
                 NEW →
-              </button>
+              </Button>
               <button
                 onClick={() => handleSubmit(lastInput)}
                 className="min-h-[44px] flex-1 rounded border border-red-400/40 font-mono text-sm text-red-400 transition-colors hover:border-red-400 hover:text-red-300"

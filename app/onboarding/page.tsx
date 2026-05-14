@@ -7,6 +7,7 @@ import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import Button from "@/components/ui/Button";
 import type { UserType, UserLevel, BusinessStage } from "@/types";
 
 const STEP_LABELS = ["USER_TYPE", "AUDIENCE_SIZE", "CURRENT_STAGE"];
@@ -58,13 +59,9 @@ export default function OnboardingPage() {
         {step === 2 && <StepStage selected={stage} onSelect={setStage} />}
 
         {/* execute button */}
-        <button
-          onClick={handleExecute}
-          disabled={!currentValue}
-          className="mt-6 min-h-[44px] w-full rounded bg-neon py-2 font-mono text-sm font-bold text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
-        >
+        <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
           EXECUTE →
-        </button>
+        </Button>
       </div>
     </main>
   );

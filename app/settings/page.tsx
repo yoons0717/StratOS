@@ -8,6 +8,7 @@ import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import Button from "@/components/ui/Button";
 import type { UserType, UserLevel, BusinessStage } from "@/types";
 
 export default function SettingsPage() {
@@ -87,13 +88,9 @@ export default function SettingsPage() {
               SETTINGS_SAVED ✓
             </div>
           )}
-          <button
-            onClick={handleSave}
-            disabled={!type || !level || !stage}
-            className="min-h-[44px] w-full rounded bg-neon font-mono text-sm font-bold text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
-          >
+          <Button onClick={handleSave} disabled={!type || !level || !stage} className="w-full">
             SAVE →
-          </button>
+          </Button>
         </div>
       </div>
     </main>

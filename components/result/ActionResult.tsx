@@ -1,6 +1,7 @@
 "use client";
 
 import MagicCopy from "./MagicCopy";
+import Button from "@/components/ui/Button";
 import type { GeneratedAction } from "@/types";
 
 interface Props {
@@ -47,18 +48,12 @@ export default function ActionResult({ action, onComplete, onReset }: Props) {
 
       {/* actions */}
       <div className="flex gap-3">
-        <button
-          onClick={onReset}
-          className="min-h-[44px] flex-1 rounded border border-zinc-700 font-mono text-sm text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
-        >
+        <Button variant="ghost" onClick={onReset} className="flex-1">
           NEW →
-        </button>
-        <button
-          onClick={onComplete}
-          className="min-h-[44px] flex-1 rounded bg-neon font-mono text-sm font-bold text-black transition-opacity hover:opacity-90"
-        >
+        </Button>
+        <Button onClick={onComplete} className="flex-1 hover:opacity-90">
           COMPLETE ✓
-        </button>
+        </Button>
       </div>
     </div>
   );

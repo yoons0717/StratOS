@@ -50,6 +50,7 @@ types/
 - **Zod**: 외부 경계(API 요청, AI 응답)는 반드시 Zod로 검증 후 사용. `safeParse` 사용 — `parse`(throws) 금지.
 - **Server Component 기본**: `"use client"`는 상태/이벤트가 필요한 최소 단위에만 붙인다.
 - **스키마 공유**: API 요청/응답 타입은 `lib/schemas.ts`에서 정의하고 `z.infer<>`로 타입 추출.
+- **inline style 금지**: `style={{...}}` 사용 금지. 반복되는 CSS는 `app/globals.css`에 유틸리티 클래스로 정의 후 `className`으로 사용. (스캔라인 오버레이 → `.scanline`, 로딩 딜레이 → `.delay-0/1/2`)
 
 ## TDD Rules
 

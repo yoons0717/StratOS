@@ -54,13 +54,7 @@ export default function Home() {
   return (
     <main className="flex min-h-dvh flex-col bg-[#0a0a0f] pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       {/* scanline overlay */}
-      <div
-        className="pointer-events-none fixed inset-0"
-        style={{
-          background:
-            "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,180,0.015) 2px,rgba(0,255,180,0.015) 4px)",
-        }}
-      />
+      <div className="scanline pointer-events-none fixed inset-0" />
 
       <div className="relative flex flex-1 flex-col px-4 py-6">
         {/* header */}
@@ -94,11 +88,10 @@ export default function Home() {
               &quot;{lastInput}&quot;
             </div>
             <div className="flex gap-1">
-              {[0, 1, 2].map((i) => (
+              {([0, 1, 2] as const).map((i) => (
                 <div
                   key={i}
-                  className="h-1 w-1 rounded-full bg-[#00ffb4]"
-                  style={{ animation: `pulse 1s ease-in-out ${i * 0.2}s infinite` }}
+                  className={`delay-${i} h-1 w-1 rounded-full bg-[#00ffb4]`}
                 />
               ))}
             </div>

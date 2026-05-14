@@ -35,13 +35,7 @@ export default function OnboardingPage() {
     <main className="safe-x flex min-h-dvh flex-col items-center justify-center bg-[#0a0a0f] px-4 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div className="w-full max-w-sm">
         {/* scanline overlay */}
-        <div
-          className="pointer-events-none fixed inset-0"
-          style={{
-            background:
-              "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,180,0.015) 2px,rgba(0,255,180,0.015) 4px)",
-          }}
-        />
+        <div className="scanline pointer-events-none fixed inset-0" />
 
         <div className="relative rounded border border-zinc-800 bg-[#0d0d12] p-6">
           {/* header */}

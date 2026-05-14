@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useStratosStore } from "@/store";
 import { generateAction } from "@/lib/api";
 import ActionInput from "@/components/input/ActionInput";
 import ActionResult from "@/components/result/ActionResult";
-import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import PageLayout from "@/components/ui/PageLayout";
 import Button from "@/components/ui/Button";
-import Link from "next/link";
 import type { GeneratedAction } from "@/types";
 
 type ViewState = "idle" | "loading" | "result" | "error";
@@ -54,95 +54,86 @@ export default function Home() {
     setResult(null);
   }
 
+  const headerRight = (
+    <Link
+      href="/settings"
+      className="flex min-h-[44px] items-center px-1 font-mono text-base text-zinc-600 transition-colors hover:text-zinc-400"
+      aria-label="settings"
+    >
+      ⚙
+    </Link>
+  );
+
   return (
-    <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
-      <ScanlineOverlay />
+    <PageLayout headerRight={headerRight}>
+      {view === "idle" && (
+        <>
+          <div className="mb-4">
+            <div className="font-mono text-lg font-bold text-white">
+              INPUT_SITUATION
+              <span className="animate-pulse text-neon">_</span>
+            </div>
+            <div className="mt-1 font-mono text-xs text-zinc-600">
+              지금 상황을 그대로 적어줘
+            </div>
+          </div>
+          <ActionInput onSubmit={handleSubmit} isLoading={false} />
+        </>
+      )}
 
-      <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
-        {/* header */}
-        <div className="mb-6 flex items-center justify-between">
-          <span className="font-mono text-xs tracking-widest text-neon">STRATOS_OS</span>
-          <Link
-            href="/settings"
-            className="flex min-h-[44px] items-center px-1 font-mono text-base text-zinc-600 transition-colors hover:text-zinc-400"
-            aria-label="settings"
-          >
-            ⚙
-          </Link>
+      {view === "loading" && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4">
+          <div className="font-mono text-xs tracking-widest text-neon">
+            ANALYZING_INPUT
+            <span className="animate-pulse">...</span>
+          </div>
+          <div className="max-w-xs text-center font-mono text-xs text-zinc-600">
+            &quot;{lastInput}&quot;
+          </div>
+          <div className="flex gap-1">
+            {([0, 1, 2] as const).map((i) => (
+              <div key={i} className={`delay-${i} h-1 w-1 rounded-full bg-neon`} />
+            ))}
+          </div>
         </div>
+      )}
 
-        {view === "idle" && (
-          <>
-            <div className="mb-4">
-              <div className="font-mono text-lg font-bold text-white">
-                INPUT_SITUATION
-                <span className="animate-pulse text-neon">_</span>
-              </div>
-              <div className="mt-1 font-mono text-xs text-zinc-600">
-                지금 상황을 그대로 적어줘
-              </div>
+      {view === "error" && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-6">
+          <div className="text-center">
+            <div className="font-mono text-xs tracking-widest text-red-400">
+              EXECUTION_FAILED
             </div>
-            <ActionInput onSubmit={handleSubmit} isLoading={false} />
-          </>
-        )}
-
-        {view === "loading" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4">
-            <div className="font-mono text-xs tracking-widest text-neon">
-              ANALYZING_INPUT
-              <span className="animate-pulse">...</span>
-            </div>
-            <div className="max-w-xs text-center font-mono text-xs text-zinc-600">
+            <div className="mt-2 max-w-xs text-center font-mono text-xs text-zinc-600">
               &quot;{lastInput}&quot;
             </div>
-            <div className="flex gap-1">
-              {([0, 1, 2] as const).map((i) => (
-                <div
-                  key={i}
-                  className={`delay-${i} h-1 w-1 rounded-full bg-neon`}
-                />
-              ))}
-            </div>
           </div>
-        )}
-
-        {view === "error" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-6">
-            <div className="text-center">
-              <div className="font-mono text-xs tracking-widest text-red-400">
-                EXECUTION_FAILED
-              </div>
-              <div className="mt-2 max-w-xs text-center font-mono text-xs text-zinc-600">
-                &quot;{lastInput}&quot;
-              </div>
-            </div>
-            <div className="flex w-full gap-3">
-              <Button variant="ghost" onClick={handleReset} className="flex-1">
-                NEW →
-              </Button>
-              <button
-                onClick={() => handleSubmit(lastInput)}
-                className="min-h-[44px] flex-1 rounded border border-red-400/40 font-mono text-sm text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
-              >
-                RETRY ↺
-              </button>
-            </div>
+          <div className="flex w-full gap-3">
+            <Button variant="ghost" onClick={handleReset} className="flex-1">
+              NEW →
+            </Button>
+            <button
+              onClick={() => handleSubmit(lastInput)}
+              className="min-h-[44px] flex-1 rounded border border-red-400/40 font-mono text-sm text-red-400 transition-colors hover:border-red-400 hover:text-red-300"
+            >
+              RETRY ↺
+            </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {view === "result" && result && (
-          <>
-            <div className="mb-4 font-mono text-xs tracking-widest text-zinc-600">
-              ACTION_GENERATED //
-            </div>
-            <ActionResult
-              action={result}
-              onComplete={handleComplete}
-              onReset={handleReset}
-            />
-          </>
-        )}
-      </div>
-    </main>
+      {view === "result" && result && (
+        <>
+          <div className="mb-4 font-mono text-xs tracking-widest text-zinc-600">
+            ACTION_GENERATED //
+          </div>
+          <ActionResult
+            action={result}
+            onComplete={handleComplete}
+            onReset={handleReset}
+          />
+        </>
+      )}
+    </PageLayout>
   );
 }

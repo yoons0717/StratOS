@@ -1,141 +1,76 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
-import Home from "./page";
+import DashboardPage from "./page";
 
 const pushMock = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: pushMock }),
+  usePathname: vi.fn().mockReturnValue("/"),
 }));
 
-vi.mock("@/lib/api", () => ({
-  generateAction: vi.fn(),
-}));
+const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
 
-beforeEach(async () => {
+const session = {
+  id: "s1",
+  createdAt: Date.now(),
+  input: "test",
+  action: {
+    title: "팔로워 DM 보내기",
+    category: "outreach" as const,
+    steps: [{ order: 1, description: "DM 발송" }],
+    magicCopy: "안녕하세요!",
+  },
+  completed: false,
+};
+
+beforeEach(() => {
   pushMock.mockClear();
-  useStratosStore.setState({
-    userContext: { type: "creator", level: "0-1K", businessStage: "idea" },
-    sessions: [],
-  });
-  const { generateAction } = await import("@/lib/api");
-  vi.mocked(generateAction).mockReset();
+  useStratosStore.setState({ userContext: ctx, sessions: [] });
 });
 
-describe("Home page", () => {
-  it("redirects to /onboarding when userContext is null", () => {
+describe("DashboardPage", () => {
+  it("redirects to /onboarding when no userContext", () => {
     useStratosStore.setState({ userContext: null, sessions: [] });
-    render(<Home />);
+    render(<DashboardPage />);
     expect(pushMock).toHaveBeenCalledWith("/onboarding");
   });
 
-  it("shows input screen when userContext exists", () => {
-    render(<Home />);
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  it("renders KPI bar", () => {
+    render(<DashboardPage />);
+    expect(screen.getByText("TOTAL")).toBeInTheDocument();
   });
 
-  it("shows loading state while API call is in progress", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockReturnValue(new Promise(() => {}));
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-
-    expect(screen.getByText(/ANALYZING_INPUT/i)).toBeInTheDocument();
+  it("renders Sidebar", () => {
+    render(<DashboardPage />);
+    expect(screen.getByText("STRATOS_OS")).toBeInTheDocument();
   });
 
-  it("shows result after successful API call", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockResolvedValue({
-      title: "팔로워 DM 보내기",
-      category: "outreach",
-      steps: [{ order: 1, description: "DM 발송" }],
-      magicCopy: "안녕하세요!",
-    });
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-
-    await waitFor(() =>
-      expect(screen.getByText("팔로워 DM 보내기")).toBeInTheDocument()
-    );
+  it("shows empty state in list panel when no active sessions", () => {
+    render(<DashboardPage />);
+    expect(screen.getByText(/액션이 없어/i)).toBeInTheDocument();
   });
 
-  it("saves session to store after result is shown", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockResolvedValue({
-      title: "팔로워 DM 보내기",
-      category: "outreach",
-      steps: [{ order: 1, description: "DM 발송" }],
-      magicCopy: "안녕하세요!",
-    });
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-
-    await waitFor(() =>
-      expect(useStratosStore.getState().sessions).toHaveLength(1)
-    );
+  it("shows active session titles in list", () => {
+    useStratosStore.setState({ userContext: ctx, sessions: [session] });
+    render(<DashboardPage />);
+    expect(screen.getByText("팔로워 DM 보내기")).toBeInTheDocument();
   });
 
-  it("returns to input view when NEW is clicked", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockResolvedValue({
-      title: "팔로워 DM 보내기",
-      category: "outreach",
-      steps: [{ order: 1, description: "DM 발송" }],
-      magicCopy: "안녕하세요!",
-    });
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await waitFor(() => screen.getByText("팔로워 DM 보내기"));
-    await userEvent.click(screen.getByRole("button", { name: /NEW/i }));
-
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  it("clicking a session shows it in the detail panel", async () => {
+    useStratosStore.setState({ userContext: ctx, sessions: [session] });
+    render(<DashboardPage />);
+    await userEvent.click(screen.getByText("팔로워 DM 보내기"));
+    expect(screen.getByText("DM 발송")).toBeInTheDocument();
   });
 
-  it("shows error state when API call fails", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-
-    await waitFor(() =>
-      expect(screen.getByText(/EXECUTION_FAILED/i)).toBeInTheDocument()
-    );
-  });
-
-  it("retries the same input when RETRY is clicked after error", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await waitFor(() => screen.getByText(/EXECUTION_FAILED/i));
-    await userEvent.click(screen.getByRole("button", { name: /RETRY/i }));
-
-    expect(vi.mocked(generateAction)).toHaveBeenCalledTimes(2);
-  });
-
-  it("returns to input view when NEW is clicked after error", async () => {
-    const { generateAction } = await import("@/lib/api");
-    vi.mocked(generateAction).mockRejectedValue(new Error("API error"));
-
-    render(<Home />);
-    await userEvent.type(screen.getByRole("textbox"), "인스타 반응 없음");
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await waitFor(() => screen.getByText(/EXECUTION_FAILED/i));
-    await userEvent.click(screen.getByRole("button", { name: /NEW/i }));
-
-    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  it("COMPLETE removes session from list", async () => {
+    useStratosStore.setState({ userContext: ctx, sessions: [session] });
+    render(<DashboardPage />);
+    await userEvent.click(screen.getByText("팔로워 DM 보내기"));
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    expect(screen.queryByText("팔로워 DM 보내기")).not.toBeInTheDocument();
+    expect(useStratosStore.getState().sessions[0].completed).toBe(true);
   });
 });

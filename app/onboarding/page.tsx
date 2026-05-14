@@ -6,7 +6,7 @@ import { useStratosStore } from "@/store";
 import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
-import PageLayout from "@/components/ui/PageLayout";
+import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 import Button from "@/components/ui/Button";
 import type { UserType, UserLevel, BusinessStage } from "@/types";
 
@@ -38,22 +38,29 @@ export default function OnboardingPage() {
   );
 
   return (
-    <PageLayout headerRight={headerRight}>
-      <div className="mb-1 font-mono text-lg font-bold text-white">
-        {STEP_LABELS[step]}
-        <span className="animate-pulse text-neon">_</span>
-      </div>
-      <div className="mb-5 font-mono text-xs text-zinc-600">
-        SELECT ONE TO CONTINUE
-      </div>
+    <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+      <ScanlineOverlay />
+      <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
+        <div className="mb-6 flex items-center justify-between">
+          <span className="font-mono text-xs tracking-widest text-neon">STRATOS_OS</span>
+          {headerRight}
+        </div>
+        <div className="mb-1 font-mono text-lg font-bold text-white">
+          {STEP_LABELS[step]}
+          <span className="animate-pulse text-neon">_</span>
+        </div>
+        <div className="mb-5 font-mono text-xs text-zinc-600">
+          SELECT ONE TO CONTINUE
+        </div>
 
-      {step === 0 && <StepType selected={type} onSelect={setType} />}
-      {step === 1 && <StepLevel selected={level} onSelect={setLevel} />}
-      {step === 2 && <StepStage selected={stage} onSelect={setStage} />}
+        {step === 0 && <StepType selected={type} onSelect={setType} />}
+        {step === 1 && <StepLevel selected={level} onSelect={setLevel} />}
+        {step === 2 && <StepStage selected={stage} onSelect={setStage} />}
 
-      <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
-        EXECUTE →
-      </Button>
-    </PageLayout>
+        <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
+          EXECUTE →
+        </Button>
+      </div>
+    </main>
   );
 }

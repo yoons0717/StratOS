@@ -86,6 +86,12 @@ export default function SettingsPage() {
         <Button onClick={handleSave} disabled={!type || !level || !stage} className="w-full">
           SAVE →
         </Button>
+        <Link
+          href="/history"
+          className="mt-3 flex min-h-[44px] w-full items-center justify-center rounded border border-zinc-800 font-mono text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-400"
+        >
+          HISTORY →
+        </Link>
       </div>
     </PageLayout>
   );

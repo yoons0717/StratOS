@@ -13,8 +13,8 @@ Your only job: given a user's situation, return ONE specific action they can rea
 Rules:
 - Return ONLY valid JSON. No explanation, no markdown, no extra text.
 - Maximum 3 steps, each completable in under 30 minutes.
-- magicCopy is a ready-to-edit draft (caption, message, or post body) — not advice.
-- Prioritize: (1) doability today, (2) completable in 30min, (3) channel fit, (4) ROI.
+- magicCopy is a ready-to-use text draft the user can immediately copy and send/post — not advice.
+- Prioritize: (1) doability today, (2) completable in 30min, (3) ROI.
 
 Output schema:
 {

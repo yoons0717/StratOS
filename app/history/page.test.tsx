@@ -4,17 +4,32 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import HistoryPage from "./page";
 
-const pushMock = vi.fn();
+const pushMock = vi.hoisted(() => vi.fn());
+const routerMock = vi.hoisted(() => ({ push: pushMock }));
+const mockFetchUserContext = vi.hoisted(() => vi.fn());
+const mockFetchSessions = vi.hoisted(() => vi.fn());
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => routerMock,
   usePathname: vi.fn().mockReturnValue("/history"),
+}));
+
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: { signOut: vi.fn().mockResolvedValue({}) },
+  }),
+}));
+
+vi.mock("@/lib/api", () => ({
+  fetchUserContext: mockFetchUserContext,
+  fetchSessions: mockFetchSessions,
 }));
 
 const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
 
 const completedSession = {
   id: "done-1",
-  createdAt: Date.now(),
+  created_at: new Date().toISOString(),
   input: "test",
   action: {
     title: "완료된 액션",
@@ -34,44 +49,47 @@ const activeSession = {
 
 beforeEach(() => {
   pushMock.mockClear();
-  useStratosStore.setState({ userContext: ctx, sessions: [] });
+  mockFetchUserContext.mockResolvedValue(ctx);
+  mockFetchSessions.mockResolvedValue([]);
+  useStratosStore.setState({ userContext: null, sessions: [] });
 });
 
 describe("HistoryPage", () => {
-  it("redirects to /onboarding when no userContext", () => {
-    useStratosStore.setState({ userContext: null, sessions: [] });
+  it("redirects to /onboarding when no userContext", async () => {
+    mockFetchUserContext.mockResolvedValue(null);
     render(<HistoryPage />);
+    await screen.findByText(/No completed actions/i).catch(() => {});
     expect(pushMock).toHaveBeenCalledWith("/onboarding");
   });
 
-  it("shows empty state when no completed sessions", () => {
+  it("shows empty state when no completed sessions", async () => {
     render(<HistoryPage />);
-    expect(screen.getByText("완료된 액션 없음")).toBeInTheDocument();
+    expect(await screen.findByText("No completed actions")).toBeInTheDocument();
   });
 
-  it("renders only completed sessions", () => {
-    useStratosStore.setState({ userContext: ctx, sessions: [completedSession, activeSession] });
+  it("renders only completed sessions", async () => {
+    mockFetchSessions.mockResolvedValue([completedSession, activeSession]);
     render(<HistoryPage />);
-    expect(screen.getByText("완료된 액션")).toBeInTheDocument();
-    expect(screen.queryByText("진행 중 액션")).not.toBeInTheDocument();
+    expect(await screen.findByText("완료된 액션")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "진행 중 액션" })).not.toBeInTheDocument();
   });
 
   it("clicking a session shows detail", async () => {
-    useStratosStore.setState({ userContext: ctx, sessions: [completedSession] });
+    mockFetchSessions.mockResolvedValue([completedSession]);
     render(<HistoryPage />);
-    await userEvent.click(screen.getByText("완료된 액션"));
+    await userEvent.click(await screen.findByRole("button", { name: "완료된 액션" }));
     expect(screen.getByText("완료 스텝")).toBeInTheDocument();
   });
 
   it("detail panel has no COMPLETE button in history (readonly)", async () => {
-    useStratosStore.setState({ userContext: ctx, sessions: [completedSession] });
+    mockFetchSessions.mockResolvedValue([completedSession]);
     render(<HistoryPage />);
-    await userEvent.click(screen.getByText("완료된 액션"));
+    await userEvent.click(await screen.findByRole("button", { name: "완료된 액션" }));
     expect(screen.queryByRole("button", { name: /COMPLETE/i })).not.toBeInTheDocument();
   });
 
-  it("renders KPI bar", () => {
+  it("renders KPI bar", async () => {
     render(<HistoryPage />);
-    expect(screen.getByText("TOTAL")).toBeInTheDocument();
+    expect(await screen.findByText("TOTAL")).toBeInTheDocument();
   });
 });

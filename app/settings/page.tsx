@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
+import { fetchUserContext, saveUserContext } from "@/lib/api";
 import AppShell from "@/components/layout/AppShell";
 import Button from "@/components/ui/Button";
 import StepType from "@/components/onboarding/StepType";
@@ -13,21 +14,28 @@ import type { UserType, UserLevel, BusinessStage } from "@/types";
 export default function SettingsPage() {
   const router = useRouter();
   const { userContext, setUserContext } = useStratosStore();
-
-  const [type, setType] = useState<UserType | null>(userContext?.type ?? null);
-  const [level, setLevel] = useState<UserLevel | null>(userContext?.level ?? null);
-  const [stage, setStage] = useState<BusinessStage | null>(userContext?.businessStage ?? null);
+  const [type, setType] = useState<UserType | null>(null);
+  const [level, setLevel] = useState<UserLevel | null>(null);
+  const [stage, setStage] = useState<BusinessStage | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    if (!userContext) router.push("/onboarding");
-  }, [userContext, router]);
+    fetchUserContext().then((ctx) => {
+      if (!ctx) { router.push("/onboarding"); return; }
+      setUserContext(ctx);
+      setType(ctx.type);
+      setLevel(ctx.level);
+      setStage(ctx.businessStage);
+    });
+  }, [router, setUserContext]);
 
   if (!userContext) return null;
 
-  function handleSave() {
+  async function handleSave() {
     if (!type || !level || !stage) return;
-    setUserContext({ type, level, businessStage: stage });
+    const ctx = { type, level, businessStage: stage };
+    await saveUserContext(ctx);
+    setUserContext(ctx);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -39,7 +47,7 @@ export default function SettingsPage() {
           <div className="font-mono text-lg font-bold text-white">
             SETTINGS<span className="animate-pulse text-neon">_</span>
           </div>
-          <div className="mt-1 font-mono text-xs text-zinc-600">프로필 설정을 변경해줘</div>
+          <div className="mt-1 font-mono text-xs text-zinc-600">Update your profile settings</div>
         </div>
         <div className="flex max-w-lg flex-col gap-6">
           <div>

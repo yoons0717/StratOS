@@ -4,33 +4,51 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import SettingsPage from "./page";
 
-const pushMock = vi.fn();
+const pushMock = vi.hoisted(() => vi.fn());
+const routerMock = vi.hoisted(() => ({ push: pushMock }));
+const mockFetchUserContext = vi.hoisted(() => vi.fn());
+const mockSaveUserContext = vi.hoisted(() => vi.fn());
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => routerMock,
   usePathname: vi.fn().mockReturnValue("/settings"),
+}));
+
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: { signOut: vi.fn().mockResolvedValue({}) },
+  }),
+}));
+
+vi.mock("@/lib/api", () => ({
+  fetchUserContext: mockFetchUserContext,
+  saveUserContext: mockSaveUserContext,
 }));
 
 const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
 
 beforeEach(() => {
   pushMock.mockClear();
-  useStratosStore.setState({ userContext: ctx, sessions: [] });
+  mockFetchUserContext.mockResolvedValue(ctx);
+  mockSaveUserContext.mockResolvedValue(undefined);
+  useStratosStore.setState({ userContext: null, sessions: [] });
 });
 
 describe("SettingsPage", () => {
-  it("redirects to /onboarding when no userContext", () => {
-    useStratosStore.setState({ userContext: null, sessions: [] });
+  it("redirects to /onboarding when no userContext", async () => {
+    mockFetchUserContext.mockResolvedValue(null);
     render(<SettingsPage />);
-    expect(pushMock).toHaveBeenCalledWith("/onboarding");
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
-  it("renders Sidebar", () => {
+  it("renders Sidebar", async () => {
     render(<SettingsPage />);
-    expect(screen.getByText("STRATOS_OS")).toBeInTheDocument();
+    expect(await screen.findByText("STRATOS_OS")).toBeInTheDocument();
   });
 
-  it("pre-selects current userContext values", () => {
+  it("pre-selects current userContext values", async () => {
     render(<SettingsPage />);
+    await screen.findByText("STRATOS_OS");
     expect(screen.getByTestId("option-creator")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-0-1K")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-idea")).toHaveAttribute("data-selected", "true");
@@ -38,17 +56,16 @@ describe("SettingsPage", () => {
 
   it("updates store when SAVE is clicked", async () => {
     render(<SettingsPage />);
+    await screen.findByText("STRATOS_OS");
     await userEvent.click(screen.getByTestId("option-seller"));
     await userEvent.click(screen.getByTestId("option-1K-10K"));
     await userEvent.click(screen.getByRole("button", { name: /SAVE/i }));
-    expect(useStratosStore.getState().userContext).toMatchObject({
-      type: "seller",
-      level: "1K-10K",
-    });
+    expect(useStratosStore.getState().userContext).toMatchObject({ type: "seller", level: "1K-10K" });
   });
 
   it("shows SETTINGS_SAVED after save", async () => {
     render(<SettingsPage />);
+    await screen.findByText("STRATOS_OS");
     await userEvent.click(screen.getByRole("button", { name: /SAVE/i }));
     await waitFor(() => expect(screen.getByText(/SETTINGS_SAVED/i)).toBeInTheDocument());
   });

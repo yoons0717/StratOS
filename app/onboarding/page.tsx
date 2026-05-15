@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
+import { saveUserContext } from "@/lib/api";
 import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
@@ -23,13 +24,15 @@ export default function OnboardingPage() {
 
   const currentValue = [type, level, stage][step];
 
-  function handleExecute() {
+  async function handleExecute() {
     if (step < 2) {
       setStep((s) => s + 1);
       return;
     }
     if (!type || !level || !stage) return;
-    setUserContext({ type, level, businessStage: stage });
+    const ctx = { type, level, businessStage: stage };
+    await saveUserContext(ctx);
+    setUserContext(ctx);
     router.push("/");
   }
 

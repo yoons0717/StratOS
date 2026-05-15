@@ -6,7 +6,7 @@ import type { ActionSession } from "@/types";
 
 const session: ActionSession = {
   id: "s1",
-  createdAt: Date.now(),
+  created_at: new Date().toISOString(),
   input: "test",
   action: {
     title: "팔로워 DM 보내기",
@@ -23,7 +23,7 @@ const session: ActionSession = {
 describe("ActionDetailPanel", () => {
   it("shows empty state when session is null", () => {
     render(<ActionDetailPanel session={null} allSessions={[]} onComplete={vi.fn()} onDeselect={vi.fn()} />);
-    expect(screen.getByText(/액션을 선택하거나/i)).toBeInTheDocument();
+    expect(screen.getByText(/Select an action/i)).toBeInTheDocument();
   });
 
   it("renders action title and category", () => {

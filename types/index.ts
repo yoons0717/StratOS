@@ -33,7 +33,7 @@ export interface GeneratedAction {
 
 export interface ActionSession {
   id: string;
-  createdAt: number;
+  created_at: string;
   input: string;
   action: GeneratedAction;
   completed: boolean;

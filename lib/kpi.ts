@@ -26,7 +26,7 @@ function computeStreak(sessions: ActionSession[]): number {
 
   const sessionDays = new Set(
     sessions.map((s) => {
-      const d = new Date(s.createdAt);
+      const d = new Date(s.created_at);
       d.setHours(0, 0, 0, 0);
       return d.getTime();
     })

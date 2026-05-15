@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import groq from "@/lib/groq";
-import {
-  generateActionRequestSchema,
-  generatedActionSchema,
-} from "@/lib/schemas";
+import { generateActionRequestSchema, generatedActionSchema } from "@/lib/schemas";
 import type { GenerateActionRequest } from "@/lib/schemas";
 
 const SYSTEM_PROMPT = `You are StratOS, an execution-focused AI for solo creators and entrepreneurs.
@@ -21,8 +19,7 @@ Output schema:
   "title": "short action title",
   "category": "content" | "outreach" | "seo" | "offer" | "community",
   "steps": [
-    { "order": 1, "description": "..." },
-    { "order": 2, "description": "..." }
+    { "order": 1, "description": "..." }
   ],
   "magicCopy": "ready-to-edit draft text"
 }`;
@@ -32,12 +29,11 @@ function buildUserPrompt(
   userContext: GenerateActionRequest["userContext"]
 ): string {
   const stageMap: Record<string, string> = {
-    idea: "아이디어 단계",
-    "first-customers": "첫 고객 확보 단계",
-    "consistent-income": "안정적 수입 단계",
-    scaling: "스케일업 단계",
+    idea: "Idea Stage",
+    "first-customers": "Getting First Customers",
+    "consistent-income": "Consistent Income",
+    scaling: "Scaling",
   };
-
   return `User type: ${userContext.type}
 Audience size: ${userContext.level}
 Stage: ${stageMap[userContext.businessStage]}
@@ -45,13 +41,34 @@ Stage: ${stageMap[userContext.businessStage]}
 Situation: ${input}`;
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
+export async function GET() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { data, error } = await supabase
+    .from("action_sessions")
+    .select("id, created_at, input, action, completed")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  return NextResponse.json(data);
+}
+
+export async function POST(req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = await req.json().catch(() => null);
   const parsed = generateActionRequestSchema.safeParse(body);
-  if (!parsed.success) {
+  if (!parsed.success)
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-  }
 
   const { input, userContext } = parsed.data;
 
@@ -67,27 +84,25 @@ export async function POST(req: NextRequest) {
   });
 
   const raw = completion.choices[0]?.message?.content;
-  if (!raw) {
-    return NextResponse.json({ error: "No response from AI" }, { status: 502 });
-  }
+  if (!raw) return NextResponse.json({ error: "No response from AI" }, { status: 502 });
 
   let json: unknown;
   try {
     json = JSON.parse(raw);
   } catch {
-    return NextResponse.json(
-      { error: "Invalid AI response format" },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: "Invalid AI response format" }, { status: 502 });
   }
 
-  const parsed2 = generatedActionSchema.safeParse(json);
-  if (!parsed2.success) {
-    return NextResponse.json(
-      { error: "Invalid AI response shape" },
-      { status: 502 }
-    );
-  }
+  const action = generatedActionSchema.safeParse(json);
+  if (!action.success)
+    return NextResponse.json({ error: "Invalid AI response shape" }, { status: 502 });
 
-  return NextResponse.json(parsed2.data);
+  const { data, error } = await supabase
+    .from("action_sessions")
+    .insert({ user_id: user.id, input, action: action.data, completed: false })
+    .select("id, created_at, input, action, completed")
+    .single();
+
+  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  return NextResponse.json(data);
 }

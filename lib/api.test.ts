@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { generateAction } from "./api";
-import type { UserContext, GeneratedAction } from "@/types";
+import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext } from "./api";
+import type { UserContext, ActionSession } from "@/types";
 
 const mockContext: UserContext = {
   type: "creator",
@@ -8,49 +8,87 @@ const mockContext: UserContext = {
   businessStage: "idea",
 };
 
-const mockAction: GeneratedAction = {
-  title: "팔로워 10명에게 DM 보내기",
-  category: "outreach",
-  steps: [
-    { order: 1, description: "최근 좋아요 누른 팔로워 10명 추출" },
-    { order: 2, description: "DM 초안 작성 후 발송" },
-  ],
-  magicCopy: "안녕하세요! 최근 콘텐츠 보셨나요?",
+const mockSession: ActionSession = {
+  id: "s1",
+  created_at: "2026-01-01T00:00:00Z",
+  input: "test",
+  action: {
+    title: "T",
+    category: "content",
+    steps: [{ order: 1, description: "D" }],
+    magicCopy: "C",
+  },
+  completed: false,
 };
 
 beforeEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("generateAction", () => {
-  it("calls /api/generate-action with input and userContext", async () => {
+describe("fetchSessions", () => {
+  it("GET /api/sessions 호출 후 목록 반환", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(mockAction), { status: 200 })
+      new Response(JSON.stringify([mockSession]), { status: 200 })
     );
-
-    await generateAction("인스타 반응 없음", mockContext);
-
-    expect(fetch).toHaveBeenCalledWith("/api/generate-action", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: "인스타 반응 없음", userContext: mockContext }),
-    });
+    const result = await fetchSessions();
+    expect(fetch).toHaveBeenCalledWith("/api/sessions");
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("s1");
   });
 
-  it("returns parsed GeneratedAction on success", async () => {
+  it("non-ok 응답 시 throw", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(mockAction), { status: 200 })
+      new Response(null, { status: 401 })
     );
+    await expect(fetchSessions()).rejects.toThrow();
+  });
+});
 
-    const result = await generateAction("인스타 반응 없음", mockContext);
-    expect(result).toEqual(mockAction);
+describe("createSession", () => {
+  it("POST /api/sessions 호출 후 세션 반환", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify(mockSession), { status: 200 })
+    );
+    const result = await createSession("test", mockContext);
+    expect(fetch).toHaveBeenCalledWith("/api/sessions", expect.objectContaining({ method: "POST" }));
+    expect(result.id).toBe("s1");
+  });
+});
+
+describe("completeSession", () => {
+  it("PATCH /api/sessions/s1/complete 호출", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true }), { status: 200 })
+    );
+    await completeSession("s1");
+    expect(fetch).toHaveBeenCalledWith("/api/sessions/s1/complete", { method: "PATCH" });
+  });
+});
+
+describe("fetchUserContext", () => {
+  it("GET /api/user-context 호출 후 컨텍스트 반환", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify(mockContext), { status: 200 })
+    );
+    const result = await fetchUserContext();
+    expect(result).toEqual(mockContext);
   });
 
-  it("throws an error when the API returns non-ok status", async () => {
+  it("null 반환 시 null", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ error: "Invalid request" }), { status: 400 })
+      new Response(JSON.stringify(null), { status: 200 })
     );
+    const result = await fetchUserContext();
+    expect(result).toBeNull();
+  });
+});
 
-    await expect(generateAction("", mockContext)).rejects.toThrow();
+describe("saveUserContext", () => {
+  it("PUT /api/user-context 호출", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true }), { status: 200 })
+    );
+    await saveUserContext(mockContext);
+    expect(fetch).toHaveBeenCalledWith("/api/user-context", expect.objectContaining({ method: "PUT" }));
   });
 });

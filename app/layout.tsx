@@ -9,7 +9,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "StratOS",
-  description: "오늘 실제 행동 1개",
+  description: "Take one real action today.",
 };
 
 export const viewport: Viewport = {

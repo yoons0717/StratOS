@@ -4,6 +4,13 @@ import Sidebar from "./Sidebar";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn().mockReturnValue("/"),
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: { signOut: vi.fn().mockResolvedValue({}) },
+  }),
 }));
 
 const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };

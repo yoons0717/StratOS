@@ -21,7 +21,7 @@ export default function ActionDetailPanel({
   if (!session) {
     return (
       <div className="flex flex-1 items-center justify-center font-mono text-xs text-zinc-700">
-        액션을 선택하거나 새로 만들어봐
+        Select an action or create a new one
       </div>
     );
   }

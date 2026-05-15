@@ -6,7 +6,7 @@ import type { ActionSession } from "@/types";
 function makeSession(category: string): ActionSession {
   return {
     id: crypto.randomUUID(),
-    createdAt: Date.now(),
+    created_at: new Date().toISOString(),
     input: "test",
     action: {
       title: "Test",

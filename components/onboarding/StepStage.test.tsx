@@ -6,16 +6,16 @@ import StepStage from "./StepStage";
 describe("StepStage", () => {
   it("renders all 4 stage options", () => {
     render(<StepStage selected={null} onSelect={vi.fn()} />);
-    expect(screen.getByText("아이디어 단계")).toBeInTheDocument();
-    expect(screen.getByText("첫 고객 확보 중")).toBeInTheDocument();
-    expect(screen.getByText("수입 안정화")).toBeInTheDocument();
-    expect(screen.getByText("스케일업")).toBeInTheDocument();
+    expect(screen.getByText("Idea Stage")).toBeInTheDocument();
+    expect(screen.getByText("Getting First Customers")).toBeInTheDocument();
+    expect(screen.getByText("Consistent Income")).toBeInTheDocument();
+    expect(screen.getByText("Scaling")).toBeInTheDocument();
   });
 
-  it("calls onSelect with 'idea' when 아이디어 단계 is clicked", async () => {
+  it("calls onSelect with 'idea' when Idea Stage is clicked", async () => {
     const onSelect = vi.fn();
     render(<StepStage selected={null} onSelect={onSelect} />);
-    await userEvent.click(screen.getByText("아이디어 단계"));
+    await userEvent.click(screen.getByText("Idea Stage"));
     expect(onSelect).toHaveBeenCalledWith("idea");
   });
 

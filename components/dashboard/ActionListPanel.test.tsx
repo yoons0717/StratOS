@@ -7,7 +7,7 @@ import type { ActionSession } from "@/types";
 function makeSession(id: string, title: string): ActionSession {
   return {
     id,
-    createdAt: Date.now(),
+    created_at: new Date().toISOString(),
     input: "test",
     action: {
       title,
@@ -24,7 +24,7 @@ const sessions = [makeSession("s1", "팔로워 DM 보내기"), makeSession("s2",
 describe("ActionListPanel", () => {
   it("shows empty state when no sessions", () => {
     render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} />);
-    expect(screen.getByText(/액션이 없어/i)).toBeInTheDocument();
+    expect(screen.getByText(/No actions yet/i)).toBeInTheDocument();
   });
 
   it("renders session titles", () => {
@@ -46,7 +46,7 @@ describe("ActionListPanel", () => {
   });
 
   it("shows custom empty label", () => {
-    render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} emptyLabel="완료된 액션 없음" />);
-    expect(screen.getByText("완료된 액션 없음")).toBeInTheDocument();
+    render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} emptyLabel="No completed actions" />);
+    expect(screen.getByText("No completed actions")).toBeInTheDocument();
   });
 });

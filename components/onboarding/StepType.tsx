@@ -3,10 +3,10 @@
 import type { UserType } from "@/types";
 
 const OPTIONS: { value: UserType; label: string; cmd: string }[] = [
-  { value: "creator", label: "크리에이터", cmd: "CREATOR" },
-  { value: "seller", label: "판매자", cmd: "SELLER" },
-  { value: "service", label: "서비스 제공자", cmd: "SERVICE" },
-  { value: "side", label: "부업 시작 중", cmd: "SIDE_GIG" },
+  { value: "creator", label: "Creator", cmd: "CREATOR" },
+  { value: "seller", label: "Seller", cmd: "SELLER" },
+  { value: "service", label: "Service Provider", cmd: "SERVICE" },
+  { value: "side", label: "Side Hustle", cmd: "SIDE_GIG" },
 ];
 
 interface Props {

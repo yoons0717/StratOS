@@ -11,7 +11,7 @@ export default function ActionListPanel({
   sessions,
   selectedId,
   onSelect,
-  emptyLabel = "액션이 없어",
+  emptyLabel = "No actions yet",
 }: Props) {
   return (
     <div className="flex w-56 shrink-0 flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">

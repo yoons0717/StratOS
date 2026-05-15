@@ -6,23 +6,23 @@ import StepType from "./StepType";
 describe("StepType", () => {
   it("renders all 4 type options", () => {
     render(<StepType selected={null} onSelect={vi.fn()} />);
-    expect(screen.getByText("크리에이터")).toBeInTheDocument();
-    expect(screen.getByText("판매자")).toBeInTheDocument();
-    expect(screen.getByText("서비스 제공자")).toBeInTheDocument();
-    expect(screen.getByText("부업 시작 중")).toBeInTheDocument();
+    expect(screen.getByText("Creator")).toBeInTheDocument();
+    expect(screen.getByText("Seller")).toBeInTheDocument();
+    expect(screen.getByText("Service Provider")).toBeInTheDocument();
+    expect(screen.getByText("Side Hustle")).toBeInTheDocument();
   });
 
-  it("calls onSelect with 'creator' when 크리에이터 is clicked", async () => {
+  it("calls onSelect with 'creator' when Creator is clicked", async () => {
     const onSelect = vi.fn();
     render(<StepType selected={null} onSelect={onSelect} />);
-    await userEvent.click(screen.getByText("크리에이터"));
+    await userEvent.click(screen.getByText("Creator"));
     expect(onSelect).toHaveBeenCalledWith("creator");
   });
 
-  it("calls onSelect with 'seller' when 판매자 is clicked", async () => {
+  it("calls onSelect with 'seller' when Seller is clicked", async () => {
     const onSelect = vi.fn();
     render(<StepType selected={null} onSelect={onSelect} />);
-    await userEvent.click(screen.getByText("판매자"));
+    await userEvent.click(screen.getByText("Seller"));
     expect(onSelect).toHaveBeenCalledWith("seller");
   });
 

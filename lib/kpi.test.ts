@@ -5,7 +5,7 @@ import type { ActionSession } from "@/types";
 function makeSession(overrides: Partial<ActionSession> = {}): ActionSession {
   return {
     id: crypto.randomUUID(),
-    createdAt: Date.now(),
+    created_at: new Date().toISOString(),
     input: "test",
     action: {
       title: "Test",
@@ -49,7 +49,7 @@ describe("computeKpi", () => {
   });
 
   it("streak is 1 when only today has sessions", () => {
-    const sessions = [makeSession({ createdAt: Date.now() })];
+    const sessions = [makeSession({ created_at: new Date().toISOString() })];
     expect(computeKpi(sessions).streak).toBe(1);
   });
 
@@ -57,9 +57,9 @@ describe("computeKpi", () => {
     const now = Date.now();
     const oneDayMs = 86400000;
     const sessions = [
-      makeSession({ createdAt: now }),
-      makeSession({ createdAt: now - oneDayMs }),
-      makeSession({ createdAt: now - oneDayMs * 2 }),
+      makeSession({ created_at: new Date(now).toISOString() }),
+      makeSession({ created_at: new Date(now - oneDayMs).toISOString() }),
+      makeSession({ created_at: new Date(now - oneDayMs * 2).toISOString() }),
     ];
     expect(computeKpi(sessions).streak).toBe(3);
   });
@@ -68,15 +68,15 @@ describe("computeKpi", () => {
     const now = Date.now();
     const oneDayMs = 86400000;
     const sessions = [
-      makeSession({ createdAt: now }),
-      makeSession({ createdAt: now - oneDayMs * 2 }),
+      makeSession({ created_at: new Date(now).toISOString() }),
+      makeSession({ created_at: new Date(now - oneDayMs * 2).toISOString() }),
     ];
     expect(computeKpi(sessions).streak).toBe(1);
   });
 
   it("streak is 0 if today has no sessions", () => {
     const yesterday = Date.now() - 86400000;
-    const sessions = [makeSession({ createdAt: yesterday })];
+    const sessions = [makeSession({ created_at: new Date(yesterday).toISOString() })];
     expect(computeKpi(sessions).streak).toBe(0);
   });
 });

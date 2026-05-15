@@ -3,10 +3,10 @@
 import type { BusinessStage } from "@/types";
 
 const OPTIONS: { value: BusinessStage; label: string; cmd: string }[] = [
-  { value: "idea", label: "아이디어 단계", cmd: "IDEA" },
-  { value: "first-customers", label: "첫 고객 확보 중", cmd: "FIRST_CUSTOMERS" },
-  { value: "consistent-income", label: "수입 안정화", cmd: "CONSISTENT_INCOME" },
-  { value: "scaling", label: "스케일업", cmd: "SCALING" },
+  { value: "idea", label: "Idea Stage", cmd: "IDEA" },
+  { value: "first-customers", label: "Getting First Customers", cmd: "FIRST_CUSTOMERS" },
+  { value: "consistent-income", label: "Consistent Income", cmd: "CONSISTENT_INCOME" },
+  { value: "scaling", label: "Scaling", cmd: "SCALING" },
 ];
 
 interface Props {

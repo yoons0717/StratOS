@@ -27,3 +27,22 @@ export const generateActionRequestSchema = z.object({
 });
 
 export type GenerateActionRequest = z.infer<typeof generateActionRequestSchema>;
+
+export const actionSessionRowSchema = z.object({
+  id: z.string(),
+  created_at: z.string(),
+  input: z.string(),
+  action: generatedActionSchema,
+  completed: z.boolean(),
+});
+
+export const userContextRowSchema = z.object({
+  type: z.enum(["creator", "seller", "service", "side"]),
+  level: z.enum(["0-1K", "1K-10K", "10K+"]),
+  business_stage: z.enum([
+    "idea",
+    "first-customers",
+    "consistent-income",
+    "scaling",
+  ]),
+});

@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Commands
 
 ```bash
@@ -9,12 +7,7 @@ npm run dev          # dev server (localhost:3000)
 npm run build        # production build
 npm run lint         # ESLint
 npm run typecheck    # TypeScript type check (no emit)
-npm run test         # vitest watch mode
-npm run test:run     # vitest single run (CI)
-```
-
-Run a single test file:
-```bash
+npm run test:run     # vitest single run
 npx vitest run path/to/file.test.ts
 ```
 
@@ -22,76 +15,90 @@ npx vitest run path/to/file.test.ts
 
 ```
 app/
-  api/sessions/route.ts           # GET(목록), POST(생성+Groq 호출)
-  api/sessions/[id]/route.ts      # PATCH(reroll)
-  api/sessions/[id]/complete/route.ts  # PATCH(완료 처리)
-  api/user-context/route.ts       # GET/PUT
-  login/page.tsx                  # Google OAuth 로그인
-  auth/callback/route.ts          # OAuth 콜백
-  page.tsx                        # 대시보드
+  api/sessions/route.ts               # GET (list), POST (create + Groq)
+  api/sessions/[id]/route.ts          # PATCH (reroll)
+  api/sessions/[id]/complete/route.ts # PATCH (complete)
+  api/user-context/route.ts           # GET / PUT
+  login/page.tsx                      # Google OAuth login
+  auth/callback/route.ts              # OAuth callback
+  page.tsx                            # Dashboard
 lib/
-  groq.ts      # 서버 전용 Groq 클라이언트. Client Component에서 import 금지.
-  schemas.ts   # Zod 스키마. API 요청/응답 양쪽에서 공유.
-  supabase/    # browser.ts (클라이언트용), server.ts (서버용)
+  groq.ts      # Server-only Groq client. Never import in Client Components.
+  prompts.ts   # Shared SYSTEM_PROMPT, STAGE_MAP, buildUserPrompt for session route handlers.
+  schemas.ts   # Zod schemas shared across API request/response boundaries.
+  hooks.ts     # useInitStore — fetch ctx + sessions, redirect to /onboarding if null.
+  supabase/    # browser.ts (client-side), server.ts (server-side)
 store/
-  index.ts     # Zustand (persist 없음). 모든 클라이언트 상태는 여기서 관리.
+  index.ts     # Zustand (no persist). All client state lives here.
 types/
-  index.ts     # 프로젝트 전체 TypeScript 인터페이스.
-middleware.ts  # 미인증 시 /login 리다이렉트
+  index.ts     # Project-wide TypeScript interfaces.
+tests/
+  fixtures.ts  # Shared test fixtures: defaultCtx, makeSession(overrides?).
+middleware.ts  # Redirects unauthenticated requests to /login.
 ```
 
-**데이터 흐름:**
-1. 클라이언트 → `POST /api/sessions` (UserContext + 자유 입력)
-2. Route Handler → Zod 검증 → Groq 호출 → Zod 검증 → Supabase 저장 → JSON 응답
-3. 클라이언트 → Zustand store에 저장
-
-**서버/클라이언트 경계:**
-- `lib/groq.ts`는 서버 전용. Client Component에서 절대 import하지 않는다.
-- `lib/supabase/server.ts`는 서버 전용. `lib/supabase/browser.ts`는 클라이언트 전용.
-- `GROQ_API_KEY`는 `.env.local`에만 존재. 클라이언트 번들에 절대 노출되지 않는다.
-- `store/`, `types/`는 클라이언트에서 사용 가능.
+**Server/client boundary — common mistakes:**
+- `lib/groq.ts` is server-only. Importing it in a Client Component will break the build.
+- `lib/supabase/server.ts` is server-only. Use `lib/supabase/browser.ts` in client code.
+- `GROQ_API_KEY` must never reach the client bundle — only in `.env.local`.
 
 ## Code Conventions
 
-- **Path alias**: `@/` → 프로젝트 루트. 상대 경로(`../`) 사용 금지.
-- **TypeScript strict mode** 활성화. `any` 사용 금지.
-- **Zod**: 외부 경계(API 요청, AI 응답)는 반드시 Zod로 검증 후 사용. `safeParse` 사용 — `parse`(throws) 금지.
-- **Server Component 기본**: `"use client"`는 상태/이벤트가 필요한 최소 단위에만 붙인다.
-- **스키마 공유**: API 요청/응답 타입은 `lib/schemas.ts`에서 정의하고 `z.infer<>`로 타입 추출.
-- **inline style 금지**: `style={{...}}` 사용 금지. 반복되는 CSS는 `app/globals.css`에 유틸리티 클래스로 정의 후 `className`으로 사용. (스캔라인 오버레이 → `.scanline`, 로딩 딜레이 → `.delay-0/1/2`)
+- **Path alias**: `@/` → project root. No relative paths (`../`).
+- **Zod**: Validate at all external boundaries — API requests, AI responses, and DB row reads. Always `safeParse`, never `parse`. Do not use `as SomeType` casting; validate and extract the type instead.
+- **Schemas**: Define types in `lib/schemas.ts`, extract with `z.infer<>`.
+- **No inline styles**: `style={{...}}` is banned. For dynamic values, define a utility class in `globals.css` that reads a CSS custom property, then pass the value via style:
+  ```tsx
+  // globals.css: .bar-fill { width: var(--bar-width); }
+  <div className="bar-fill" style={{ "--bar-width": `${pct}%` } as React.CSSProperties} />
+  ```
+- **No dynamic Tailwind arbitrary values**: `w-[${value}%]` will not work — Tailwind's scanner is static and won't generate the class. Use the CSS custom property pattern above.
+- **`"use client"`**: Only on components that need state or event handlers.
 
 ## Working Style
 
-- **플랜 작성 시**: 파일명 + 한 줄 기능 설명 수준으로만. 코드 포함 금지.
-- **코드 작업 시**: 한 번에 한 태스크만. 완료 후 확인 받고 다음으로.
+- **Plans**: filename + one-line description only. No code in plans.
+- **Tasks**: one at a time. Confirm before moving to the next.
 
 ## TDD Rules
 
-새 기능/버그픽스는 반드시 테스트 먼저 작성한다.
+Write tests first for all new features and bug fixes.
 
 ```
-1. 실패하는 테스트 작성 (red)
-2. 최소한의 코드로 통과 (green)
-3. 리팩터링 (refactor)
+1. Write failing test (red)
+2. Minimal code to pass (green)
+3. Refactor (refactor)
 ```
 
-**테스트 파일 위치**: 테스트 대상 파일과 같은 디렉토리에 `*.test.ts(x)` 로 배치.
+**Test file location**: same directory as the source file, `*.test.ts(x)`.
 
-**무엇을 테스트하는가:**
-- `lib/schemas.ts`: 유효/무효 입력에 대한 Zod 검증 결과
-- `store/index.ts`: 각 액션(setUserContext, addSession, completeSession) 후 상태
-- React 컴포넌트: 사용자 인터랙션 후 DOM 변화 (`@testing-library/react`)
-- `app/api/`: Route Handler는 통합 테스트로 — Groq 클라이언트는 `vi.mock`으로 대체
+**Shared fixtures**: use `defaultCtx` and `makeSession(overrides?)` from `@/tests/fixtures` instead of defining fixtures locally in each test file.
 
-**Groq mock 패턴:**
+**Critical: stable router mock to prevent infinite re-render**
+
+Using `useRouter: () => ({ push: vi.fn() })` creates a new object every render, causing useEffect to re-run infinitely and the test to hang. Always use `vi.hoisted()`:
+
+```ts
+const pushMock = vi.hoisted(() => vi.fn());
+const routerMock = vi.hoisted(() => ({ push: pushMock }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => routerMock,
+  usePathname: vi.fn().mockReturnValue("/"),
+}));
+```
+
+**Supabase browser mock** (required in any test that renders Sidebar or AppShell):
+```ts
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: { signOut: vi.fn().mockResolvedValue({}) },
+  }),
+}));
+```
+
+**Groq mock**:
 ```ts
 vi.mock("@/lib/groq", () => ({
-  default: {
-    chat: {
-      completions: {
-        create: vi.fn(),
-      },
-    },
-  },
+  default: { chat: { completions: { create: vi.fn() } } },
 }));
 ```

@@ -1,22 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import CategoryChart from "./CategoryChart";
-import type { ActionSession } from "@/types";
-
-function makeSession(category: string): ActionSession {
-  return {
-    id: crypto.randomUUID(),
-    created_at: new Date().toISOString(),
-    input: "test",
-    action: {
-      title: "Test",
-      category: category as ActionSession["action"]["category"],
-      steps: [{ order: 1, description: "step" }],
-      magicCopy: "copy",
-    },
-    completed: false,
-  };
-}
+import { makeSession } from "@/tests/fixtures";
 
 describe("CategoryChart", () => {
   it("renders nothing for empty sessions", () => {
@@ -25,14 +10,14 @@ describe("CategoryChart", () => {
   });
 
   it("renders category names", () => {
-    const sessions = [makeSession("outreach"), makeSession("content"), makeSession("outreach")];
+    const sessions = [makeSession({ action: { category: "outreach" } }), makeSession({ action: { category: "content" } }), makeSession({ action: { category: "outreach" } })];
     render(<CategoryChart sessions={sessions} />);
     expect(screen.getByText("OUTREACH")).toBeInTheDocument();
     expect(screen.getByText("CONTENT")).toBeInTheDocument();
   });
 
   it("renders counts", () => {
-    const sessions = [makeSession("outreach"), makeSession("outreach"), makeSession("content")];
+    const sessions = [makeSession({ action: { category: "outreach" } }), makeSession({ action: { category: "outreach" } }), makeSession({ action: { category: "content" } })];
     render(<CategoryChart sessions={sessions} />);
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();

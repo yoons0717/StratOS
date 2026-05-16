@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
+import { defaultCtx, makeSession } from "@/tests/fixtures";
 import DashboardPage from "./page";
 
 const pushMock = vi.hoisted(() => vi.fn());
@@ -30,24 +31,14 @@ vi.mock("@/lib/api", () => ({
   regenerateSession: mockRegenerateSession,
 }));
 
-const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
-
-const session = {
+const session = makeSession({
   id: "s1",
-  created_at: new Date().toISOString(),
-  input: "test",
-  action: {
-    title: "팔로워 DM 보내기",
-    category: "outreach" as const,
-    steps: [{ order: 1, description: "DM 발송" }],
-    magicCopy: "안녕하세요!",
-  },
-  completed: false,
-};
+  action: { title: "팔로워 DM 보내기", steps: [{ order: 1, description: "DM 발송" }], magicCopy: "안녕하세요!" },
+});
 
 beforeEach(() => {
   pushMock.mockClear();
-  mockFetchUserContext.mockResolvedValue(ctx);
+  mockFetchUserContext.mockResolvedValue(defaultCtx);
   mockFetchSessions.mockResolvedValue([]);
   mockCompleteSession.mockResolvedValue(undefined);
   mockRegenerateSession.mockResolvedValue(undefined);

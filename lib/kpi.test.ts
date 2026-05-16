@@ -1,22 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { computeKpi } from "./kpi";
-import type { ActionSession } from "@/types";
-
-function makeSession(overrides: Partial<ActionSession> = {}): ActionSession {
-  return {
-    id: crypto.randomUUID(),
-    created_at: new Date().toISOString(),
-    input: "test",
-    action: {
-      title: "Test",
-      category: "outreach",
-      steps: [{ order: 1, description: "step" }],
-      magicCopy: "copy",
-    },
-    completed: false,
-    ...overrides,
-  };
-}
+import { makeSession } from "@/tests/fixtures";
 
 describe("computeKpi", () => {
   it("returns zeros for empty sessions", () => {

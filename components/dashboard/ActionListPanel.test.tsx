@@ -2,24 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import ActionListPanel from "./ActionListPanel";
-import type { ActionSession } from "@/types";
+import { makeSession } from "@/tests/fixtures";
 
-function makeSession(id: string, title: string): ActionSession {
-  return {
-    id,
-    created_at: new Date().toISOString(),
-    input: "test",
-    action: {
-      title,
-      category: "outreach",
-      steps: [{ order: 1, description: "step" }],
-      magicCopy: "copy",
-    },
-    completed: false,
-  };
-}
-
-const sessions = [makeSession("s1", "팔로워 DM 보내기"), makeSession("s2", "키워드 리서치")];
+const sessions = [
+  makeSession({ id: "s1", action: { title: "팔로워 DM 보내기" } }),
+  makeSession({ id: "s2", action: { title: "키워드 리서치" } }),
+];
 
 describe("ActionListPanel", () => {
   it("shows empty state when no sessions", () => {

@@ -2,23 +2,19 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import ActionDetailPanel from "./ActionDetailPanel";
-import type { ActionSession } from "@/types";
+import { makeSession } from "@/tests/fixtures";
 
-const session: ActionSession = {
+const session = makeSession({
   id: "s1",
-  created_at: new Date().toISOString(),
-  input: "test",
   action: {
     title: "팔로워 DM 보내기",
-    category: "outreach",
     steps: [
       { order: 1, description: "대상 선별" },
       { order: 2, description: "메시지 작성" },
     ],
     magicCopy: "안녕하세요!",
   },
-  completed: false,
-};
+});
 
 describe("ActionDetailPanel", () => {
   it("shows empty state when session is null", () => {

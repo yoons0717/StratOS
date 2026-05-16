@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
+import { defaultCtx } from "@/tests/fixtures";
 import HistoryPage from "./page";
 
 const pushMock = vi.hoisted(() => vi.fn());
@@ -25,8 +26,6 @@ vi.mock("@/lib/api", () => ({
   fetchSessions: mockFetchSessions,
 }));
 
-const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
-
 const completedSession = {
   id: "done-1",
   created_at: new Date().toISOString(),
@@ -49,7 +48,7 @@ const activeSession = {
 
 beforeEach(() => {
   pushMock.mockClear();
-  mockFetchUserContext.mockResolvedValue(ctx);
+  mockFetchUserContext.mockResolvedValue(defaultCtx);
   mockFetchSessions.mockResolvedValue([]);
   useStratosStore.setState({ userContext: null, sessions: [] });
 });

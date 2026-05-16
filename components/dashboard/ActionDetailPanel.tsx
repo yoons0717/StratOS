@@ -1,7 +1,14 @@
-import type { ActionSession } from "@/types";
+import type { ActionSession, Channel } from "@/types";
 import Button from "@/components/ui/Button";
 import MagicCopy from "@/components/result/MagicCopy";
 import CategoryChart from "./CategoryChart";
+
+const CHANNEL_LABEL: Partial<Record<Channel, string>> = {
+  "instagram-dm": "DM 인스타",
+  linkedin: "LinkedIn",
+  "naver-blog": "네이버 블로그",
+  youtube: "유튜브",
+};
 
 interface Props {
   session: ActionSession | null;
@@ -31,14 +38,22 @@ export default function ActionDetailPanel({
   }
 
   const { action } = session;
+  const channelLabel = CHANNEL_LABEL[session.channel];
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5">
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-mono text-base font-bold text-white">{action.title}</h2>
-        <span className="shrink-0 rounded border border-neon/40 px-2 py-0.5 font-mono text-xs text-neon">
-          {action.category.toUpperCase()}
-        </span>
+        <div className="flex shrink-0 gap-2">
+          {channelLabel && (
+            <span className="rounded border border-zinc-600 px-2 py-0.5 font-mono text-xs text-zinc-400">
+              {channelLabel}
+            </span>
+          )}
+          <span className="rounded border border-neon/40 px-2 py-0.5 font-mono text-xs text-neon">
+            {action.category.toUpperCase()}
+          </span>
+        </div>
       </div>
 
       <div>

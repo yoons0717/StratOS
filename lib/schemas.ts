@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const channelSchema = z.enum(["instagram-dm", "linkedin", "naver-blog", "youtube", "general"]);
+
 export const actionStepSchema = z.object({
   order: z.number().int().min(1).max(3),
   description: z.string().min(1),
@@ -14,6 +16,7 @@ export const generatedActionSchema = z.object({
 
 export const generateActionRequestSchema = z.object({
   input: z.string().min(1).max(500),
+  channel: channelSchema.default("general"),
   userContext: z.object({
     type: z.enum(["creator", "seller", "service", "side"]),
     level: z.enum(["0-1K", "1K-10K", "10K+"]),
@@ -33,6 +36,7 @@ export const actionSessionRowSchema = z.object({
   id: z.string(),
   created_at: z.string(),
   input: z.string(),
+  channel: channelSchema.default("general"),
   action: generatedActionSchema,
   completed: z.boolean(),
 });

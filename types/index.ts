@@ -5,6 +5,7 @@ export type BusinessStage =
   | "first-customers"
   | "consistent-income"
   | "scaling";
+export type Channel = "instagram-dm" | "linkedin" | "naver-blog" | "youtube" | "general";
 
 export interface UserContext {
   type: UserType;
@@ -36,6 +37,7 @@ export interface ActionSession {
   id: string;
   created_at: string;
   input: string;
+  channel: Channel;
   action: GeneratedAction;
   completed: boolean;
 }

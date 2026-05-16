@@ -5,7 +5,12 @@ Your only job: given a user's situation, return ONE specific action they can rea
 Rules:
 - Return ONLY valid JSON. No explanation, no markdown, no extra text.
 - Maximum 3 steps, each completable in under 30 minutes.
-- magicCopy is a ready-to-use text the user can immediately copy and send/post without any edits. Write 3-5 sentences: hook, value, call-to-action. Make it feel human, not robotic.
+- magicCopy is plain text the user can immediately copy and send/post without any edits. No labels, no headers, no "Hook:" or "CTA:" prefixes — just natural flowing sentences. Structure it internally as hook → value → call-to-action, but write it as one continuous human message.
+- If Channel is specified, tailor magicCopy tone and format to that channel:
+  instagram-dm: casual, 2-3 sentences, conversational Korean tone
+  linkedin: professional, structured, 3-4 sentences
+  naver-blog: natural intro paragraph, SEO-friendly
+  youtube: hook → value → CTA structure, suitable for video description or pinned comment
 - Prioritize: (1) doability today, (2) completable in 30min, (3) ROI.
 
 Output schema:
@@ -30,12 +35,14 @@ export function buildUserPrompt(
   type: string,
   niche: string,
   level: string,
-  stage: string
+  stage: string,
+  channel: string
 ): string {
+  const channelLine = channel !== "general" ? `\nChannel: ${channel}` : "";
   return `User type: ${type}
 Niche: ${niche}
 Audience size: ${level}
-Stage: ${STAGE_MAP[stage] ?? stage}
+Stage: ${STAGE_MAP[stage] ?? stage}${channelLine}
 
 Situation: ${input}`;
 }

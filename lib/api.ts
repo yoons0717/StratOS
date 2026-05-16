@@ -8,12 +8,13 @@ export async function fetchSessions(): Promise<ActionSession[]> {
 
 export async function createSession(
   input: string,
-  userContext: UserContext
+  userContext: UserContext,
+  channel: import("@/types").Channel = "general"
 ): Promise<ActionSession> {
   const res = await fetch("/api/sessions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ input, userContext }),
+    body: JSON.stringify({ input, channel, userContext }),
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();

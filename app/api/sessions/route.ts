@@ -13,7 +13,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("action_sessions")
-    .select("id, created_at, input, action, completed")
+    .select("id, created_at, input, channel, action, completed")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
-  const { input, userContext } = parsed.data;
+  const { input, channel, userContext } = parsed.data;
 
   const completion = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.niche, userContext.level, userContext.businessStage) },
+      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.niche, userContext.level, userContext.businessStage, channel) },
     ],
     temperature: 0.7,
     max_tokens: 512,
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("action_sessions")
-    .insert({ user_id: user.id, input, action: action.data, completed: false })
-    .select("id, created_at, input, action, completed")
+    .insert({ user_id: user.id, input, channel, action: action.data, completed: false })
+    .select("id, created_at, input, channel, action, completed")
     .single();
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });

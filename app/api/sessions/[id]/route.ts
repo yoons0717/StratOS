@@ -17,7 +17,7 @@ export async function PATCH(
 
   const { data: session } = await supabase
     .from("action_sessions")
-    .select("input")
+    .select("input, channel")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -36,7 +36,7 @@ export async function PATCH(
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(session.input, ctx.type, ctx.niche ?? "", ctx.level, ctx.business_stage) },
+      { role: "user", content: buildUserPrompt(session.input, ctx.type, ctx.niche ?? "", ctx.level, ctx.business_stage, session.channel ?? "general") },
     ],
     temperature: 0.9,
     max_tokens: 512,

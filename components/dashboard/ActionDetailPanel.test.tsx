@@ -41,6 +41,16 @@ describe("ActionDetailPanel", () => {
     expect(screen.getAllByText("OUTREACH").length).toBeGreaterThan(0);
   });
 
+  it("shows channel tag for non-general sessions", () => {
+    renderPanel({ session: makeSession({ id: "s1", channel: "instagram-dm" }) });
+    expect(screen.getByText("DM 인스타")).toBeInTheDocument();
+  });
+
+  it("does not show channel tag for general sessions", () => {
+    renderPanel({ session: makeSession({ id: "s1", channel: "general" }) });
+    expect(screen.queryByText("DM 인스타")).not.toBeInTheDocument();
+  });
+
   it("renders all steps", () => {
     renderPanel();
     expect(screen.getByText("대상 선별")).toBeInTheDocument();

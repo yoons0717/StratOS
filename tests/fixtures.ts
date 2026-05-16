@@ -13,6 +13,7 @@ export function makeSession(overrides: Partial<ActionSession> = {}): ActionSessi
     id: crypto.randomUUID(),
     created_at: new Date().toISOString(),
     input: "test",
+    channel: "general",
     action: {
       title: "Test Action",
       category: "outreach",

@@ -36,6 +36,15 @@ describe("createSession", () => {
     expect(fetch).toHaveBeenCalledWith("/api/sessions", expect.objectContaining({ method: "POST" }));
     expect(result.id).toBe("s1");
   });
+
+  it("channel을 request body에 포함", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify(mockSession), { status: 200 })
+    );
+    await createSession("test", defaultCtx, "instagram-dm");
+    const body = JSON.parse((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+    expect(body.channel).toBe("instagram-dm");
+  });
 });
 
 describe("completeSession", () => {

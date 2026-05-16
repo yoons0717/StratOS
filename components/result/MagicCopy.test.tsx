@@ -1,7 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import MagicCopy from "./MagicCopy";
+
+const writeText = vi.fn();
+
+beforeEach(() => {
+  writeText.mockResolvedValue(undefined);
+  Object.defineProperty(navigator, "clipboard", {
+    value: { writeText },
+    configurable: true,
+  });
+});
 
 describe("MagicCopy", () => {
   it("renders the magic copy text", () => {
@@ -15,12 +25,6 @@ describe("MagicCopy", () => {
   });
 
   it("copies text to clipboard when copy button is clicked", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText },
-      configurable: true,
-    });
-
     render(<MagicCopy text="복사할 캡션 텍스트" />);
     await userEvent.click(screen.getByRole("button", { name: /COPY/i }));
     expect(writeText).toHaveBeenCalledWith("복사할 캡션 텍스트");
@@ -32,11 +36,6 @@ describe("MagicCopy", () => {
   });
 
   it("shows COPIED after clicking copy", async () => {
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText: vi.fn().mockResolvedValue(undefined) },
-      configurable: true,
-    });
-
     render(<MagicCopy text="캡션" />);
     await userEvent.click(screen.getByRole("button", { name: /COPY/i }));
     expect(screen.getByText(/COPIED/i)).toBeInTheDocument();

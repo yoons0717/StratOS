@@ -1,25 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext, regenerateSession } from "./api";
-import type { UserContext, ActionSession } from "@/types";
+import { defaultCtx, makeSession } from "@/tests/fixtures";
 
-const mockContext: UserContext = {
-  type: "creator",
-  level: "0-1K",
-  businessStage: "idea",
-};
-
-const mockSession: ActionSession = {
-  id: "s1",
-  created_at: "2026-01-01T00:00:00Z",
-  input: "test",
-  action: {
-    title: "T",
-    category: "content",
-    steps: [{ order: 1, description: "D" }],
-    magicCopy: "C",
-  },
-  completed: false,
-};
+const mockSession = makeSession({ id: "s1" });
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -49,7 +32,7 @@ describe("createSession", () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify(mockSession), { status: 200 })
     );
-    const result = await createSession("test", mockContext);
+    const result = await createSession("test", defaultCtx);
     expect(fetch).toHaveBeenCalledWith("/api/sessions", expect.objectContaining({ method: "POST" }));
     expect(result.id).toBe("s1");
   });
@@ -68,10 +51,10 @@ describe("completeSession", () => {
 describe("fetchUserContext", () => {
   it("GET /api/user-context 호출 후 컨텍스트 반환", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(mockContext), { status: 200 })
+      new Response(JSON.stringify(defaultCtx), { status: 200 })
     );
     const result = await fetchUserContext();
-    expect(result).toEqual(mockContext);
+    expect(result).toEqual(defaultCtx);
   });
 
   it("null 반환 시 null", async () => {
@@ -88,7 +71,7 @@ describe("saveUserContext", () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true }), { status: 200 })
     );
-    await saveUserContext(mockContext);
+    await saveUserContext(defaultCtx);
     expect(fetch).toHaveBeenCalledWith("/api/user-context", expect.objectContaining({ method: "PUT" }));
   });
 });

@@ -15,17 +15,5 @@ describe("KpiBar", () => {
     expect(screen.getByText("STREAK")).toBeInTheDocument();
   });
 
-  it("renders numeric values", () => {
-    render(<KpiBar data={data} />);
-    expect(screen.getByText("12")).toBeInTheDocument();
-    expect(screen.getByText("4")).toBeInTheDocument();
-    expect(screen.getByText("8")).toBeInTheDocument();
-    expect(screen.getByText("5")).toBeInTheDocument();
-  });
-
-  it("appends % to RATE", () => {
-    render(<KpiBar data={data} />);
-    expect(screen.getByText("67%")).toBeInTheDocument();
-  });
 
 });

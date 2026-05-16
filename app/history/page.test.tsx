@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
-import { defaultCtx } from "@/tests/fixtures";
+import { defaultCtx, makeSession } from "@/tests/fixtures";
 import HistoryPage from "./page";
 
 const pushMock = vi.hoisted(() => vi.fn());
@@ -26,25 +26,8 @@ vi.mock("@/lib/api", () => ({
   fetchSessions: mockFetchSessions,
 }));
 
-const completedSession = {
-  id: "done-1",
-  created_at: new Date().toISOString(),
-  input: "test",
-  action: {
-    title: "완료된 액션",
-    category: "content" as const,
-    steps: [{ order: 1, description: "완료 스텝" }],
-    magicCopy: "완료 copy",
-  },
-  completed: true,
-};
-
-const activeSession = {
-  ...completedSession,
-  id: "active-1",
-  action: { ...completedSession.action, title: "진행 중 액션" },
-  completed: false,
-};
+const completedSession = makeSession({ id: "done-1", action: { title: "완료된 액션", steps: [{ order: 1, description: "완료 스텝" }] }, completed: true });
+const activeSession = makeSession({ id: "active-1", action: { title: "진행 중 액션" }, completed: false });
 
 beforeEach(() => {
   pushMock.mockClear();

@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { useStratosStore } from "./index";
-import { makeSession } from "@/tests/fixtures";
+import { defaultCtx, makeSession } from "@/tests/fixtures";
 
 const session = makeSession({ id: "s1" });
 
-beforeEach(() => {
-  useStratosStore.setState({ userContext: null, sessions: [] });
-});
-
 describe("useStratosStore", () => {
+  beforeEach(() => {
+    useStratosStore.setState({ userContext: null, sessions: [] });
+  });
+
   it("setSessions", () => {
     useStratosStore.getState().setSessions([session]);
     expect(useStratosStore.getState().sessions).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("useStratosStore", () => {
   });
 
   it("setUserContext", () => {
-    useStratosStore.getState().setUserContext({ type: "creator", level: "0-1K", businessStage: "idea" });
+    useStratosStore.getState().setUserContext(defaultCtx);
     expect(useStratosStore.getState().userContext?.type).toBe("creator");
   });
 

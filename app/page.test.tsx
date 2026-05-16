@@ -89,13 +89,14 @@ describe("DashboardPage", () => {
     expect(screen.getByText("DM 발송")).toBeInTheDocument();
   });
 
-  it("COMPLETE removes session from list", async () => {
+  it("COMPLETE removes session from list and shows feedback", async () => {
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
     await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
     expect(screen.queryByRole("button", { name: "팔로워 DM 보내기" })).not.toBeInTheDocument();
     expect(useStratosStore.getState().sessions[0].completed).toBe(true);
+    expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
   });
 
   it("RETRY calls regenerateSession and updates action in store", async () => {

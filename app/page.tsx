@@ -8,6 +8,7 @@ import { computeKpi } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
 import ActionDetailPanel from "@/components/dashboard/ActionDetailPanel";
+import CompletionFeedback from "@/components/dashboard/CompletionFeedback";
 import NewActionModal from "@/components/dashboard/NewActionModal";
 
 export default function DashboardPage() {
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -55,6 +57,7 @@ export default function DashboardPage() {
     await completeSession(id);
     markCompleted(id);
     setSelectedId(null);
+    setShowFeedback(true);
   }
 
   async function handleRegenerate(id: string) {
@@ -85,14 +88,22 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-        <ActionDetailPanel
-          session={selectedSession}
-          allSessions={sessions}
-          onComplete={handleComplete}
-          onDeselect={() => setSelectedId(null)}
-          onRegenerate={selectedSession ? () => handleRegenerate(selectedSession.id) : undefined}
-          isRegenerating={regenerating}
-        />
+        {showFeedback ? (
+          <CompletionFeedback
+            streak={kpiData.streak}
+            rate={kpiData.rate}
+            onDismiss={() => setShowFeedback(false)}
+          />
+        ) : (
+          <ActionDetailPanel
+            session={selectedSession}
+            allSessions={sessions}
+            onComplete={handleComplete}
+            onDeselect={() => setSelectedId(null)}
+            onRegenerate={selectedSession ? () => handleRegenerate(selectedSession.id) : undefined}
+            isRegenerating={regenerating}
+          />
+        )}
       </div>
       {showModal && (
         <NewActionModal

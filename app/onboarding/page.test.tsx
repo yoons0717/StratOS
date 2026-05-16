@@ -23,18 +23,18 @@ describe("OnboardingPage", () => {
   it("starts at step 1 — type selection", () => {
     render(<OnboardingPage />);
     expect(screen.getByText("USER_TYPE")).toBeInTheDocument();
-    expect(screen.getByText("1 / 3")).toBeInTheDocument();
+    expect(screen.getByText("1 / 4")).toBeInTheDocument();
   });
 
   it("advances to step 2 after selecting a type", async () => {
     render(<OnboardingPage />);
     await userEvent.click(screen.getByText("Creator"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    expect(screen.getByText("2 / 3")).toBeInTheDocument();
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
     expect(screen.getByText("AUDIENCE_SIZE")).toBeInTheDocument();
   });
 
-  it("saves userContext to store after completing all 3 steps", async () => {
+  it("advances to niche step (4/4) after completing type, level, stage", async () => {
     render(<OnboardingPage />);
     await userEvent.click(screen.getByText("Creator"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
@@ -42,8 +42,23 @@ describe("OnboardingPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     await userEvent.click(screen.getByText("Idea Stage"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    expect(screen.getByText("4 / 4")).toBeInTheDocument();
+    expect(screen.getByText("YOUR_NICHE")).toBeInTheDocument();
+    expect(screen.getByTestId("niche-input")).toBeInTheDocument();
+  });
+
+  it("saves userContext with niche after completing all 4 steps", async () => {
+    render(<OnboardingPage />);
+    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    await userEvent.click(screen.getByText("0 ~ 1K"));
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    await userEvent.click(screen.getByText("Idea Stage"));
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    await userEvent.type(screen.getByTestId("niche-input"), "피트니스 코치");
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     const { userContext } = useStratosStore.getState();
-    expect(userContext).toEqual({ type: "creator", level: "0-1K", businessStage: "idea" });
+    expect(userContext).toEqual({ type: "creator", level: "0-1K", businessStage: "idea", niche: "피트니스 코치" });
   });
 
   it("EXECUTE 버튼은 선택하지 않으면 비활성화", () => {

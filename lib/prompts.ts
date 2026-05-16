@@ -28,10 +28,12 @@ export const STAGE_MAP: Record<string, string> = {
 export function buildUserPrompt(
   input: string,
   type: string,
+  niche: string,
   level: string,
   stage: string
 ): string {
   return `User type: ${type}
+Niche: ${niche}
 Audience size: ${level}
 Stage: ${STAGE_MAP[stage] ?? stage}
 

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.level, userContext.businessStage) },
+      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.niche, userContext.level, userContext.businessStage) },
     ],
     temperature: 0.7,
     max_tokens: 512,

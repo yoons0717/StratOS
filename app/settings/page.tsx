@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
+import StepNiche from "@/components/onboarding/StepNiche";
 import type { UserType, UserLevel, BusinessStage } from "@/types";
 
 export default function SettingsPage() {
@@ -17,6 +18,7 @@ export default function SettingsPage() {
   const [type, setType] = useState<UserType | null>(null);
   const [level, setLevel] = useState<UserLevel | null>(null);
   const [stage, setStage] = useState<BusinessStage | null>(null);
+  const [niche, setNiche] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -26,14 +28,15 @@ export default function SettingsPage() {
       setType(ctx.type);
       setLevel(ctx.level);
       setStage(ctx.businessStage);
+      setNiche(ctx.niche);
     });
   }, [router, setUserContext]);
 
   if (!userContext) return null;
 
   async function handleSave() {
-    if (!type || !level || !stage) return;
-    const ctx = { type, level, businessStage: stage };
+    if (!type || !level || !stage || !niche.trim()) return;
+    const ctx = { type, level, businessStage: stage, niche: niche.trim() };
     await saveUserContext(ctx);
     setUserContext(ctx);
     setSaved(true);
@@ -63,10 +66,14 @@ export default function SettingsPage() {
             <StepStage selected={stage} onSelect={setStage} />
           </div>
           <div>
+            <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">YOUR_NICHE //</div>
+            <StepNiche value={niche} onChange={setNiche} />
+          </div>
+          <div>
             {saved && (
               <div className="mb-3 font-mono text-xs tracking-widest text-neon">SETTINGS_SAVED ✓</div>
             )}
-            <Button onClick={handleSave} disabled={!type || !level || !stage} className="w-full">
+            <Button onClick={handleSave} disabled={!type || !level || !stage || !niche.trim()} className="w-full">
               SAVE →
             </Button>
           </div>

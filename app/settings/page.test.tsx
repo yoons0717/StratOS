@@ -40,12 +40,13 @@ describe("SettingsPage", () => {
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
-  it("pre-selects current userContext values", async () => {
+  it("pre-selects current userContext values including niche", async () => {
     render(<SettingsPage />);
     await screen.findByText("STRATOS_OS");
     expect(screen.getByTestId("option-creator")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-0-1K")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-idea")).toHaveAttribute("data-selected", "true");
+    expect(screen.getByTestId("niche-input")).toHaveValue(defaultCtx.niche);
   });
 
   it("updates store when SAVE is clicked", async () => {

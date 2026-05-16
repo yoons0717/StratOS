@@ -10,6 +10,7 @@ export interface UserContext {
   type: UserType;
   level: UserLevel;
   businessStage: BusinessStage;
+  niche: string;
 }
 
 export type ActionCategory =

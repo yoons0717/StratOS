@@ -23,6 +23,7 @@ export const generateActionRequestSchema = z.object({
       "consistent-income",
       "scaling",
     ]),
+    niche: z.string().min(1).max(100),
   }),
 });
 
@@ -45,4 +46,5 @@ export const userContextRowSchema = z.object({
     "consistent-income",
     "scaling",
   ]),
+  niche: z.string().min(1).max(100),
 });

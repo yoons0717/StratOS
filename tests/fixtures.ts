@@ -4,6 +4,7 @@ export const defaultCtx: UserContext = {
   type: "creator",
   level: "0-1K",
   businessStage: "idea",
+  niche: "피트니스 코치",
 };
 
 export function makeSession(overrides: Partial<ActionSession> = {}): ActionSession {

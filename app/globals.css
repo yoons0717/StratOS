@@ -57,6 +57,9 @@ body {
 .delay-1 { animation: pulse 1s ease-in-out 0.2s infinite; }
 .delay-2 { animation: pulse 1s ease-in-out 0.4s infinite; }
 
+/* 동적 바 너비 (CategoryChart) */
+.bar-fill { width: var(--bar-width); }
+
 /* 완료 피드백 라인별 순차 등장 */
 @keyframes revealLine {
   from { opacity: 0; transform: translateY(6px); }

@@ -2,44 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import groq from "@/lib/groq";
 import { generateActionRequestSchema, generatedActionSchema } from "@/lib/schemas";
-import type { GenerateActionRequest } from "@/lib/schemas";
-
-const SYSTEM_PROMPT = `You are StratOS, an execution-focused AI for solo creators and entrepreneurs.
-
-Your only job: given a user's situation, return ONE specific action they can realistically start TODAY.
-
-Rules:
-- Return ONLY valid JSON. No explanation, no markdown, no extra text.
-- Maximum 3 steps, each completable in under 30 minutes.
-- magicCopy is a ready-to-use text draft the user can immediately copy and send/post — not advice.
-- Prioritize: (1) doability today, (2) completable in 30min, (3) ROI.
-
-Output schema:
-{
-  "title": "short action title",
-  "category": "content" | "outreach" | "seo" | "offer" | "community",
-  "steps": [
-    { "order": 1, "description": "..." }
-  ],
-  "magicCopy": "ready-to-edit draft text"
-}`;
-
-function buildUserPrompt(
-  input: string,
-  userContext: GenerateActionRequest["userContext"]
-): string {
-  const stageMap: Record<string, string> = {
-    idea: "Idea Stage",
-    "first-customers": "Getting First Customers",
-    "consistent-income": "Consistent Income",
-    scaling: "Scaling",
-  };
-  return `User type: ${userContext.type}
-Audience size: ${userContext.level}
-Stage: ${stageMap[userContext.businessStage]}
-
-Situation: ${input}`;
-}
+import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/prompts";
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
@@ -76,7 +39,7 @@ export async function POST(req: NextRequest) {
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(input, userContext) },
+      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.level, userContext.businessStage) },
     ],
     temperature: 0.7,
     max_tokens: 512,

@@ -2,33 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import groq from "@/lib/groq";
 import { generatedActionSchema } from "@/lib/schemas";
-
-const SYSTEM_PROMPT = `You are StratOS, an execution-focused AI for solo creators and entrepreneurs.
-
-Your only job: given a user's situation, return ONE specific action they can realistically start TODAY.
-
-Rules:
-- Return ONLY valid JSON. No explanation, no markdown, no extra text.
-- Maximum 3 steps, each completable in under 30 minutes.
-- magicCopy is a ready-to-use text draft the user can immediately copy and send/post — not advice.
-- Prioritize: (1) doability today, (2) completable in 30min, (3) ROI.
-
-Output schema:
-{
-  "title": "short action title",
-  "category": "content" | "outreach" | "seo" | "offer" | "community",
-  "steps": [
-    { "order": 1, "description": "..." }
-  ],
-  "magicCopy": "ready-to-edit draft text"
-}`;
-
-const STAGE_MAP: Record<string, string> = {
-  idea: "Idea Stage",
-  "first-customers": "Getting First Customers",
-  "consistent-income": "Consistent Income",
-  scaling: "Scaling",
-};
+import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/prompts";
 
 export async function PATCH(
   _req: Request,
@@ -58,17 +32,11 @@ export async function PATCH(
 
   if (!ctx) return NextResponse.json({ error: "No user context" }, { status: 400 });
 
-  const userPrompt = `User type: ${ctx.type}
-Audience size: ${ctx.level}
-Stage: ${STAGE_MAP[ctx.business_stage] ?? ctx.business_stage}
-
-Situation: ${session.input}`;
-
   const completion = await groq.chat.completions.create({
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: userPrompt },
+      { role: "user", content: buildUserPrompt(session.input, ctx.type, ctx.level, ctx.business_stage) },
     ],
     temperature: 0.9,
     max_tokens: 512,

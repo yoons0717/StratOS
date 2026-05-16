@@ -28,7 +28,8 @@ export default function CategoryChart({ sessions }: Props) {
             </span>
             <div className="h-1.5 flex-1 rounded bg-zinc-800">
               <div
-                className={`h-full rounded bg-neon/70 w-[${Math.round((count / max) * 100)}%]`}
+                className="bar-fill h-full rounded bg-neon/70"
+                style={{ "--bar-width": `${Math.round((count / max) * 100)}%` } as React.CSSProperties}
               />
             </div>
             <span className="w-4 font-mono text-xs text-zinc-600">{count}</span>

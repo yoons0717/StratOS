@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { generateActionRequestSchema } from "@/lib/schemas";
-import type { UserContext } from "@/types";
+import { generateActionRequestSchema, userContextRowSchema } from "@/lib/schemas";
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
@@ -18,12 +17,14 @@ export async function GET() {
 
   if (!data) return NextResponse.json(null);
 
-  const ctx: UserContext = {
-    type: data.type as UserContext["type"],
-    level: data.level as UserContext["level"],
-    businessStage: data.business_stage as UserContext["businessStage"],
-  };
-  return NextResponse.json(ctx);
+  const parsed = userContextRowSchema.safeParse(data);
+  if (!parsed.success) return NextResponse.json(null);
+
+  return NextResponse.json({
+    type: parsed.data.type,
+    level: parsed.data.level,
+    businessStage: parsed.data.business_stage,
+  });
 }
 
 export async function PUT(req: NextRequest) {

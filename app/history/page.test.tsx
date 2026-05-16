@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
@@ -57,8 +57,7 @@ describe("HistoryPage", () => {
   it("redirects to /onboarding when no userContext", async () => {
     mockFetchUserContext.mockResolvedValue(null);
     render(<HistoryPage />);
-    await screen.findByText(/No completed actions/i).catch(() => {});
-    expect(pushMock).toHaveBeenCalledWith("/onboarding");
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
   it("shows empty state when no completed sessions", async () => {

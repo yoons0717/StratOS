@@ -3,9 +3,12 @@ import { describe, it, expect, vi } from "vitest";
 import Sidebar from "./Sidebar";
 import { defaultCtx } from "@/tests/fixtures";
 
+const pushMock = vi.hoisted(() => vi.fn());
+const routerMock = vi.hoisted(() => ({ push: pushMock }));
+
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn().mockReturnValue("/"),
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => routerMock,
 }));
 
 vi.mock("@/lib/supabase/browser", () => ({

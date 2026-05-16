@@ -4,8 +4,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import OnboardingPage from "./page";
 
+const pushMock = vi.hoisted(() => vi.fn());
+const routerMock = vi.hoisted(() => ({ push: pushMock }));
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => routerMock,
 }));
 
 vi.mock("@/lib/api", () => ({

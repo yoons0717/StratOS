@@ -26,6 +26,11 @@ describe("MagicCopy", () => {
     expect(writeText).toHaveBeenCalledWith("복사할 캡션 텍스트");
   });
 
+  it("shows character count", () => {
+    render(<MagicCopy text="hello" />);
+    expect(screen.getByText("5")).toBeInTheDocument();
+  });
+
   it("shows COPIED after clicking copy", async () => {
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText: vi.fn().mockResolvedValue(undefined) },

@@ -22,24 +22,32 @@ npx vitest run path/to/file.test.ts
 
 ```
 app/
-  api/generate-action/route.ts  # 유일한 API 엔드포인트. Groq 호출은 여기서만.
-  page.tsx                       # SPA처럼 동작하는 단일 페이지
+  api/sessions/route.ts           # GET(목록), POST(생성+Groq 호출)
+  api/sessions/[id]/route.ts      # PATCH(reroll)
+  api/sessions/[id]/complete/route.ts  # PATCH(완료 처리)
+  api/user-context/route.ts       # GET/PUT
+  login/page.tsx                  # Google OAuth 로그인
+  auth/callback/route.ts          # OAuth 콜백
+  page.tsx                        # 대시보드
 lib/
   groq.ts      # 서버 전용 Groq 클라이언트. Client Component에서 import 금지.
   schemas.ts   # Zod 스키마. API 요청/응답 양쪽에서 공유.
+  supabase/    # browser.ts (클라이언트용), server.ts (서버용)
 store/
-  index.ts     # Zustand + persist. 모든 클라이언트 상태는 여기서 관리.
+  index.ts     # Zustand (persist 없음). 모든 클라이언트 상태는 여기서 관리.
 types/
   index.ts     # 프로젝트 전체 TypeScript 인터페이스.
+middleware.ts  # 미인증 시 /login 리다이렉트
 ```
 
 **데이터 흐름:**
-1. 클라이언트 → `POST /api/generate-action` (UserContext + 자유 입력)
-2. Route Handler → Zod 검증 → Groq 호출 → Zod 검증 → JSON 응답
-3. 클라이언트 → Zustand store에 저장 → LocalStorage persist
+1. 클라이언트 → `POST /api/sessions` (UserContext + 자유 입력)
+2. Route Handler → Zod 검증 → Groq 호출 → Zod 검증 → Supabase 저장 → JSON 응답
+3. 클라이언트 → Zustand store에 저장
 
 **서버/클라이언트 경계:**
 - `lib/groq.ts`는 서버 전용. Client Component에서 절대 import하지 않는다.
+- `lib/supabase/server.ts`는 서버 전용. `lib/supabase/browser.ts`는 클라이언트 전용.
 - `GROQ_API_KEY`는 `.env.local`에만 존재. 클라이언트 번들에 절대 노출되지 않는다.
 - `store/`, `types/`는 클라이언트에서 사용 가능.
 

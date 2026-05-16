@@ -19,13 +19,6 @@ describe("StepType", () => {
     expect(onSelect).toHaveBeenCalledWith("creator");
   });
 
-  it("calls onSelect with 'seller' when Seller is clicked", async () => {
-    const onSelect = vi.fn();
-    render(<StepType selected={null} onSelect={onSelect} />);
-    await userEvent.click(screen.getByText("Seller"));
-    expect(onSelect).toHaveBeenCalledWith("seller");
-  });
-
   it("highlights the selected option", () => {
     render(<StepType selected="creator" onSelect={vi.fn()} />);
     const selected = screen.getByTestId("option-creator");

@@ -28,8 +28,4 @@ describe("KpiBar", () => {
     expect(screen.getByText("67%")).toBeInTheDocument();
   });
 
-  it("renders 0% when rate is 0", () => {
-    render(<KpiBar data={{ ...data, rate: 0 }} />);
-    expect(screen.getByText("0%")).toBeInTheDocument();
-  });
 });

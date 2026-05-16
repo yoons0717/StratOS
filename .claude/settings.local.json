@@ -17,7 +17,8 @@
       "Bash(echo \"exit: $?\")",
       "Bash(pkill -9 -f \"vitest run\")",
       "Bash(pkill -9 -f \"vitest\")",
-      "Bash(gtimeout 30 npx vitest run app/page.test.tsx)"
+      "Bash(gtimeout 30 npx vitest run app/page.test.tsx)",
+      "Bash(grep *)"
     ]
   }
 }

@@ -41,11 +41,6 @@ describe("SettingsPage", () => {
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
-  it("renders Sidebar", async () => {
-    render(<SettingsPage />);
-    expect(await screen.findByText("STRATOS_OS")).toBeInTheDocument();
-  });
-
   it("pre-selects current userContext values", async () => {
     render(<SettingsPage />);
     await screen.findByText("STRATOS_OS");

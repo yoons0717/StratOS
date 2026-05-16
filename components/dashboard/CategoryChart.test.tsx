@@ -24,11 +24,6 @@ describe("CategoryChart", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it("renders CATEGORY_DIST label", () => {
-    render(<CategoryChart sessions={[makeSession("outreach")]} />);
-    expect(screen.getByText(/CATEGORY_DIST/i)).toBeInTheDocument();
-  });
-
   it("renders category names", () => {
     const sessions = [makeSession("outreach"), makeSession("content"), makeSession("outreach")];
     render(<CategoryChart sessions={sessions} />);

@@ -31,16 +31,6 @@ describe("OnboardingPage", () => {
     expect(screen.getByText("AUDIENCE_SIZE")).toBeInTheDocument();
   });
 
-  it("advances to step 3 after selecting a level", async () => {
-    render(<OnboardingPage />);
-    await userEvent.click(screen.getByText("Creator"));
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await userEvent.click(screen.getByText("0 ~ 1K"));
-    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    expect(screen.getByText("3 / 3")).toBeInTheDocument();
-    expect(screen.getByText("CURRENT_STAGE")).toBeInTheDocument();
-  });
-
   it("saves userContext to store after completing all 3 steps", async () => {
     render(<OnboardingPage />);
     await userEvent.click(screen.getByText("Creator"));

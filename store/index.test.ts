@@ -47,4 +47,17 @@ describe("useStratosStore", () => {
     useStratosStore.getState().setUserContext(null);
     expect(useStratosStore.getState().userContext).toBeNull();
   });
+
+  it("updateSession replaces action for matching id", () => {
+    const newAction = { ...session.action, title: "Updated" };
+    useStratosStore.getState().setSessions([session]);
+    useStratosStore.getState().updateSession("s1", newAction);
+    expect(useStratosStore.getState().sessions[0].action.title).toBe("Updated");
+  });
+
+  it("updateSession ignores non-matching id", () => {
+    useStratosStore.getState().setSessions([session]);
+    useStratosStore.getState().updateSession("other", session.action);
+    expect(useStratosStore.getState().sessions[0].action.title).toBe("T");
+  });
 });

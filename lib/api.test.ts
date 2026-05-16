@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext } from "./api";
+import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext, regenerateSession } from "./api";
 import type { UserContext, ActionSession } from "@/types";
 
 const mockContext: UserContext = {
@@ -90,5 +90,23 @@ describe("saveUserContext", () => {
     );
     await saveUserContext(mockContext);
     expect(fetch).toHaveBeenCalledWith("/api/user-context", expect.objectContaining({ method: "PUT" }));
+  });
+});
+
+describe("regenerateSession", () => {
+  it("PATCH /api/sessions/:id 호출 후 세션 반환", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify(mockSession), { status: 200 })
+    );
+    const result = await regenerateSession("s1");
+    expect(fetch).toHaveBeenCalledWith("/api/sessions/s1", { method: "PATCH" });
+    expect(result.id).toBe("s1");
+  });
+
+  it("non-ok 응답 시 throw", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(null, { status: 500 })
+    );
+    await expect(regenerateSession("s1")).rejects.toThrow("API error: 500");
   });
 });

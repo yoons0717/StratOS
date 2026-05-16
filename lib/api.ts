@@ -38,3 +38,9 @@ export async function saveUserContext(ctx: UserContext): Promise<void> {
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
 }
+
+export async function regenerateSession(id: string): Promise<ActionSession> {
+  const res = await fetch(`/api/sessions/${id}`, { method: "PATCH" });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}

@@ -14,7 +14,7 @@ export default function ActionListPanel({
   emptyLabel = "No actions yet",
 }: Props) {
   return (
-    <div className="flex w-56 shrink-0 flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
+    <div className="flex w-72 shrink-0 flex-col gap-2 overflow-y-auto border-r border-zinc-800 p-3">
       <div className="font-mono text-xs tracking-widest text-zinc-600">ACTIONS //</div>
       {sessions.length === 0 ? (
         <div className="flex flex-1 items-center justify-center font-mono text-xs text-zinc-700">

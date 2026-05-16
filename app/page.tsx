@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
-import { fetchSessions, fetchUserContext, createSession, completeSession } from "@/lib/api";
+import { fetchSessions, fetchUserContext, createSession, completeSession, regenerateSession } from "@/lib/api";
 import { computeKpi } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
@@ -12,12 +12,13 @@ import NewActionModal from "@/components/dashboard/NewActionModal";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { userContext, sessions, setUserContext, setSessions, addSession, markCompleted } =
+  const { userContext, sessions, setUserContext, setSessions, addSession, markCompleted, updateSession } =
     useStratosStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -56,10 +57,20 @@ export default function DashboardPage() {
     setSelectedId(null);
   }
 
+  async function handleRegenerate(id: string) {
+    setRegenerating(true);
+    try {
+      const updated = await regenerateSession(id);
+      updateSession(id, updated.action);
+    } finally {
+      setRegenerating(false);
+    }
+  }
+
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex w-56 shrink-0 flex-col border-r border-zinc-800">
+        <div className="flex w-72 shrink-0 flex-col border-r border-zinc-800">
           <ActionListPanel
             sessions={activeSessions}
             selectedId={selectedId}
@@ -79,6 +90,8 @@ export default function DashboardPage() {
           allSessions={sessions}
           onComplete={handleComplete}
           onDeselect={() => setSelectedId(null)}
+          onRegenerate={selectedSession ? () => handleRegenerate(selectedSession.id) : undefined}
+          isRegenerating={regenerating}
         />
       </div>
       {showModal && (

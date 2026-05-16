@@ -9,7 +9,15 @@
       "Bash(git *)",
       "Bash(npx vitest *)",
       "Bash(npm run *)",
-      "Bash(curl -s http://localhost:3000)"
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(bash *)",
+      "Skill(superpowers:writing-plans)",
+      "Bash(kill -9 3336 3338 3339 4827 4829 4831)",
+      "Bash(gtimeout 15 npx vitest run app/onboarding/page.test.tsx)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(pkill -9 -f \"vitest run\")",
+      "Bash(pkill -9 -f \"vitest\")",
+      "Bash(gtimeout 30 npx vitest run app/page.test.tsx)"
     ]
   }
 }

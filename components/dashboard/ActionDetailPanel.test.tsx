@@ -61,4 +61,26 @@ describe("ActionDetailPanel", () => {
     render(<ActionDetailPanel session={session} allSessions={[session]} onComplete={vi.fn()} onDeselect={vi.fn()} readonly />);
     expect(screen.queryByRole("button", { name: /COMPLETE/i })).not.toBeInTheDocument();
   });
+
+  it("shows REROLL button when onRegenerate is provided", () => {
+    render(<ActionDetailPanel session={session} allSessions={[session]} onComplete={vi.fn()} onDeselect={vi.fn()} onRegenerate={vi.fn()} />);
+    expect(screen.getByRole("button", { name: /REROLL/i })).toBeInTheDocument();
+  });
+
+  it("calls onRegenerate when REROLL is clicked", async () => {
+    const onRegenerate = vi.fn();
+    render(<ActionDetailPanel session={session} allSessions={[session]} onComplete={vi.fn()} onDeselect={vi.fn()} onRegenerate={onRegenerate} />);
+    await userEvent.click(screen.getByRole("button", { name: /REROLL/i }));
+    expect(onRegenerate).toHaveBeenCalled();
+  });
+
+  it("hides REROLL button when readonly", () => {
+    render(<ActionDetailPanel session={session} allSessions={[session]} onComplete={vi.fn()} onDeselect={vi.fn()} onRegenerate={vi.fn()} readonly />);
+    expect(screen.queryByRole("button", { name: /REROLL/i })).not.toBeInTheDocument();
+  });
+
+  it("disables REROLL button and shows REROLLING when isRegenerating", () => {
+    render(<ActionDetailPanel session={session} allSessions={[session]} onComplete={vi.fn()} onDeselect={vi.fn()} onRegenerate={vi.fn()} isRegenerating />);
+    expect(screen.getByRole("button", { name: /REROLLING/i })).toBeDisabled();
+  });
 });

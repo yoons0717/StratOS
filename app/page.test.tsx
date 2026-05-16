@@ -9,6 +9,7 @@ const routerMock = vi.hoisted(() => ({ push: pushMock }));
 const mockFetchUserContext = vi.hoisted(() => vi.fn());
 const mockFetchSessions = vi.hoisted(() => vi.fn());
 const mockCompleteSession = vi.hoisted(() => vi.fn());
+const mockRegenerateSession = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({
   useRouter: () => routerMock,
@@ -26,6 +27,7 @@ vi.mock("@/lib/api", () => ({
   fetchSessions: mockFetchSessions,
   createSession: vi.fn(),
   completeSession: mockCompleteSession,
+  regenerateSession: mockRegenerateSession,
 }));
 
 const ctx = { type: "creator" as const, level: "0-1K" as const, businessStage: "idea" as const };
@@ -48,6 +50,7 @@ beforeEach(() => {
   mockFetchUserContext.mockResolvedValue(ctx);
   mockFetchSessions.mockResolvedValue([]);
   mockCompleteSession.mockResolvedValue(undefined);
+  mockRegenerateSession.mockResolvedValue(undefined);
   useStratosStore.setState({ userContext: null, sessions: [] });
 });
 
@@ -93,5 +96,17 @@ describe("DashboardPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
     expect(screen.queryByRole("button", { name: "팔로워 DM 보내기" })).not.toBeInTheDocument();
     expect(useStratosStore.getState().sessions[0].completed).toBe(true);
+  });
+
+  it("RETRY calls regenerateSession and updates action in store", async () => {
+    const updatedSession = { ...session, action: { ...session.action, title: "New Action" } };
+    mockFetchSessions.mockResolvedValue([session]);
+    mockRegenerateSession.mockResolvedValue(updatedSession);
+    render(<DashboardPage />);
+    await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
+    await userEvent.click(screen.getByRole("button", { name: /REROLL/i }));
+    await waitFor(() =>
+      expect(useStratosStore.getState().sessions[0].action.title).toBe("New Action")
+    );
   });
 });

@@ -8,6 +8,8 @@ interface Props {
   allSessions: ActionSession[];
   onComplete: (id: string) => void;
   onDeselect: () => void;
+  onRegenerate?: () => void;
+  isRegenerating?: boolean;
   readonly?: boolean;
 }
 
@@ -16,6 +18,8 @@ export default function ActionDetailPanel({
   allSessions,
   onComplete,
   onDeselect,
+  onRegenerate,
+  isRegenerating = false,
   readonly = false,
 }: Props) {
   if (!session) {
@@ -59,13 +63,24 @@ export default function ActionDetailPanel({
       <CategoryChart sessions={allSessions} />
 
       {!readonly && (
-        <div className="mt-auto flex gap-3">
-          <Button variant="ghost" className="flex-1" onClick={onDeselect}>
-            NEW →
-          </Button>
-          <Button className="flex-1" onClick={() => onComplete(session.id)}>
-            COMPLETE ✓
-          </Button>
+        <div className="mt-auto flex flex-col gap-2">
+          {onRegenerate && (
+            <button
+              onClick={onRegenerate}
+              disabled={isRegenerating}
+              className="min-h-[44px] w-full rounded border border-dashed border-zinc-700 font-mono text-xs text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {isRegenerating ? "↺ REROLLING..." : "↺ REROLL"}
+            </button>
+          )}
+          <div className="flex gap-3">
+            <Button variant="ghost" className="flex-1" onClick={onDeselect}>
+              NEW →
+            </Button>
+            <Button className="flex-1" onClick={() => onComplete(session.id)}>
+              COMPLETE ✓
+            </Button>
+          </div>
         </div>
       )}
     </div>

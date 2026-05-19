@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStratosStore } from "@/store";
 import { createSession, completeSession, regenerateSession } from "@/lib/api";
 import { useInitStore } from "@/lib/hooks";
@@ -9,7 +9,10 @@ import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
 import ActionDetailPanel from "@/components/dashboard/ActionDetailPanel";
 import CompletionFeedback from "@/components/dashboard/CompletionFeedback";
+import FirstRunGuide from "@/components/dashboard/FirstRunGuide";
 import NewActionModal from "@/components/dashboard/NewActionModal";
+
+const WELCOME_KEY = "stratos_welcome_seen";
 
 export default function DashboardPage() {
   useInitStore(true);
@@ -20,12 +23,39 @@ export default function DashboardPage() {
   const [modalError, setModalError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showFirstRun, setShowFirstRun] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem(WELCOME_KEY)) {
+      setShowFirstRun(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showFirstRun) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") handleDismissFirstRun();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showFirstRun]);
 
   if (!userContext) return null;
 
   const activeSessions = sessions.filter((s) => !s.completed);
   const kpiData = computeKpi(sessions);
   const selectedSession = activeSessions.find((s) => s.id === selectedId) ?? null;
+
+  function handleDismissFirstRun() {
+    localStorage.setItem(WELCOME_KEY, "1");
+    setShowFirstRun(false);
+  }
+
+  function handleOpenModal() {
+    localStorage.setItem(WELCOME_KEY, "1");
+    setShowFirstRun(false);
+    setShowModal(true);
+  }
 
   async function handleNewAction(input: string, channel: import("@/types").Channel) {
     setModalLoading(true);
@@ -70,7 +100,7 @@ export default function DashboardPage() {
           />
           <div className="border-t border-zinc-800 p-3">
             <button
-              onClick={() => setShowModal(true)}
+              onClick={handleOpenModal}
               className="w-full rounded border border-zinc-800 py-2 font-mono text-xs text-zinc-600 transition-colors hover:border-neon hover:text-neon"
             >
               + NEW ACTION
@@ -101,6 +131,17 @@ export default function DashboardPage() {
           isLoading={modalLoading}
           error={modalError}
         />
+      )}
+      {showFirstRun && (
+        <div
+          data-testid="firstrun-backdrop"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+          onClick={handleDismissFirstRun}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <FirstRunGuide onBegin={handleOpenModal} />
+          </div>
+        </div>
       )}
     </AppShell>
   );

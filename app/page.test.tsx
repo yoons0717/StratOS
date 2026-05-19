@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
@@ -23,6 +23,15 @@ vi.mock("@/lib/supabase/browser", () => ({
   }),
 }));
 
+vi.mock("@/components/dashboard/FirstRunGuide", () => ({
+  default: ({ onBegin }: { onBegin?: () => void }) => (
+    <div>
+      <span>STRATOS_OS v1.0</span>
+      {onBegin && <button onClick={onBegin}>[ + NEW ACTION ]</button>}
+    </div>
+  ),
+}));
+
 vi.mock("@/lib/api", () => ({
   fetchUserContext: mockFetchUserContext,
   fetchSessions: mockFetchSessions,
@@ -43,6 +52,7 @@ beforeEach(() => {
   mockCompleteSession.mockResolvedValue(undefined);
   mockRegenerateSession.mockResolvedValue(undefined);
   useStratosStore.setState({ userContext: null, sessions: [] });
+  localStorage.clear();
 });
 
 describe("DashboardPage", () => {
@@ -63,17 +73,32 @@ describe("DashboardPage", () => {
   });
 
   it("shows empty state in list panel when no active sessions", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
     render(<DashboardPage />);
     expect(await screen.findByText(/No actions yet/i)).toBeInTheDocument();
   });
 
+  it("shows FirstRunGuide on first visit with no sessions", async () => {
+    render(<DashboardPage />);
+    expect(await screen.findByText(/STRATOS_OS v1.0/i)).toBeInTheDocument();
+  });
+
+  it("does not show FirstRunGuide when already seen", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
+    render(<DashboardPage />);
+    await screen.findByText("STRATOS_OS");
+    expect(screen.queryByText(/STRATOS_OS v1.0/i)).not.toBeInTheDocument();
+  });
+
   it("shows active session titles in list", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
     expect(await screen.findByRole("button", { name: "팔로워 DM 보내기" })).toBeInTheDocument();
   });
 
   it("clicking a session shows it in the detail panel", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
     await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
@@ -81,6 +106,7 @@ describe("DashboardPage", () => {
   });
 
   it("COMPLETE removes session from list and shows feedback", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
     await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
@@ -90,7 +116,32 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
   });
 
+  it("FirstRunGuide overlay: ESC dismisses without opening modal", async () => {
+    render(<DashboardPage />);
+    await screen.findByText(/STRATOS_OS v1\.0/i);
+    fireEvent.keyDown(document, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByText(/STRATOS_OS v1\.0/i)).not.toBeInTheDocument());
+    expect(screen.queryByText(/SITUATION \/\//i)).not.toBeInTheDocument();
+  });
+
+  it("FirstRunGuide overlay: backdrop click dismisses without opening modal", async () => {
+    render(<DashboardPage />);
+    await screen.findByText(/STRATOS_OS v1\.0/i);
+    await userEvent.click(screen.getByTestId("firstrun-backdrop"));
+    await waitFor(() => expect(screen.queryByText(/STRATOS_OS v1\.0/i)).not.toBeInTheDocument());
+    expect(screen.queryByText(/SITUATION \/\//i)).not.toBeInTheDocument();
+  });
+
+  it("FirstRunGuide overlay: clicking + NEW ACTION opens modal", async () => {
+    render(<DashboardPage />);
+    const backdrop = await screen.findByTestId("firstrun-backdrop");
+    await waitFor(() => within(backdrop).getByRole("button", { name: /\+ NEW ACTION/i }));
+    await userEvent.click(within(backdrop).getByRole("button", { name: /\+ NEW ACTION/i }));
+    expect(await screen.findByText(/SITUATION \/\//i)).toBeInTheDocument();
+  });
+
   it("RETRY calls regenerateSession and updates action in store", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
     const updatedSession = { ...session, action: { ...session.action, title: "New Action" } };
     mockFetchSessions.mockResolvedValue([session]);
     mockRegenerateSession.mockResolvedValue(updatedSession);

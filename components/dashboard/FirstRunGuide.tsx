@@ -29,7 +29,7 @@ export default function FirstRunGuide({ lineDelay = 300, onBegin }: Props) {
     if (visibleCount >= LINES.length) return;
     const timeout = setTimeout(() => setVisibleCount((c) => c + 1), lineDelay);
     return () => clearTimeout(timeout);
-  }, [visibleCount]);
+  }, [visibleCount, lineDelay]);
 
   const done = visibleCount >= LINES.length;
 

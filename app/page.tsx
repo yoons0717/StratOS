@@ -23,13 +23,7 @@ export default function DashboardPage() {
   const [modalError, setModalError] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [showFirstRun, setShowFirstRun] = useState(false);
-
-  useEffect(() => {
-    if (!localStorage.getItem(WELCOME_KEY)) {
-      setShowFirstRun(true);
-    }
-  }, []);
+  const [showFirstRun, setShowFirstRun] = useState(() => !localStorage.getItem(WELCOME_KEY));
 
   useEffect(() => {
     if (!showFirstRun) return;

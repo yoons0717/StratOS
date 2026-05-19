@@ -1,4 +1,6 @@
-import type { UserContext, ActionSession } from "@/types";
+import type { UserContext, ActionSession, GeneratedAction } from "@/types";
+
+type SessionOverrides = Omit<Partial<ActionSession>, "action"> & { action?: Partial<GeneratedAction> };
 
 export const defaultCtx: UserContext = {
   type: "creator",
@@ -7,7 +9,7 @@ export const defaultCtx: UserContext = {
   niche: "피트니스 코치",
 };
 
-export function makeSession(overrides: Partial<ActionSession> = {}): ActionSession {
+export function makeSession(overrides: SessionOverrides = {}): ActionSession {
   const { action: actionOverrides, ...rest } = overrides;
   return {
     id: crypto.randomUUID(),

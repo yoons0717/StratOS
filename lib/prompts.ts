@@ -23,7 +23,7 @@ Output schema:
   "magicCopy": "ready-to-edit draft text"
 }`;
 
-export const STAGE_MAP: Record<string, string> = {
+const STAGE_MAP: Record<string, string> = {
   idea: "Idea Stage",
   "first-customers": "Getting First Customers",
   "consistent-income": "Consistent Income",

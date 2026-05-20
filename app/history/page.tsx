@@ -21,6 +21,9 @@ export default function HistoryPage() {
 
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
+      <div className="flex shrink-0 items-center border-b border-zinc-800/60 px-6 py-4">
+        <h1 className="text-2xl font-semibold text-foreground">History</h1>
+      </div>
       <div className="flex flex-1 overflow-hidden">
         <ActionListPanel
           sessions={completed}

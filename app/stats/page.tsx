@@ -92,9 +92,7 @@ export default function StatsPage() {
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
       <div className="flex-1 overflow-y-auto p-8">
-        <h1 className="mb-6 font-mono text-xs uppercase tracking-widest text-zinc-600">
-          STATS
-        </h1>
+        <h1 className="mb-6 text-2xl font-semibold text-foreground">Stats</h1>
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="현재 스트릭" value={kpiData.streak} sub="연속 실행 중" />

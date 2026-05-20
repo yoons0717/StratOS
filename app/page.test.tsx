@@ -69,7 +69,7 @@ describe("DashboardPage", () => {
 
   it("renders Sidebar", async () => {
     render(<DashboardPage />);
-    expect(await screen.findByText("STRATOS_OS")).toBeInTheDocument();
+    expect(await screen.findByText("StratOS")).toBeInTheDocument();
   });
 
   it("shows empty state in list panel when no active sessions", async () => {
@@ -86,7 +86,7 @@ describe("DashboardPage", () => {
   it("does not show FirstRunGuide when already seen", async () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     render(<DashboardPage />);
-    await screen.findByText("STRATOS_OS");
+    await screen.findByText("StratOS");
     expect(screen.queryByText(/STRATOS_OS v1.0/i)).not.toBeInTheDocument();
   });
 
@@ -94,14 +94,14 @@ describe("DashboardPage", () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
-    expect(await screen.findByRole("button", { name: "팔로워 DM 보내기" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /팔로워 DM 보내기/ })).toBeInTheDocument();
   });
 
   it("clicking a session shows it in the detail panel", async () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
-    await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
+    await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
     expect(screen.getByText("DM 발송")).toBeInTheDocument();
   });
 
@@ -109,9 +109,9 @@ describe("DashboardPage", () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     mockFetchSessions.mockResolvedValue([session]);
     render(<DashboardPage />);
-    await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
+    await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
-    expect(screen.queryByRole("button", { name: "팔로워 DM 보내기" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /팔로워 DM 보내기/ })).not.toBeInTheDocument();
     expect(useStratosStore.getState().sessions[0].completed).toBe(true);
     expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
   });
@@ -146,7 +146,7 @@ describe("DashboardPage", () => {
     mockFetchSessions.mockResolvedValue([session]);
     mockRegenerateSession.mockResolvedValue(updatedSession);
     render(<DashboardPage />);
-    await userEvent.click(await screen.findByRole("button", { name: "팔로워 DM 보내기" }));
+    await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
     await userEvent.click(screen.getByRole("button", { name: /REROLL/i }));
     await waitFor(() =>
       expect(useStratosStore.getState().sessions[0].action.title).toBe("New Action")

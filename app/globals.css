@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #ffffff;
-  --neon: #00ffb4;
-  --surface: #0d0d12;
+  --background: #0c0c0c;
+  --foreground: #ededed;
+  --neon: #3ecf8e;
+  --surface: #111111;
 }
 
 @theme {
@@ -15,14 +15,14 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-inter), system-ui, sans-serif;
   /* iOS tap highlight 제거 */
   -webkit-tap-highlight-color: transparent;
 }
@@ -41,14 +41,14 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
-/* 사이버펑크 스캔라인 오버레이 */
+/* 스캔라인 오버레이 */
 .scanline {
   background: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 255, 180, 0.015) 2px,
-    rgba(0, 255, 180, 0.015) 4px
+    rgba(62, 207, 142, 0.012) 2px,
+    rgba(62, 207, 142, 0.012) 4px
   );
 }
 

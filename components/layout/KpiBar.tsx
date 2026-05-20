@@ -14,12 +14,12 @@ const CARDS: Array<{ key: keyof KpiData; label: string; neon?: boolean }> = [
 
 export default function KpiBar({ data }: Props) {
   return (
-    <div className="flex shrink-0 gap-3 border-b border-zinc-800 bg-background px-4 py-3">
+    <div className="flex shrink-0 gap-2 border-b border-zinc-800/60 bg-background px-4 py-3">
       {CARDS.map(({ key, label, neon }) => (
-        <div key={key} className="flex-1 rounded border border-zinc-800 bg-surface px-3 py-2">
-          <div className="font-mono text-xs tracking-widest text-zinc-600">{label}</div>
+        <div key={key} className="flex-1 rounded-md border border-zinc-800/60 bg-surface px-3 py-2">
+          <div className="mb-1 text-xs font-medium text-zinc-500">{label}</div>
           <div
-            className={`font-mono text-xl font-bold leading-tight ${neon ? "text-neon" : "text-white"}`}
+            className={`font-mono text-xl font-semibold leading-tight ${neon ? "text-neon" : "text-foreground"}`}
           >
             {key === "rate" ? `${data[key]}%` : data[key]}
           </div>

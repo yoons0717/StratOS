@@ -13,12 +13,19 @@ interface Props {
 
 export default function AppShell({ userContext, kpiData, children }: Props) {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen bg-background">
       <ScanlineOverlay />
       <Sidebar userContext={userContext} />
-      <div className="flex min-h-0 flex-1 flex-col">
-        {kpiData && <KpiBar data={kpiData} />}
-        {children}
+      <div className="flex flex-1 min-h-0 flex-col">
+        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-zinc-800/60 px-6">
+          <span className="text-sm text-zinc-300">{userContext.niche}</span>
+          <span className="text-zinc-700">·</span>
+          <span className="text-xs text-zinc-600">{userContext.level} / {userContext.type}</span>
+        </div>
+        <div className="flex flex-1 min-h-0 w-full max-w-5xl flex-col mx-auto">
+          {kpiData && <KpiBar data={kpiData} />}
+          {children}
+        </div>
       </div>
     </div>
   );

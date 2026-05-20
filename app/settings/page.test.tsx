@@ -42,7 +42,7 @@ describe("SettingsPage", () => {
 
   it("pre-selects current userContext values including niche", async () => {
     render(<SettingsPage />);
-    await screen.findByText("STRATOS_OS");
+    await screen.findByText("StratOS");
     expect(screen.getByTestId("option-creator")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-0-1K")).toHaveAttribute("data-selected", "true");
     expect(screen.getByTestId("option-idea")).toHaveAttribute("data-selected", "true");
@@ -51,7 +51,7 @@ describe("SettingsPage", () => {
 
   it("updates store when SAVE is clicked", async () => {
     render(<SettingsPage />);
-    await screen.findByText("STRATOS_OS");
+    await screen.findByText("StratOS");
     await userEvent.click(screen.getByTestId("option-seller"));
     await userEvent.click(screen.getByTestId("option-1K-10K"));
     await userEvent.click(screen.getByRole("button", { name: /SAVE/i }));
@@ -60,7 +60,7 @@ describe("SettingsPage", () => {
 
   it("shows SETTINGS_SAVED after save", async () => {
     render(<SettingsPage />);
-    await screen.findByText("STRATOS_OS");
+    await screen.findByText("StratOS");
     await userEvent.click(screen.getByRole("button", { name: /SAVE/i }));
     await waitFor(() => expect(screen.getByText(/SETTINGS_SAVED/i)).toBeInTheDocument());
   });

@@ -12,12 +12,6 @@ vi.mock("next/navigation", () => ({
   useRouter: () => routerMock,
 }));
 
-vi.mock("@/lib/supabase/browser", () => ({
-  createSupabaseBrowserClient: () => ({
-    auth: { signOut: vi.fn().mockResolvedValue({}) },
-  }),
-}));
-
 const kpi: KpiData = { total: 5, active: 2, completed: 3, rate: 60, streak: 2 };
 
 describe("AppShell", () => {

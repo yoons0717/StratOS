@@ -14,12 +14,6 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn().mockReturnValue("/stats"),
 }));
 
-vi.mock("@/lib/supabase/browser", () => ({
-  createSupabaseBrowserClient: () => ({
-    auth: { signOut: vi.fn().mockResolvedValue({}) },
-  }),
-}));
-
 vi.mock("@/lib/api", () => ({
   fetchUserContext: mockFetchUserContext,
   fetchSessions: mockFetchSessions,

@@ -17,12 +17,6 @@ vi.mock("next/navigation", () => ({
   usePathname: vi.fn().mockReturnValue("/"),
 }));
 
-vi.mock("@/lib/supabase/browser", () => ({
-  createSupabaseBrowserClient: () => ({
-    auth: { signOut: vi.fn().mockResolvedValue({}) },
-  }),
-}));
-
 vi.mock("@/components/dashboard/FirstRunGuide", () => ({
   default: ({ onBegin }: { onBegin?: () => void }) => (
     <div>

@@ -13,6 +13,7 @@ interface Props {
 const NAV = [
   { href: "/", label: "DASHBOARD" },
   { href: "/history", label: "HISTORY" },
+  { href: "/stats", label: "STATS" },
   { href: "/settings", label: "SETTINGS" },
 ] as const;
 

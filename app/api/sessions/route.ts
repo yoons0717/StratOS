@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import groq from "@/lib/groq";
-import { generateActionRequestSchema, generatedActionSchema } from "@/lib/schemas";
-import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/prompts";
+import { getAuthUser } from "@/lib/auth";
+import { generateAction } from "@/lib/generate-action";
+import { generateActionRequestSchema } from "@/lib/schemas";
+import { buildUserPrompt } from "@/lib/prompts";
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getAuthUser();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, supabase } = auth;
 
   const { data, error } = await supabase
     .from("action_sessions")
@@ -22,11 +20,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getAuthUser();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, supabase } = auth;
 
   const body = await req.json().catch(() => null);
   const parsed = generateActionRequestSchema.safeParse(body);
@@ -34,35 +30,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
   const { input, channel, userContext } = parsed.data;
+  const userPrompt = buildUserPrompt(input, userContext.type, userContext.niche, userContext.level, userContext.businessStage, channel);
 
-  const completion = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(input, userContext.type, userContext.niche, userContext.level, userContext.businessStage, channel) },
-    ],
-    temperature: 0.7,
-    max_tokens: 512,
-    response_format: { type: "json_object" },
-  });
-
-  const raw = completion.choices[0]?.message?.content;
-  if (!raw) return NextResponse.json({ error: "No response from AI" }, { status: 502 });
-
-  let json: unknown;
-  try {
-    json = JSON.parse(raw);
-  } catch {
-    return NextResponse.json({ error: "Invalid AI response format" }, { status: 502 });
-  }
-
-  const action = generatedActionSchema.safeParse(json);
-  if (!action.success)
-    return NextResponse.json({ error: "Invalid AI response shape" }, { status: 502 });
+  const result = await generateAction(userPrompt, 0.7);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
 
   const { data, error } = await supabase
     .from("action_sessions")
-    .insert({ user_id: user.id, input, channel, action: action.data, completed: false })
+    .insert({ user_id: user.id, input, channel, action: result.action, completed: false })
     .select("id, created_at, completed_at, input, channel, action, completed")
     .single();
 

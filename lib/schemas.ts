@@ -14,20 +14,17 @@ export const generatedActionSchema = z.object({
   magicCopy: z.string().min(1),
 });
 
+export const userContextInputSchema = z.object({
+  type: z.enum(["creator", "seller", "service", "side"]),
+  level: z.enum(["0-1K", "1K-10K", "10K+"]),
+  businessStage: z.enum(["idea", "first-customers", "consistent-income", "scaling"]),
+  niche: z.string().min(1).max(100),
+});
+
 export const generateActionRequestSchema = z.object({
   input: z.string().min(1).max(500),
   channel: channelSchema.default("general"),
-  userContext: z.object({
-    type: z.enum(["creator", "seller", "service", "side"]),
-    level: z.enum(["0-1K", "1K-10K", "10K+"]),
-    businessStage: z.enum([
-      "idea",
-      "first-customers",
-      "consistent-income",
-      "scaling",
-    ]),
-    niche: z.string().min(1).max(100),
-  }),
+  userContext: userContextInputSchema,
 });
 
 export type GenerateActionRequest = z.infer<typeof generateActionRequestSchema>;

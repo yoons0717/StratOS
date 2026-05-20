@@ -1,19 +1,16 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import groq from "@/lib/groq";
-import { generatedActionSchema } from "@/lib/schemas";
-import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/prompts";
+import { getAuthUser } from "@/lib/auth";
+import { generateAction } from "@/lib/generate-action";
+import { buildUserPrompt } from "@/lib/prompts";
 
 export async function PATCH(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getAuthUser();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, supabase } = auth;
 
   const { data: session } = await supabase
     .from("action_sessions")
@@ -32,34 +29,14 @@ export async function PATCH(
 
   if (!ctx) return NextResponse.json({ error: "No user context" }, { status: 400 });
 
-  const completion = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant",
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(session.input, ctx.type, ctx.niche ?? "", ctx.level, ctx.business_stage, session.channel ?? "general") },
-    ],
-    temperature: 0.9,
-    max_tokens: 512,
-    response_format: { type: "json_object" },
-  });
+  const userPrompt = buildUserPrompt(session.input, ctx.type, ctx.niche ?? "", ctx.level, ctx.business_stage, session.channel ?? "general");
 
-  const raw = completion.choices[0]?.message?.content;
-  if (!raw) return NextResponse.json({ error: "No response from AI" }, { status: 502 });
-
-  let json: unknown;
-  try {
-    json = JSON.parse(raw);
-  } catch {
-    return NextResponse.json({ error: "Invalid AI response format" }, { status: 502 });
-  }
-
-  const action = generatedActionSchema.safeParse(json);
-  if (!action.success)
-    return NextResponse.json({ error: "Invalid AI response shape" }, { status: 502 });
+  const result = await generateAction(userPrompt, 0.9);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });
 
   const { data, error } = await supabase
     .from("action_sessions")
-    .update({ action: action.data })
+    .update({ action: result.action })
     .eq("id", id)
     .eq("user_id", user.id)
     .select("id, created_at, completed_at, input, channel, action, completed")

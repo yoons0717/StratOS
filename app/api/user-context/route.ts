@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { generateActionRequestSchema, userContextRowSchema } from "@/lib/schemas";
+import { getAuthUser } from "@/lib/auth";
+import { userContextInputSchema, userContextRowSchema } from "@/lib/schemas";
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getAuthUser();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, supabase } = auth;
 
   const { data } = await supabase
     .from("user_contexts")
@@ -29,14 +27,12 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await getAuthUser();
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, supabase } = auth;
 
   const body = await req.json().catch(() => null);
-  const parsed = generateActionRequestSchema.shape.userContext.safeParse(body);
+  const parsed = userContextInputSchema.safeParse(body);
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid" }, { status: 400 });
 

@@ -48,41 +48,7 @@ GROQ_API_KEY=your_groq_api_key
 
 ### 3. 데이터베이스 설정
 
-Supabase SQL 에디터에서 아래 SQL 실행:
-
-```sql
--- 유저 컨텍스트
-CREATE TABLE user_contexts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
-  type TEXT NOT NULL,
-  level TEXT NOT NULL,
-  business_stage TEXT NOT NULL,
-  niche TEXT NOT NULL DEFAULT '',
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- 액션 세션
-CREATE TABLE action_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  input TEXT NOT NULL,
-  channel TEXT NOT NULL DEFAULT 'general',
-  action JSONB NOT NULL,
-  completed BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Row-level security
-ALTER TABLE user_contexts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE action_sessions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "users manage own context" ON user_contexts
-  FOR ALL USING (auth.uid() = user_id);
-
-CREATE POLICY "users manage own sessions" ON action_sessions
-  FOR ALL USING (auth.uid() = user_id);
-```
+`supabase/migrations/` 아래 마이그레이션 파일을 참고해 스키마를 적용하세요.
 
 ### 4. Google OAuth 설정
 
@@ -109,17 +75,24 @@ npm run build  # 프로덕션 빌드
 
 ```
 app/
-  api/sessions/          # GET 목록, POST 생성, PATCH 리롤
-  api/sessions/[id]/     # PATCH 완료
+  api/sessions/          # GET 목록, POST 생성
+  api/sessions/[id]/     # PATCH 리롤
+  api/sessions/[id]/complete/  # PATCH 완료
   api/user-context/      # GET / PUT
   auth/callback/         # OAuth 콜백
   login/                 # Google 로그인 페이지
   history/               # 완료된 세션 히스토리
+  stats/                 # 실행 통계 (스트릭, 히트맵, 채널/카테고리 분포)
   page.tsx               # 대시보드
 lib/
   groq.ts                # Groq 클라이언트 (서버 전용)
+  generate-action.ts     # Groq 호출 + 파싱 + 검증 (서버 전용)
+  auth.ts                # getAuthUser() — API route 인증 가드
   prompts.ts             # AI 시스템 프롬프트 및 유저 프롬프트 빌더
   schemas.ts             # API 경계용 Zod 스키마
+  kpi.ts                 # KPI 및 통계 계산 함수
+  labels.ts              # 채널·카테고리 한국어 레이블
+  api.ts                 # 클라이언트 API 함수
   hooks.ts               # useInitStore — 인증 + 데이터 초기화
   supabase/              # browser.ts (클라이언트), server.ts (서버)
 components/

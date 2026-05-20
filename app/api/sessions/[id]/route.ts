@@ -62,7 +62,7 @@ export async function PATCH(
     .update({ action: action.data })
     .eq("id", id)
     .eq("user_id", user.id)
-    .select("id, created_at, input, action, completed")
+    .select("id, created_at, completed_at, input, channel, action, completed")
     .single();
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });

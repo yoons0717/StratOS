@@ -35,6 +35,7 @@ export type GenerateActionRequest = z.infer<typeof generateActionRequestSchema>;
 export const actionSessionRowSchema = z.object({
   id: z.string(),
   created_at: z.string(),
+  completed_at: z.string().nullable(),
   input: z.string(),
   channel: channelSchema.default("general"),
   action: generatedActionSchema,

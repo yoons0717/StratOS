@@ -1,14 +1,40 @@
-import type { ActionSession, Channel } from "@/types";
+import type { ActionSession } from "@/types";
 import Button from "@/components/ui/Button";
 import MagicCopy from "@/components/result/MagicCopy";
 import CategoryChart from "./CategoryChart";
+import { CHANNEL_LABEL } from "@/lib/labels";
 
-const CHANNEL_LABEL: Partial<Record<Channel, string>> = {
-  "instagram-dm": "DM 인스타",
-  linkedin: "LinkedIn",
-  "naver-blog": "네이버 블로그",
-  youtube: "유튜브",
-};
+function formatDuration(startIso: string, endIso: string): string {
+  const mins = Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000);
+  if (mins < 60) return `${mins}분`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+}
+
+function SessionTimestamp({ session }: { session: ActionSession }) {
+  const started = new Date(session.created_at).toLocaleString("ko-KR", {
+    month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+
+  if (!session.completed_at) {
+    return (
+      <p className="font-mono text-xs text-zinc-700">시작 {started}</p>
+    );
+  }
+
+  const ended = new Date(session.completed_at).toLocaleString("ko-KR", {
+    month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+  const duration = formatDuration(session.created_at, session.completed_at);
+
+  return (
+    <p className="font-mono text-xs text-zinc-700">
+      {started} → {ended} <span className="text-neon">({duration})</span>
+    </p>
+  );
+}
+
 
 interface Props {
   session: ActionSession | null;
@@ -72,6 +98,8 @@ export default function ActionDetailPanel({
           ))}
         </div>
       </div>
+
+      <SessionTimestamp session={session} />
 
       <MagicCopy text={action.magicCopy} />
 

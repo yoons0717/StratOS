@@ -14,6 +14,7 @@ export function makeSession(overrides: SessionOverrides = {}): ActionSession {
   return {
     id: crypto.randomUUID(),
     created_at: new Date().toISOString(),
+    completed_at: null,
     input: "test",
     channel: "general",
     action: {

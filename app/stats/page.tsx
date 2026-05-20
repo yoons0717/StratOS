@@ -10,22 +10,7 @@ import {
   computeCategoryDist,
 } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
-
-const CHANNEL_LABEL: Record<string, string> = {
-  "instagram-dm": "인스타 DM",
-  linkedin: "LinkedIn",
-  "naver-blog": "네이버 블로그",
-  youtube: "유튜브",
-  general: "일반",
-};
-
-const CATEGORY_LABEL: Record<string, string> = {
-  content: "콘텐츠",
-  outreach: "아웃리치",
-  seo: "SEO",
-  offer: "오퍼",
-  community: "커뮤니티",
-};
+import { CHANNEL_LABEL, CATEGORY_LABEL } from "@/lib/labels";
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
@@ -59,6 +44,13 @@ function BarChart({ items }: { items: { label: string; count: number; pct: numbe
   );
 }
 
+function toIntensity(count: number): 0 | 1 | 2 | 3 {
+  if (count === 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 3) return 2;
+  return 3;
+}
+
 function HeatmapGrid({ data, days = 30 }: { data: Record<string, number>; days?: number }) {
   const cells: { key: string; intensity: 0 | 1 | 2 | 3 }[] = [];
   const today = new Date();
@@ -67,9 +59,7 @@ function HeatmapGrid({ data, days = 30 }: { data: Record<string, number>; days?:
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today.getTime() - i * 86400000);
     const key = d.toISOString().slice(0, 10);
-    const count = data[key] ?? 0;
-    const intensity: 0 | 1 | 2 | 3 = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : 3;
-    cells.push({ key, intensity });
+    cells.push({ key, intensity: toIntensity(data[key] ?? 0) });
   }
 
   const intensityClass = ["bg-zinc-800", "bg-neon/20", "bg-neon/50", "bg-neon"] as const;

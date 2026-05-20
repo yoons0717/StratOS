@@ -18,7 +18,12 @@
       "Bash(pkill -9 -f \"vitest run\")",
       "Bash(pkill -9 -f \"vitest\")",
       "Bash(gtimeout 30 npx vitest run app/page.test.tsx)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Skill(superpowers:test-driven-development)",
+      "Skill(superpowers:brainstorming)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.get\\('dependencies',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(gh repo *)",
+      "Bash(xargs ls -la)"
     ]
   }
 }

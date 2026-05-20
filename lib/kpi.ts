@@ -1,5 +1,17 @@
 import type { ActionSession, Channel, ActionCategory } from "@/types";
 
+const DAY_MS = 86400000;
+
+function toDayStart(isoString: string): number {
+  const d = new Date(isoString);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function completedSessions(sessions: ActionSession[]): ActionSession[] {
+  return sessions.filter((s) => s.completed);
+}
+
 export interface KpiData {
   total: number;
   active: number;
@@ -10,7 +22,7 @@ export interface KpiData {
 
 export function computeKpi(sessions: ActionSession[]): KpiData {
   const total = sessions.length;
-  const completed = sessions.filter((s) => s.completed).length;
+  const completed = completedSessions(sessions).length;
   const active = total - completed;
   const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
   const streak = computeStreak(sessions);
@@ -20,15 +32,7 @@ export function computeKpi(sessions: ActionSession[]): KpiData {
 export function computeLongestStreak(sessions: ActionSession[]): number {
   if (sessions.length === 0) return 0;
 
-  const DAY_MS = 86400000;
-  const days = new Set(
-    sessions.map((s) => {
-      const d = new Date(s.created_at);
-      d.setHours(0, 0, 0, 0);
-      return d.getTime();
-    })
-  );
-
+  const days = new Set(sessions.map((s) => toDayStart(s.created_at)));
   const sorted = Array.from(days).sort((a, b) => a - b);
   let longest = 1;
   let current = 1;
@@ -59,48 +63,40 @@ export function computeHeatmap(sessions: ActionSession[], days = 30): Record<str
 }
 
 export function computeChannelDist(sessions: ActionSession[]): { channel: Channel; count: number; pct: number }[] {
-  const completed = sessions.filter((s) => s.completed);
-  if (completed.length === 0) return [];
+  const done = completedSessions(sessions);
+  if (done.length === 0) return [];
 
   const counts = new Map<Channel, number>();
-  for (const s of completed) {
+  for (const s of done) {
     counts.set(s.channel, (counts.get(s.channel) ?? 0) + 1);
   }
 
   return Array.from(counts.entries())
-    .map(([channel, count]) => ({ channel, count, pct: Math.round((count / completed.length) * 100) }))
+    .map(([channel, count]) => ({ channel, count, pct: Math.round((count / done.length) * 100) }))
     .sort((a, b) => b.pct - a.pct);
 }
 
 export function computeCategoryDist(sessions: ActionSession[]): { category: ActionCategory; count: number; pct: number }[] {
-  const completed = sessions.filter((s) => s.completed);
-  if (completed.length === 0) return [];
+  const done = completedSessions(sessions);
+  if (done.length === 0) return [];
 
   const counts = new Map<ActionCategory, number>();
-  for (const s of completed) {
-    const cat = s.action.category;
-    counts.set(cat, (counts.get(cat) ?? 0) + 1);
+  for (const s of done) {
+    counts.set(s.action.category, (counts.get(s.action.category) ?? 0) + 1);
   }
 
   return Array.from(counts.entries())
-    .map(([category, count]) => ({ category, count, pct: Math.round((count / completed.length) * 100) }))
+    .map(([category, count]) => ({ category, count, pct: Math.round((count / done.length) * 100) }))
     .sort((a, b) => b.pct - a.pct);
 }
 
 function computeStreak(sessions: ActionSession[]): number {
   if (sessions.length === 0) return 0;
 
-  const DAY_MS = 86400000;
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  const sessionDays = new Set(
-    sessions.map((s) => {
-      const d = new Date(s.created_at);
-      d.setHours(0, 0, 0, 0);
-      return d.getTime();
-    })
-  );
+  const sessionDays = new Set(sessions.map((s) => toDayStart(s.created_at)));
 
   let streak = 0;
   let current = todayStart.getTime();

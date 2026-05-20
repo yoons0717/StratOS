@@ -36,6 +36,7 @@ export interface GeneratedAction {
 export interface ActionSession {
   id: string;
   created_at: string;
+  completed_at: string | null;
   input: string;
   channel: Channel;
   action: GeneratedAction;

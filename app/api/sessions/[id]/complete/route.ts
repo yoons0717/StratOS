@@ -14,7 +14,7 @@ export async function PATCH(
 
   const { error } = await supabase
     .from("action_sessions")
-    .update({ completed: true })
+    .update({ completed: true, completed_at: new Date().toISOString() })
     .eq("id", id)
     .eq("user_id", user.id);
 

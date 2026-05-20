@@ -62,32 +62,27 @@ export function computeHeatmap(sessions: ActionSession[], days = 30): Record<str
   return result;
 }
 
-export function computeChannelDist(sessions: ActionSession[]): { channel: Channel; count: number; pct: number }[] {
+function computeDist<K extends string>(sessions: ActionSession[], getKey: (s: ActionSession) => K) {
   const done = completedSessions(sessions);
   if (done.length === 0) return [];
-
-  const counts = new Map<Channel, number>();
+  const counts = new Map<K, number>();
   for (const s of done) {
-    counts.set(s.channel, (counts.get(s.channel) ?? 0) + 1);
+    const k = getKey(s);
+    counts.set(k, (counts.get(k) ?? 0) + 1);
   }
-
   return Array.from(counts.entries())
-    .map(([channel, count]) => ({ channel, count, pct: Math.round((count / done.length) * 100) }))
+    .map(([key, count]) => ({ key, count, pct: Math.round((count / done.length) * 100) }))
     .sort((a, b) => b.pct - a.pct);
 }
 
+export function computeChannelDist(sessions: ActionSession[]): { channel: Channel; count: number; pct: number }[] {
+  return computeDist(sessions, (s) => s.channel)
+    .map(({ key, count, pct }) => ({ channel: key, count, pct }));
+}
+
 export function computeCategoryDist(sessions: ActionSession[]): { category: ActionCategory; count: number; pct: number }[] {
-  const done = completedSessions(sessions);
-  if (done.length === 0) return [];
-
-  const counts = new Map<ActionCategory, number>();
-  for (const s of done) {
-    counts.set(s.action.category, (counts.get(s.action.category) ?? 0) + 1);
-  }
-
-  return Array.from(counts.entries())
-    .map(([category, count]) => ({ category, count, pct: Math.round((count / done.length) * 100) }))
-    .sort((a, b) => b.pct - a.pct);
+  return computeDist(sessions, (s) => s.action.category)
+    .map(({ key, count, pct }) => ({ category: key, count, pct }));
 }
 
 function computeStreak(sessions: ActionSession[]): number {

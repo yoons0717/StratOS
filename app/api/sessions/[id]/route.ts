@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { generateAction } from "@/lib/generate-action";
 import { buildUserPrompt } from "@/lib/prompts";
+import { userContextRowSchema } from "@/lib/schemas";
 
 export async function PATCH(
   _req: Request,
@@ -29,7 +30,10 @@ export async function PATCH(
 
   if (!ctx) return NextResponse.json({ error: "No user context" }, { status: 400 });
 
-  const userPrompt = buildUserPrompt(session.input, ctx.type, ctx.niche ?? "", ctx.level, ctx.business_stage, session.channel ?? "general");
+  const parsedCtx = userContextRowSchema.safeParse(ctx);
+  if (!parsedCtx.success) return NextResponse.json({ error: "Invalid user context" }, { status: 500 });
+
+  const userPrompt = buildUserPrompt(session.input, parsedCtx.data.type, parsedCtx.data.niche, parsedCtx.data.level, parsedCtx.data.business_stage, session.channel ?? "general");
 
   const result = await generateAction(userPrompt, 0.9);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: result.status });

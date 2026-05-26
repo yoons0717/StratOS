@@ -35,7 +35,6 @@ export default function HistoryPage() {
           session={selected}
           allSessions={sessions}
           onComplete={() => {}}
-          onDeselect={() => setSelectedId(null)}
           readonly
         />
       </div>

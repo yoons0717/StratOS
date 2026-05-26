@@ -37,16 +37,18 @@ describe("useStratosStore", () => {
     expect(useStratosStore.getState().userContext).toBeNull();
   });
 
-  it("updateSession replaces action for matching id", () => {
-    const newAction = { ...session.action, title: "Updated" };
-    useStratosStore.getState().setSessions([session]);
-    useStratosStore.getState().updateSession("s1", newAction);
-    expect(useStratosStore.getState().sessions[0].action.title).toBe("Updated");
+  it("removeSession removes the matching session", () => {
+    const s2 = makeSession({ id: "s2" });
+    useStratosStore.getState().setSessions([session, s2]);
+    useStratosStore.getState().removeSession("s1");
+    expect(useStratosStore.getState().sessions).toHaveLength(1);
+    expect(useStratosStore.getState().sessions[0].id).toBe("s2");
   });
 
-  it("updateSession ignores non-matching id", () => {
+  it("removeSession ignores non-matching id", () => {
     useStratosStore.getState().setSessions([session]);
-    useStratosStore.getState().updateSession("other", session.action);
-    expect(useStratosStore.getState().sessions[0].action.title).toBe("Test Action");
+    useStratosStore.getState().removeSession("other");
+    expect(useStratosStore.getState().sessions).toHaveLength(1);
   });
+
 });

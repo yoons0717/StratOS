@@ -23,7 +23,6 @@ function renderPanel(props: Partial<ComponentProps<typeof ActionDetailPanel>> = 
       session={session}
       allSessions={[session]}
       onComplete={vi.fn()}
-      onDeselect={vi.fn()}
       {...props}
     />
   );
@@ -69,37 +68,9 @@ describe("ActionDetailPanel", () => {
     expect(onComplete).toHaveBeenCalledWith("s1");
   });
 
-  it("calls onDeselect when NEW button is clicked", async () => {
-    const onDeselect = vi.fn();
-    renderPanel({ onDeselect });
-    await userEvent.click(screen.getByRole("button", { name: /NEW/i }));
-    expect(onDeselect).toHaveBeenCalled();
-  });
-
   it("hides COMPLETE button when readonly", () => {
     renderPanel({ readonly: true });
     expect(screen.queryByRole("button", { name: /COMPLETE/i })).not.toBeInTheDocument();
   });
 
-  it("shows REROLL button when onRegenerate is provided", () => {
-    renderPanel({ onRegenerate: vi.fn() });
-    expect(screen.getByRole("button", { name: /REROLL/i })).toBeInTheDocument();
-  });
-
-  it("calls onRegenerate when REROLL is clicked", async () => {
-    const onRegenerate = vi.fn();
-    renderPanel({ onRegenerate });
-    await userEvent.click(screen.getByRole("button", { name: /REROLL/i }));
-    expect(onRegenerate).toHaveBeenCalled();
-  });
-
-  it("hides REROLL button when readonly", () => {
-    renderPanel({ onRegenerate: vi.fn(), readonly: true });
-    expect(screen.queryByRole("button", { name: /REROLL/i })).not.toBeInTheDocument();
-  });
-
-  it("disables REROLL button and shows REROLLING when isRegenerating", () => {
-    renderPanel({ onRegenerate: vi.fn(), isRegenerating: true });
-    expect(screen.getByRole("button", { name: /REROLLING/i })).toBeDisabled();
-  });
 });

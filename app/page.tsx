@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useStratosStore } from "@/store";
-import { createSession, completeSession, regenerateSession } from "@/lib/api";
+import { createSession, completeSession, deleteSession } from "@/lib/api";
 import { useInitStore } from "@/lib/hooks";
 import { computeKpi } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
@@ -16,12 +16,11 @@ const WELCOME_KEY = "stratos_welcome_seen";
 
 export default function DashboardPage() {
   useInitStore(true);
-  const { userContext, sessions, addSession, markCompleted, updateSession } = useStratosStore();
+  const { userContext, sessions, addSession, markCompleted, removeSession } = useStratosStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
-  const [regenerating, setRegenerating] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showFirstRun, setShowFirstRun] = useState(() => typeof window !== "undefined" && !localStorage.getItem(WELCOME_KEY));
 
@@ -66,21 +65,17 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleDelete(id: string) {
+    await deleteSession(id);
+    removeSession(id);
+    if (selectedId === id) setSelectedId(null);
+  }
+
   async function handleComplete(id: string) {
     await completeSession(id);
     markCompleted(id);
     setSelectedId(null);
     setShowFeedback(true);
-  }
-
-  async function handleRegenerate(id: string) {
-    setRegenerating(true);
-    try {
-      const updated = await regenerateSession(id);
-      updateSession(id, updated.action);
-    } finally {
-      setRegenerating(false);
-    }
   }
 
   return (
@@ -91,6 +86,7 @@ export default function DashboardPage() {
             sessions={activeSessions}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            onDelete={handleDelete}
           />
           <div className="border-t border-zinc-800 p-3">
             <button
@@ -112,9 +108,6 @@ export default function DashboardPage() {
             session={selectedSession}
             allSessions={sessions}
             onComplete={handleComplete}
-            onDeselect={() => setSelectedId(null)}
-            onRegenerate={selectedSession ? () => handleRegenerate(selectedSession.id) : undefined}
-            isRegenerating={regenerating}
           />
         )}
       </div>

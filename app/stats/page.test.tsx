@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import { defaultCtx, makeSession } from "@/tests/fixtures";
@@ -50,17 +50,24 @@ describe("StatsPage", () => {
   it("shows zero stat values when no sessions", async () => {
     render(<StatsPage />);
     await screen.findByText("현재 스트릭");
-    const zeros = screen.getAllByText("0");
-    expect(zeros.length).toBeGreaterThanOrEqual(3);
+    const card = (label: string) => screen.getByText(label).closest("div")!;
+    expect(within(card("현재 스트릭")).getByText("0")).toBeInTheDocument();
+    expect(within(card("최장 스트릭")).getByText("0")).toBeInTheDocument();
+    expect(within(card("총 완료")).getByText("0")).toBeInTheDocument();
+    expect(within(card("완료율")).getByText("0%")).toBeInTheDocument();
   });
 
-  it("shows correct streak from sessions", async () => {
+  it("shows correct stat values from sessions", async () => {
     const sessions = [
       makeSession({ completed: true, created_at: new Date().toISOString() }),
     ];
     mockFetchSessions.mockResolvedValue(sessions);
     render(<StatsPage />);
     await screen.findByText("현재 스트릭");
-    expect(screen.getAllByText("1").length).toBeGreaterThanOrEqual(1);
+    const card = (label: string) => screen.getByText(label).closest("div")!;
+    expect(within(card("현재 스트릭")).getByText("1")).toBeInTheDocument();
+    expect(within(card("최장 스트릭")).getByText("1")).toBeInTheDocument();
+    expect(within(card("총 완료")).getByText("1")).toBeInTheDocument();
+    expect(within(card("완료율")).getByText("100%")).toBeInTheDocument();
   });
 });

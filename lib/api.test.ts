@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext, regenerateSession } from "./api";
+import { fetchSessions, createSession, completeSession, fetchUserContext, saveUserContext, deleteSession } from "./api";
 import { defaultCtx, makeSession } from "@/tests/fixtures";
 
 const mockSession = makeSession({ id: "s1" });
@@ -85,20 +85,20 @@ describe("saveUserContext", () => {
   });
 });
 
-describe("regenerateSession", () => {
-  it("PATCH /api/sessions/:id 호출 후 세션 반환", async () => {
+describe("deleteSession", () => {
+  it("DELETE /api/sessions/:id 호출", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(mockSession), { status: 200 })
+      new Response(null, { status: 204 })
     );
-    const result = await regenerateSession("s1");
-    expect(fetch).toHaveBeenCalledWith("/api/sessions/s1", { method: "PATCH" });
-    expect(result.id).toBe("s1");
+    await deleteSession("s1");
+    expect(fetch).toHaveBeenCalledWith("/api/sessions/s1", { method: "DELETE" });
   });
 
   it("non-ok 응답 시 throw", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(null, { status: 500 })
     );
-    await expect(regenerateSession("s1")).rejects.toThrow("API error: 500");
+    await expect(deleteSession("s1")).rejects.toThrow("API error: 500");
   });
 });
+

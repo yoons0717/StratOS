@@ -8,7 +8,7 @@ interface StratosStore {
   setSessions: (sessions: ActionSession[]) => void;
   addSession: (session: ActionSession) => void;
   markCompleted: (id: string) => void;
-  updateSession: (id: string, action: ActionSession["action"]) => void;
+  removeSession: (id: string) => void;
 }
 
 export const useStratosStore = create<StratosStore>()((set) => ({
@@ -24,10 +24,8 @@ export const useStratosStore = create<StratosStore>()((set) => ({
         s.id === id ? { ...s, completed: true } : s
       ),
     })),
-  updateSession: (id, action) =>
+  removeSession: (id) =>
     set((state) => ({
-      sessions: state.sessions.map((s) =>
-        s.id === id ? { ...s, action } : s
-      ),
+      sessions: state.sessions.filter((s) => s.id !== id),
     })),
 }));

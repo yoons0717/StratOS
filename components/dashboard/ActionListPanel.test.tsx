@@ -37,4 +37,16 @@ describe("ActionListPanel", () => {
     render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} emptyLabel="No completed actions" />);
     expect(screen.getByText("No completed actions")).toBeInTheDocument();
   });
+
+  it("calls onDelete with session id when ✕ is clicked", async () => {
+    const onDelete = vi.fn();
+    render(<ActionListPanel sessions={sessions} selectedId={null} onSelect={vi.fn()} onDelete={onDelete} />);
+    await userEvent.click(screen.getAllByRole("button", { name: /✕/ })[0]);
+    expect(onDelete).toHaveBeenCalledWith("s1");
+  });
+
+  it("does not show delete buttons when onDelete is not provided", () => {
+    render(<ActionListPanel sessions={sessions} selectedId={null} onSelect={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /✕/ })).not.toBeInTheDocument();
+  });
 });

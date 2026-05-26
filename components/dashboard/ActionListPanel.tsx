@@ -4,6 +4,7 @@ interface Props {
   sessions: ActionSession[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onDelete?: (id: string) => void;
   emptyLabel?: string;
 }
 
@@ -11,6 +12,7 @@ export default function ActionListPanel({
   sessions,
   selectedId,
   onSelect,
+  onDelete,
   emptyLabel = "No actions yet",
 }: Props) {
   return (
@@ -23,17 +25,30 @@ export default function ActionListPanel({
       ) : (
         <div className="flex flex-col gap-1.5">
           {sessions.map((session) => (
-            <button
+            <div
               key={session.id}
-              onClick={() => onSelect(session.id)}
-              className={`rounded border px-3 py-2 text-left font-mono text-sm transition-colors ${
-                selectedId === session.id
-                  ? "border-neon text-neon"
-                  : "border-zinc-800 text-zinc-300 hover:border-zinc-600"
-              }`}
+              className="group relative"
             >
-              {session.action.title}
-            </button>
+              <button
+                onClick={() => onSelect(session.id)}
+                className={`w-full rounded border px-3 py-2 pr-8 text-left font-mono text-sm transition-colors ${
+                  selectedId === session.id
+                    ? "border-neon text-neon"
+                    : "border-zinc-800 text-zinc-300 hover:border-zinc-600"
+                }`}
+              >
+                {session.action.title}
+              </button>
+              {onDelete && (
+                <button
+                  onClick={() => onDelete(session.id)}
+                  aria-label="✕"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 font-mono text-xs text-zinc-700 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-400"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}

@@ -10,7 +10,6 @@ const routerMock = vi.hoisted(() => ({ push: pushMock }));
 const mockFetchUserContext = vi.hoisted(() => vi.fn());
 const mockFetchSessions = vi.hoisted(() => vi.fn());
 const mockCompleteSession = vi.hoisted(() => vi.fn());
-const mockRegenerateSession = vi.hoisted(() => vi.fn());
 
 vi.mock("next/navigation", () => ({
   useRouter: () => routerMock,
@@ -31,7 +30,6 @@ vi.mock("@/lib/api", () => ({
   fetchSessions: mockFetchSessions,
   createSession: vi.fn(),
   completeSession: mockCompleteSession,
-  regenerateSession: mockRegenerateSession,
 }));
 
 const session = makeSession({
@@ -44,7 +42,6 @@ beforeEach(() => {
   mockFetchUserContext.mockResolvedValue(defaultCtx);
   mockFetchSessions.mockResolvedValue([]);
   mockCompleteSession.mockResolvedValue(undefined);
-  mockRegenerateSession.mockResolvedValue(undefined);
   useStratosStore.setState({ userContext: null, sessions: [] });
   localStorage.clear();
 });
@@ -134,16 +131,4 @@ describe("DashboardPage", () => {
     expect(await screen.findByText(/SITUATION \/\//i)).toBeInTheDocument();
   });
 
-  it("RETRY calls regenerateSession and updates action in store", async () => {
-    localStorage.setItem("stratos_welcome_seen", "1");
-    const updatedSession = { ...session, action: { ...session.action, title: "New Action" } };
-    mockFetchSessions.mockResolvedValue([session]);
-    mockRegenerateSession.mockResolvedValue(updatedSession);
-    render(<DashboardPage />);
-    await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
-    await userEvent.click(screen.getByRole("button", { name: /REROLL/i }));
-    await waitFor(() =>
-      expect(useStratosStore.getState().sessions[0].action.title).toBe("New Action")
-    );
-  });
 });

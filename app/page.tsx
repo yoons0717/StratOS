@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [showFirstRun, setShowFirstRun] = useState(() => typeof window !== "undefined" && !localStorage.getItem(WELCOME_KEY));
 
   useEffect(() => {
@@ -66,16 +67,24 @@ export default function DashboardPage() {
   }
 
   async function handleDelete(id: string) {
-    await deleteSession(id);
-    removeSession(id);
-    if (selectedId === id) setSelectedId(null);
+    try {
+      await deleteSession(id);
+      removeSession(id);
+      if (selectedId === id) setSelectedId(null);
+    } catch {
+      setActionError("DELETE_FAILED — Please try again");
+    }
   }
 
   async function handleComplete(id: string) {
-    await completeSession(id);
-    markCompleted(id);
-    setSelectedId(null);
-    setShowFeedback(true);
+    try {
+      await completeSession(id);
+      markCompleted(id);
+      setSelectedId(null);
+      setShowFeedback(true);
+    } catch {
+      setActionError("COMPLETE_FAILED — Please try again");
+    }
   }
 
   return (
@@ -96,20 +105,27 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-        {showFeedback ? (
-          <CompletionFeedback
-            streak={kpiData.streak}
-            rate={kpiData.rate}
-            onDismiss={() => setShowFeedback(false)}
-          />
-        ) : (
-          <ActionDetailPanel
-            session={selectedSession}
-            allSessions={sessions}
-            onComplete={handleComplete}
-            onDelete={selectedSession ? handleDelete : undefined}
-          />
-        )}
+        <div className="relative flex flex-1 overflow-hidden">
+          {showFeedback ? (
+            <CompletionFeedback
+              streak={kpiData.streak}
+              rate={kpiData.rate}
+              onDismiss={() => setShowFeedback(false)}
+            />
+          ) : (
+            <ActionDetailPanel
+              session={selectedSession}
+              allSessions={sessions}
+              onComplete={handleComplete}
+              onDelete={selectedSession ? handleDelete : undefined}
+            />
+          )}
+          {actionError && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded border border-red-900 bg-zinc-900 px-4 py-2 font-mono text-xs text-red-400">
+              {actionError}
+            </div>
+          )}
+        </div>
       </div>
       {showModal && (
         <NewActionModal

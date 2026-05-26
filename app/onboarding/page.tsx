@@ -20,6 +20,7 @@ export default function OnboardingPage() {
   const setUserContext = useStratosStore((s) => s.setUserContext);
 
   const [step, setStep] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [type, setType] = useState<UserType | null>(null);
   const [level, setLevel] = useState<UserLevel | null>(null);
   const [stage, setStage] = useState<BusinessStage | null>(null);
@@ -34,9 +35,13 @@ export default function OnboardingPage() {
     }
     if (!type || !level || !stage || !niche.trim()) return;
     const ctx = { type, level, businessStage: stage, niche: niche.trim() };
-    await saveUserContext(ctx);
-    setUserContext(ctx);
-    router.push("/");
+    try {
+      await saveUserContext(ctx);
+      setUserContext(ctx);
+      router.push("/");
+    } catch {
+      setError("SAVE_FAILED — Please try again");
+    }
   }
 
   const headerRight = (
@@ -67,6 +72,9 @@ export default function OnboardingPage() {
         <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
           EXECUTE →
         </Button>
+        {error && (
+          <p className="mt-3 font-mono text-xs text-red-400">{error}</p>
+        )}
       </div>
     </main>
   );

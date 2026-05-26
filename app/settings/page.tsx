@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const [stage, setStage] = useState<BusinessStage | null>(null);
   const [niche, setNiche] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUserContext().then((ctx) => {
@@ -29,6 +30,8 @@ export default function SettingsPage() {
       setLevel(ctx.level);
       setStage(ctx.businessStage);
       setNiche(ctx.niche);
+    }).catch(() => {
+      router.push("/onboarding");
     });
   }, [router, setUserContext]);
 
@@ -37,10 +40,15 @@ export default function SettingsPage() {
   async function handleSave() {
     if (!type || !level || !stage || !niche.trim()) return;
     const ctx = { type, level, businessStage: stage, niche: niche.trim() };
-    await saveUserContext(ctx);
-    setUserContext(ctx);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await saveUserContext(ctx);
+      setUserContext(ctx);
+      setSaved(true);
+      setSaveError(null);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      setSaveError("SAVE_FAILED — Please try again");
+    }
   }
 
   return (
@@ -72,6 +80,9 @@ export default function SettingsPage() {
           <div>
             {saved && (
               <div className="mb-3 font-mono text-xs tracking-widest text-neon">SETTINGS_SAVED ✓</div>
+            )}
+            {saveError && (
+              <div className="mb-3 font-mono text-xs text-red-400">{saveError}</div>
             )}
             <Button onClick={handleSave} disabled={!type || !level || !stage || !niche.trim()} className="w-full">
               SAVE →

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { ActionSession } from "@/types";
 import Button from "@/components/ui/Button";
 import MagicCopy from "@/components/result/MagicCopy";
@@ -40,6 +43,7 @@ interface Props {
   session: ActionSession | null;
   allSessions: ActionSession[];
   onComplete: (id: string) => void;
+  onDelete?: (id: string) => void;
   readonly?: boolean;
 }
 
@@ -47,8 +51,11 @@ export default function ActionDetailPanel({
   session,
   allSessions,
   onComplete,
+  onDelete,
   readonly = false,
 }: Props) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   if (!session) {
     return (
       <div className="flex flex-1 items-center justify-center font-mono text-xs text-zinc-700">
@@ -100,10 +107,38 @@ export default function ActionDetailPanel({
       <CategoryChart sessions={allSessions} />
 
       {!readonly && (
-        <div className="mt-auto">
-          <Button className="w-full" onClick={() => onComplete(session.id)}>
+        <div className="mt-auto flex gap-3">
+          {onDelete && (
+            <Button variant="ghost" className="px-4" onClick={() => setConfirmDelete(true)}>
+              ✕ DELETE
+            </Button>
+          )}
+          <Button className="flex-1" onClick={() => onComplete(session.id)}>
             COMPLETE ✓
           </Button>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+          onClick={() => setConfirmDelete(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded border border-zinc-800 bg-surface p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-1 font-mono text-xs tracking-widest text-zinc-600">CONFIRM_DELETE //</p>
+            <p className="mb-6 font-mono text-sm text-white">{session.action.title}</p>
+            <div className="flex gap-3">
+              <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(false)}>
+                CANCEL
+              </Button>
+              <Button className="flex-1" onClick={() => onDelete!(session.id)}>
+                CONFIRM
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>

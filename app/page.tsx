@@ -86,7 +86,6 @@ export default function DashboardPage() {
             sessions={activeSessions}
             selectedId={selectedId}
             onSelect={setSelectedId}
-            onDelete={handleDelete}
           />
           <div className="border-t border-zinc-800 p-3">
             <button
@@ -108,6 +107,7 @@ export default function DashboardPage() {
             session={selectedSession}
             allSessions={sessions}
             onComplete={handleComplete}
+            onDelete={selectedSession ? handleDelete : undefined}
           />
         )}
       </div>

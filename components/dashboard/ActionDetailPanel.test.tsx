@@ -73,4 +73,38 @@ describe("ActionDetailPanel", () => {
     expect(screen.queryByRole("button", { name: /COMPLETE/i })).not.toBeInTheDocument();
   });
 
+  it("shows DELETE button when onDelete is provided", () => {
+    renderPanel({ onDelete: vi.fn() });
+    expect(screen.getByRole("button", { name: /DELETE/i })).toBeInTheDocument();
+  });
+
+  it("does not show DELETE button when onDelete is not provided", () => {
+    renderPanel();
+    expect(screen.queryByRole("button", { name: /DELETE/i })).not.toBeInTheDocument();
+  });
+
+  it("clicking DELETE opens confirm modal, COMPLETE still visible", async () => {
+    renderPanel({ onDelete: vi.fn() });
+    await userEvent.click(screen.getByRole("button", { name: /DELETE/i }));
+    expect(screen.getByText(/CONFIRM_DELETE/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /COMPLETE/i })).toBeInTheDocument();
+  });
+
+  it("CANCEL closes confirm modal without calling onDelete", async () => {
+    const onDelete = vi.fn();
+    renderPanel({ onDelete });
+    await userEvent.click(screen.getByRole("button", { name: /DELETE/i }));
+    await userEvent.click(screen.getByRole("button", { name: /CANCEL/i }));
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.queryByText(/CONFIRM_DELETE/i)).not.toBeInTheDocument();
+  });
+
+  it("CONFIRM calls onDelete with id", async () => {
+    const onDelete = vi.fn();
+    renderPanel({ onDelete });
+    await userEvent.click(screen.getByRole("button", { name: /DELETE/i }));
+    await userEvent.click(screen.getByRole("button", { name: /CONFIRM/i }));
+    expect(onDelete).toHaveBeenCalledWith("s1");
+  });
+
 });

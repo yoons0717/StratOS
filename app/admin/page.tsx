@@ -2,6 +2,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import {
+  computeDauEntries,
+  computeDauAvg,
+  computeOnboardingRate,
+  computeSessionCompletionRate,
+} from "@/lib/metrics";
 
 async function fetchMetrics() {
   const supabase = createSupabaseAdminClient();
@@ -15,30 +21,14 @@ async function fetchMetrics() {
     supabase.from("events").select("name").gte("created_at", since30).in("name", ["session_created", "session_completed"]),
   ]);
 
-  const dauMap = new Map<string, Set<string>>();
-  for (const row of dauRaw ?? []) {
-    const date = row.created_at.slice(0, 10);
-    if (!dauMap.has(date)) dauMap.set(date, new Set());
-    dauMap.get(date)!.add(row.user_id);
-  }
-  const dauEntries = Array.from(dauMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, users]) => ({ date, users: users.size }));
-  const dauLast7Avg = dauEntries.length
-    ? Math.round(dauEntries.reduce((s, e) => s + e.users, 0) / 7)
-    : 0;
+  const dauEntries = computeDauEntries(dauRaw ?? []);
 
-  const allUsers = new Set((onboardingRaw ?? []).map((r) => r.user_id));
-  const onboardedUsers = new Set(
-    (onboardingRaw ?? []).filter((r) => r.name === "onboarding_completed").map((r) => r.user_id)
-  );
-  const onboardingRate = allUsers.size ? Math.round((onboardedUsers.size / allUsers.size) * 100) : 0;
-
-  const created = (sessionRaw ?? []).filter((r) => r.name === "session_created").length;
-  const completed = (sessionRaw ?? []).filter((r) => r.name === "session_completed").length;
-  const sessionCompletionRate = created ? Math.round((completed / created) * 100) : 0;
-
-  return { dauLast7Avg, dauEntries, onboardingRate, sessionCompletionRate };
+  return {
+    dauLast7Avg: computeDauAvg(dauEntries, 7),
+    dauEntries,
+    onboardingRate: computeOnboardingRate(onboardingRaw ?? []),
+    sessionCompletionRate: computeSessionCompletionRate(sessionRaw ?? []),
+  };
 }
 
 function StatCard({ label, value }: { label: string; value: string | number }) {

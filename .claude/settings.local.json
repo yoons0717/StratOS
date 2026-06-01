@@ -23,7 +23,9 @@
       "Skill(superpowers:brainstorming)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.get\\('dependencies',{}\\).keys\\(\\)\\)\\)\")",
       "Bash(gh repo *)",
-      "Bash(xargs ls -la)"
+      "Bash(xargs ls -la)",
+      "Bash(gh pr *)",
+      "Bash(xargs sed -i '' 's/STRATOS_OS/STRATOS/g')"
     ]
   }
 }

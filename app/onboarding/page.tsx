@@ -53,7 +53,7 @@ export default function OnboardingPage() {
       <ScanlineOverlay />
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
-          <span className="font-mono text-xs tracking-widest text-neon">STRATOS_OS</span>
+          <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
           {headerRight}
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">

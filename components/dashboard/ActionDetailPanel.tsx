@@ -121,7 +121,7 @@ export default function ActionDetailPanel({
           confirmLabel="DELETE"
           confirmVariant="danger"
           onConfirm={() => onDelete!(session.id)}
-          onCancel={() => setConfirmDelete(false)}
+          onClose={() => setConfirmDelete(false)}
         />
       )}
     </div>

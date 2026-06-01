@@ -11,7 +11,7 @@ function renderModal(overrides = {}) {
       confirmLabel="DELETE"
       confirmVariant="danger"
       onConfirm={vi.fn()}
-      onCancel={vi.fn()}
+      onClose={vi.fn()}
       {...overrides}
     />
   );
@@ -26,24 +26,26 @@ describe("ConfirmModal", () => {
     expect(screen.getByRole("button", { name: "CANCEL" })).toBeInTheDocument();
   });
 
-  it("calls onConfirm when confirm button is clicked", async () => {
+  it("calls onConfirm then onClose when confirm button is clicked", async () => {
     const onConfirm = vi.fn();
-    renderModal({ onConfirm });
+    const onClose = vi.fn();
+    renderModal({ onConfirm, onClose });
     await userEvent.click(screen.getByRole("button", { name: "DELETE" }));
     expect(onConfirm).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it("calls onCancel when CANCEL is clicked", async () => {
-    const onCancel = vi.fn();
-    renderModal({ onCancel });
+  it("calls onClose when CANCEL is clicked", async () => {
+    const onClose = vi.fn();
+    renderModal({ onClose });
     await userEvent.click(screen.getByRole("button", { name: "CANCEL" }));
-    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it("calls onCancel when backdrop is clicked", async () => {
-    const onCancel = vi.fn();
-    renderModal({ onCancel });
+  it("calls onClose when backdrop is clicked", async () => {
+    const onClose = vi.fn();
+    renderModal({ onClose });
     await userEvent.click(screen.getByTestId("confirm-modal-backdrop"));
-    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
   });
 });

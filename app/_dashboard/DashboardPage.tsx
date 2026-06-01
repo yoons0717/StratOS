@@ -117,7 +117,6 @@ export default function DashboardPage() {
           ) : (
             <ActionDetailPanel
               session={selectedSession}
-              allSessions={sessions}
               onComplete={handleComplete}
               onDelete={selectedSession ? handleDelete : undefined}
             />

@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { ActionSession } from "@/types";
 import Button from "@/components/ui/Button";
 import MagicCopy from "@/components/result/MagicCopy";
-import CategoryChart from "./CategoryChart";
 import { CHANNEL_LABEL } from "@/lib/analytics/labels";
 
 function formatDuration(startIso: string, endIso: string): string {
@@ -38,10 +37,8 @@ function SessionTimestamp({ session }: { session: ActionSession }) {
   );
 }
 
-
 interface Props {
   session: ActionSession | null;
-  allSessions: ActionSession[];
   onComplete: (id: string) => void;
   onDelete?: (id: string) => void;
   readonly?: boolean;
@@ -49,7 +46,6 @@ interface Props {
 
 export default function ActionDetailPanel({
   session,
-  allSessions,
   onComplete,
   onDelete,
   readonly = false,
@@ -103,8 +99,6 @@ export default function ActionDetailPanel({
       <SessionTimestamp session={session} />
 
       <MagicCopy text={action.magicCopy} />
-
-      <CategoryChart sessions={allSessions} />
 
       {!readonly && (
         <div className="mt-auto flex gap-3">

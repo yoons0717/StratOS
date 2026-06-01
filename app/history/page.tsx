@@ -34,7 +34,6 @@ export default function HistoryPage() {
         />
         <ActionDetailPanel
           session={selected}
-          allSessions={sessions}
           onComplete={() => {}}
           readonly
         />

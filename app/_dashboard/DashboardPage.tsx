@@ -92,7 +92,10 @@ export default function DashboardPage() {
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex w-72 shrink-0 flex-col border-r border-zinc-800">
+        {/* List panel: full width on mobile when no selection, fixed width on desktop */}
+        <div className={`flex flex-col border-r border-zinc-800 ${
+          selectedId || showFeedback ? "hidden md:flex md:w-72 md:shrink-0" : "flex w-full md:w-72 md:shrink-0"
+        }`}>
           <ActionListPanel
             sessions={activeSessions}
             selectedId={selectedId}
@@ -107,7 +110,19 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
-        <div className="relative flex flex-1 overflow-hidden">
+        {/* Detail panel: hidden on mobile when no selection */}
+        <div className={`relative overflow-hidden ${
+          selectedId || showFeedback ? "flex flex-1" : "hidden md:flex md:flex-1"
+        }`}>
+          {/* Mobile back button */}
+          {(selectedId || showFeedback) && (
+            <button
+              onClick={() => { setSelectedId(null); setShowFeedback(false); }}
+              className="absolute left-4 top-4 z-10 font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300 md:hidden"
+            >
+              ← Back
+            </button>
+          )}
           {showFeedback ? (
             <CompletionFeedback
               streak={kpiData.streak}

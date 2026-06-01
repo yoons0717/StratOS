@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { UserContext } from "@/types";
 import type { KpiData } from "@/lib/analytics/kpi";
 import Sidebar from "./Sidebar";
+import BottomNav from "./BottomNav";
 import KpiBar from "./KpiBar";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 
@@ -16,8 +17,8 @@ export default function AppShell({ userContext, kpiData, children }: Props) {
     <div className="flex h-screen bg-background">
       <ScanlineOverlay />
       <Sidebar userContext={userContext} />
-      <div className="flex flex-1 min-h-0 flex-col">
-        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-zinc-800/60 px-6">
+      <div className="flex flex-1 min-h-0 flex-col pb-[calc(56px+env(safe-area-inset-bottom))] md:pb-0">
+        <div className="flex h-12 shrink-0 items-center gap-2 border-b border-zinc-800/60 px-4 md:px-6">
           <span className="text-sm text-zinc-300">{userContext.niche}</span>
           <span className="text-zinc-700">·</span>
           <span className="text-xs text-zinc-600">{userContext.level} / {userContext.type}</span>
@@ -27,6 +28,7 @@ export default function AppShell({ userContext, kpiData, children }: Props) {
           {children}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 }

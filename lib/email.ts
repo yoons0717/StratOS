@@ -1,8 +1,7 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function sendReminderEmail(to: string, streak: number) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: "StratOS <onboarding@resend.dev>",
     to,

@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [level, setLevel] = useState<UserLevel | null>(null);
   const [stage, setStage] = useState<BusinessStage | null>(null);
   const [niche, setNiche] = useState("");
+  const [reminderEmail, setReminderEmail] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -30,6 +31,7 @@ export default function SettingsPage() {
       setLevel(ctx.level);
       setStage(ctx.businessStage);
       setNiche(ctx.niche);
+      setReminderEmail(ctx.reminderEmail);
     }).catch(() => {
       router.push("/onboarding");
     });
@@ -39,7 +41,7 @@ export default function SettingsPage() {
 
   async function handleSave() {
     if (!type || !level || !stage || !niche.trim()) return;
-    const ctx = { type, level, businessStage: stage, niche: niche.trim() };
+    const ctx = { type, level, businessStage: stage, niche: niche.trim(), reminderEmail };
     try {
       await saveUserContext(ctx);
       setUserContext(ctx);
@@ -76,6 +78,20 @@ export default function SettingsPage() {
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">YOUR_NICHE //</div>
             <StepNiche value={niche} onChange={setNiche} />
+          </div>
+          <div>
+            <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">NOTIFICATIONS //</div>
+            <button
+              onClick={() => setReminderEmail((v) => !v)}
+              className={`flex min-h-[44px] w-full items-center justify-between rounded border px-4 py-3 font-mono text-sm transition-colors ${
+                reminderEmail
+                  ? "border-neon bg-neon/10 text-neon"
+                  : "border-zinc-700 text-zinc-500 hover:border-zinc-500"
+              }`}
+            >
+              <span>{reminderEmail ? "▶ " : "  "}REMINDER_EMAIL</span>
+              <span className="text-xs opacity-60">{reminderEmail ? "ON" : "OFF"}</span>
+            </button>
           </div>
           <div>
             {saved && (

@@ -12,6 +12,7 @@ export interface UserContext {
   level: UserLevel;
   businessStage: BusinessStage;
   niche: string;
+  reminderEmail: boolean;
 }
 
 export type ActionCategory =

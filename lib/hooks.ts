@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
 import { fetchUserContext, fetchSessions } from "@/lib/api";
@@ -8,6 +8,7 @@ import { fetchUserContext, fetchSessions } from "@/lib/api";
 export function useInitStore(withSessions = false) {
   const router = useRouter();
   const { setUserContext, setSessions } = useStratosStore();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function init() {
@@ -21,7 +22,10 @@ export function useInitStore(withSessions = false) {
         if (!ctx) { router.push("/onboarding"); return; }
         setUserContext(ctx);
       }
+      setIsLoading(false);
     }
-    init();
+    init().catch(() => setIsLoading(false));
   }, [router, setUserContext, setSessions, withSessions]);
+
+  return { isLoading };
 }

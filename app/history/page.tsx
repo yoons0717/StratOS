@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { useStratosStore } from "@/store";
 import { useInitStore } from "@/lib/hooks";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import { computeKpi } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
 import ActionDetailPanel from "@/components/dashboard/ActionDetailPanel";
 
 export default function HistoryPage() {
-  useInitStore(true);
+  const { isLoading } = useInitStore(true);
   const { userContext, sessions } = useStratosStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  if (!userContext) return null;
+  if (isLoading || !userContext) return <LoadingScreen />;
 
   const completed = sessions.filter((s) => s.completed);
   const kpiData = computeKpi(sessions);

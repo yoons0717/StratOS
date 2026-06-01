@@ -1,9 +1,10 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 
 async function fetchMetrics() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
 
   const since7 = new Date(Date.now() - 7 * 86400000).toISOString();
   const since30 = new Date(Date.now() - 30 * 86400000).toISOString();

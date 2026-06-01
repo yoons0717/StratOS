@@ -35,12 +35,12 @@ describe("StatsPage", () => {
 
   it("shows zero stat values when no sessions", async () => {
     render(<StatsPage />);
-    await screen.findByText("현재 스트릭");
+    await screen.findByText("Current Streak");
     const card = (label: string) => screen.getByText(label).closest("div")!;
-    expect(within(card("현재 스트릭")).getByText("0")).toBeInTheDocument();
-    expect(within(card("최장 스트릭")).getByText("0")).toBeInTheDocument();
-    expect(within(card("총 완료")).getByText("0")).toBeInTheDocument();
-    expect(within(card("완료율")).getByText("0%")).toBeInTheDocument();
+    expect(within(card("Current Streak")).getByText("0")).toBeInTheDocument();
+    expect(within(card("Longest Streak")).getByText("0")).toBeInTheDocument();
+    expect(within(card("Total Done")).getByText("0")).toBeInTheDocument();
+    expect(within(card("Completion Rate")).getByText("0%")).toBeInTheDocument();
   });
 
   it("shows correct stat values from sessions", async () => {
@@ -49,11 +49,11 @@ describe("StatsPage", () => {
     ];
     mockFetchSessions.mockResolvedValue(sessions);
     render(<StatsPage />);
-    await screen.findByText("현재 스트릭");
+    await screen.findByText("Current Streak");
     const card = (label: string) => screen.getByText(label).closest("div")!;
-    expect(within(card("현재 스트릭")).getByText("1")).toBeInTheDocument();
-    expect(within(card("최장 스트릭")).getByText("1")).toBeInTheDocument();
-    expect(within(card("총 완료")).getByText("1")).toBeInTheDocument();
-    expect(within(card("완료율")).getByText("100%")).toBeInTheDocument();
+    expect(within(card("Current Streak")).getByText("1")).toBeInTheDocument();
+    expect(within(card("Longest Streak")).getByText("1")).toBeInTheDocument();
+    expect(within(card("Total Done")).getByText("1")).toBeInTheDocument();
+    expect(within(card("Completion Rate")).getByText("100%")).toBeInTheDocument();
   });
 });

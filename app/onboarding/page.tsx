@@ -102,7 +102,7 @@ export default function OnboardingPage() {
             onClick={() => setStep((s) => s - 1)}
             className="mt-3 w-full font-mono text-xs text-zinc-600 transition-colors hover:text-zinc-400"
           >
-            ← 이전으로
+            ← BACK
           </button>
         )}
         {error && (

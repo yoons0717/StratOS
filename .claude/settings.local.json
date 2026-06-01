@@ -25,7 +25,11 @@
       "Bash(gh repo *)",
       "Bash(xargs ls -la)",
       "Bash(gh pr *)",
-      "Bash(xargs sed -i '' 's/STRATOS_OS/STRATOS/g')"
+      "Bash(xargs sed -i '' 's/STRATOS_OS/STRATOS/g')",
+      "Bash(sed -i '' -e 's|/이전으로/i|/BACK/i|g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/onboarding/page.test.tsx)",
+      "Bash(sed -i '' -e 's|/일반/i|/General/i|g' -e 's|/인스타그램/i|/Instagram/i|g' -e 's|/현재 수치/i|/current metrics/i|g' -e 's|/게시물·릴스/i|/post.*reel/i|g' /Users/yoonmigoo/Desktop/myProject/StratOS/components/dashboard/NewActionModal.test.tsx)",
+      "Bash(sed -i '' -e 's|\"인스타그램\"|\"Instagram\"|g' -e 's|queryByText\\(\"인스타그램\"\\)|queryByText\\(\"Instagram\"\\)|g' /Users/yoonmigoo/Desktop/myProject/StratOS/components/dashboard/ActionDetailPanel.test.tsx)",
+      "Bash(sed -i '' -e 's/\"현재 스트릭\"/\"Current Streak\"/g' -e 's/\"최장 스트릭\"/\"Longest Streak\"/g' -e 's/\"총 완료\"/\"Total Done\"/g' -e 's/\"완료율\"/\"Completion Rate\"/g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/stats/page.test.tsx)"
     ]
   }
 }

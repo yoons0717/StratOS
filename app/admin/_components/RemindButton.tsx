@@ -21,7 +21,7 @@ export default function RemindButton() {
 
   return (
     <div className="rounded border border-zinc-800 p-4">
-      <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">리마인더 이메일</p>
+      <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">reminder email</p>
       <button
         onClick={handleSend}
         disabled={status === "sending"}
@@ -30,10 +30,10 @@ export default function RemindButton() {
         {status === "sending" ? "SENDING..." : "SEND_REMINDERS →"}
       </button>
       {status === "done" && (
-        <p className="mt-3 font-mono text-xs text-neon">{sent}명에게 발송 완료</p>
+        <p className="mt-3 font-mono text-xs text-neon">sent to {sent} users</p>
       )}
       {status === "error" && (
-        <p className="mt-3 font-mono text-xs text-red-400">SEND_FAILED — 다시 시도해주세요</p>
+        <p className="mt-3 font-mono text-xs text-red-400">SEND_FAILED — please try again</p>
       )}
     </div>
   );

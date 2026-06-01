@@ -9,6 +9,7 @@ import {
   computeHeatmap,
   computeChannelDist,
   computeCategoryDist,
+  computeWeeklyChannelDist,
 } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
 import { CHANNEL_LABEL, CATEGORY_LABEL } from "@/lib/labels";
@@ -89,6 +90,7 @@ export default function StatsPage() {
   const heatmapData = computeHeatmap(sessions);
   const channelDist = computeChannelDist(sessions);
   const categoryDist = computeCategoryDist(sessions);
+  const weeklyChannelDist = computeWeeklyChannelDist(sessions);
 
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
@@ -115,6 +117,60 @@ export default function StatsPage() {
             <div className="h-3 w-3 rounded-sm bg-neon" />
             <span>많음</span>
           </div>
+        </div>
+
+        <div className="mb-6 rounded border border-zinc-800 bg-surface p-4">
+          <p className="mb-4 font-mono text-xs uppercase tracking-widest text-zinc-600">
+            주별 채널 분포
+          </p>
+          {weeklyChannelDist.every((w) => Object.keys(w.channels).length === 0) ? (
+            <p className="font-mono text-xs text-zinc-700">데이터 없음</p>
+          ) : (
+            <div className="space-y-2">
+              {weeklyChannelDist.map(({ week, channels }) => {
+                const total = Object.values(channels).reduce((s, n) => s + n, 0);
+                return (
+                  <div key={week} className="flex items-center gap-3">
+                    <span className="w-12 shrink-0 font-mono text-xs text-zinc-600">{week}</span>
+                    <div className="flex h-4 flex-1 overflow-hidden rounded">
+                      {total === 0 ? (
+                        <div className="h-full w-full bg-zinc-800" />
+                      ) : (
+                        (["instagram", "naver-blog", "youtube", "general"] as const).map((ch) => {
+                          const count = channels[ch] ?? 0;
+                          if (count === 0) return null;
+                          const pct = Math.round((count / total) * 100);
+                          const colors: Record<string, string> = {
+                            instagram: "bg-pink-500/70",
+                            "naver-blog": "bg-green-500/70",
+                            youtube: "bg-red-500/70",
+                            general: "bg-zinc-600",
+                          };
+                          return (
+                            <div
+                              key={ch}
+                              className={`h-full ${colors[ch]}`}
+                              style={{ width: `${pct}%` }}
+                              title={`${CHANNEL_LABEL[ch]}: ${count}`}
+                            />
+                          );
+                        })
+                      )}
+                    </div>
+                    <span className="w-6 shrink-0 font-mono text-xs text-zinc-600">{total || ""}</span>
+                  </div>
+                );
+              })}
+              <div className="mt-3 flex flex-wrap gap-3">
+                {(["instagram", "naver-blog", "youtube", "general"] as const).map((ch) => (
+                  <div key={ch} className="flex items-center gap-1">
+                    <div className={`h-2 w-2 rounded-sm ${{ instagram: "bg-pink-500/70", "naver-blog": "bg-green-500/70", youtube: "bg-red-500/70", general: "bg-zinc-600" }[ch]}`} />
+                    <span className="font-mono text-xs text-zinc-600">{CHANNEL_LABEL[ch]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

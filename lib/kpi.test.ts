@@ -128,13 +128,13 @@ describe("computeChannelDist", () => {
 
   it("counts completed sessions by channel and sorts by pct desc", () => {
     const sessions = [
-      makeSession({ completed: true, channel: "instagram-dm" }),
-      makeSession({ completed: true, channel: "instagram-dm" }),
+      makeSession({ completed: true, channel: "instagram" }),
+      makeSession({ completed: true, channel: "instagram" }),
       makeSession({ completed: true, channel: "youtube" }),
-      makeSession({ completed: false, channel: "linkedin" }),
+      makeSession({ completed: false, channel: "general" }),
     ];
     const result = computeChannelDist(sessions);
-    expect(result[0].channel).toBe("instagram-dm");
+    expect(result[0].channel).toBe("instagram");
     expect(result[0].count).toBe(2);
     expect(result[0].pct).toBe(67);
     expect(result[1].channel).toBe("youtube");

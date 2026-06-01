@@ -16,9 +16,9 @@ describe("buildUserPrompt", () => {
   });
 
   it("includes channel line for non-general channels", () => {
-    const result = buildUserPrompt("test", "creator", "피트니스", "0-1K", "idea", "instagram-dm");
+    const result = buildUserPrompt("test", "creator", "피트니스", "0-1K", "idea", "instagram");
     expect(result).toContain("Channel:");
-    expect(result).toContain("instagram-dm");
+    expect(result).toContain("instagram");
   });
 
   it("omits channel line for general channel", () => {

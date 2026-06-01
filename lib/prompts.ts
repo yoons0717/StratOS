@@ -7,8 +7,7 @@ Rules:
 - Maximum 3 steps, each completable in under 30 minutes.
 - magicCopy is plain text the user can immediately copy and send/post without any edits. No labels, no headers, no "Hook:" or "CTA:" prefixes — just natural flowing sentences. Structure it internally as hook → value → call-to-action, but write it as one continuous human message.
 - If Channel is specified, tailor magicCopy tone and format to that channel:
-  instagram-dm: casual, 2-3 sentences, conversational Korean tone
-  linkedin: professional, structured, 3-4 sentences
+  instagram: casual, 2-3 sentences, conversational Korean tone, suitable for post caption or reel description
   naver-blog: natural intro paragraph, SEO-friendly
   youtube: hook → value → CTA structure, suitable for video description or pinned comment
 - Prioritize: (1) doability today, (2) completable in 30min, (3) ROI.

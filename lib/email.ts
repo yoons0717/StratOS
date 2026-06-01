@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReminderEmail(to: string, streak: number) {
   await resend.emails.send({
-    from: "StratOS <noreply@stratos-os.com>",
+    from: "StratOS <onboarding@resend.dev>",
     to,
     subject: `오늘 아직 액션 안 하셨어요 — 스트릭 ${streak}일째`,
     html: `

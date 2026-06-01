@@ -13,7 +13,6 @@ export async function POST() {
   const supabase = createSupabaseAdminClient();
   const today = new Date().toISOString().slice(0, 10);
 
-  // 오늘 session_created 이벤트가 없는 유저 ID 목록
   const { data: activeToday } = await supabase
     .from("events")
     .select("user_id")
@@ -22,7 +21,6 @@ export async function POST() {
 
   const activeTodayIds = new Set((activeToday ?? []).map((r) => r.user_id));
 
-  // reminder_email=true인 유저 목록 (auth.users join)
   const { data: targets } = await supabase
     .from("user_contexts")
     .select("user_id, reminder_email")

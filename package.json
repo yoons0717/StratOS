@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "prepare": "husky"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
@@ -35,7 +36,9 @@
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.7",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.6"

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type EventName =
+  | "onboarding_started"
   | "onboarding_completed"
   | "session_created"
   | "session_completed";

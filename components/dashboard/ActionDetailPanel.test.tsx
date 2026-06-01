@@ -21,7 +21,6 @@ function renderPanel(props: Partial<ComponentProps<typeof ActionDetailPanel>> = 
   return render(
     <ActionDetailPanel
       session={session}
-      allSessions={[session]}
       onComplete={vi.fn()}
       {...props}
     />
@@ -30,7 +29,7 @@ function renderPanel(props: Partial<ComponentProps<typeof ActionDetailPanel>> = 
 
 describe("ActionDetailPanel", () => {
   it("shows empty state when session is null", () => {
-    renderPanel({ session: null, allSessions: [] });
+    renderPanel({ session: null });
     expect(screen.getByText(/Select an action/i)).toBeInTheDocument();
   });
 

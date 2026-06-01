@@ -29,20 +29,6 @@ export const generateActionRequestSchema = z.object({
 
 export type GenerateActionRequest = z.infer<typeof generateActionRequestSchema>;
 
-export const dauEntrySchema = z.object({
-  date: z.string(),
-  users: z.number(),
-});
-
-export const metricsSchema = z.object({
-  dauLast7Avg: z.number(),
-  dauEntries: z.array(dauEntrySchema),
-  onboardingRate: z.number(),
-  sessionCompletionRate: z.number(),
-});
-
-export type Metrics = z.infer<typeof metricsSchema>;
-
 export const userContextRowSchema = z.object({
   type: z.enum(["creator", "seller", "service", "side"]),
   level: z.enum(["0-1K", "1K-10K", "10K+"]),

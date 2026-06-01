@@ -50,6 +50,17 @@ describe("computeDauEntries", () => {
     }));
     expect(computeDauEntries(rows)[0].users).toBe(50);
   });
+
+  it("same user on multiple days counts once per day", () => {
+    const rows = [
+      { user_id: "u1", created_at: "2026-06-01T10:00:00Z" },
+      { user_id: "u1", created_at: "2026-06-02T10:00:00Z" },
+      { user_id: "u1", created_at: "2026-06-03T10:00:00Z" },
+    ];
+    const result = computeDauEntries(rows);
+    expect(result).toHaveLength(3);
+    expect(result.every((e) => e.users === 1)).toBe(true);
+  });
 });
 
 describe("computeDauAvg", () => {
@@ -73,6 +84,11 @@ describe("computeDauAvg", () => {
   it("full 7-day window", () => {
     const entries = Array.from({ length: 7 }, () => ({ users: 7 }));
     expect(computeDauAvg(entries, 7)).toBe(7);
+  });
+
+  it("sparse data: 2 days of activity in 7-day window divides by 7 not 2", () => {
+    const entries = [{ users: 7 }, { users: 7 }];
+    expect(computeDauAvg(entries, 7)).toBe(2);
   });
 });
 
@@ -103,6 +119,23 @@ describe("computeOnboardingRate", () => {
       { user_id: "u2", name: "session_created" },
     ];
     expect(computeOnboardingRate(rows)).toBe(0);
+  });
+
+  it("user with both onboarding_completed and session_created counts once", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u1", name: "session_created" },
+    ];
+    expect(computeOnboardingRate(rows)).toBe(100);
+  });
+
+  it("user with duplicate onboarding_completed events counts once", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u2", name: "session_created" },
+    ];
+    expect(computeOnboardingRate(rows)).toBe(50);
   });
 });
 
@@ -141,5 +174,14 @@ describe("computeSessionCompletionRate", () => {
       { name: "session_completed" },
     ];
     expect(computeSessionCompletionRate(rows)).toBe(33);
+  });
+
+  it("completed > created (data anomaly) returns over 100%", () => {
+    const rows = [
+      { name: "session_created" },
+      { name: "session_completed" },
+      { name: "session_completed" },
+    ];
+    expect(computeSessionCompletionRate(rows)).toBe(200);
   });
 });

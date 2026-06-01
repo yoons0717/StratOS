@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { userContextInputSchema, userContextRowSchema } from "@/lib/schemas";
+import { logEvent } from "@/lib/events";
 
 export async function GET() {
   const auth = await getAuthUser();
@@ -37,6 +38,13 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Invalid" }, { status: 400 });
 
   const { type, level, businessStage, niche } = parsed.data;
+
+  const { data: existing } = await supabase
+    .from("user_contexts")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .single();
+
   const { error } = await supabase.from("user_contexts").upsert({
     user_id: user.id,
     type,
@@ -46,5 +54,6 @@ export async function PUT(req: NextRequest) {
   });
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  if (!existing) await logEvent("onboarding_completed", user.id, supabase);
   return NextResponse.json({ ok: true });
 }

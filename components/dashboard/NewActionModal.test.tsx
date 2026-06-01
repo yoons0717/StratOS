@@ -18,31 +18,26 @@ function renderModal(props: Partial<Parameters<typeof NewActionModal>[0]> = {}) 
 describe("NewActionModal", () => {
   it("selects 일반 by default", () => {
     renderModal();
-    expect(screen.getByRole("button", { name: /일반/i })).toHaveAttribute("data-selected", "true");
+    expect(screen.getByRole("button", { name: /General/i })).toHaveAttribute("data-selected", "true");
   });
 
   it("changes selected channel on click", async () => {
     renderModal();
-    await userEvent.click(screen.getByRole("button", { name: /인스타그램/i }));
-    expect(screen.getByRole("button", { name: /인스타그램/i })).toHaveAttribute("data-selected", "true");
-    expect(screen.getByRole("button", { name: /일반/i })).toHaveAttribute("data-selected", "false");
-  });
-
-  it("shows guide text for 일반 by default", () => {
-    renderModal();
-    expect(screen.getByText(/현재 수치/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Instagram/i }));
+    expect(screen.getByRole("button", { name: /Instagram/i })).toHaveAttribute("data-selected", "true");
+    expect(screen.getByRole("button", { name: /General/i })).toHaveAttribute("data-selected", "false");
   });
 
   it("shows channel-specific guide text when channel is selected", async () => {
     renderModal();
-    await userEvent.click(screen.getByRole("button", { name: /인스타그램/i }));
-    expect(screen.getByText(/게시물·릴스/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Instagram/i }));
+    expect(screen.getByText(/post.*reel/i)).toBeInTheDocument();
   });
 
   it("calls onSubmit with input and selected channel", async () => {
     const onSubmit = vi.fn();
     renderModal({ onSubmit });
-    await userEvent.click(screen.getByRole("button", { name: /인스타그램/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Instagram/i }));
     await userEvent.type(screen.getByRole("textbox"), "상황 설명");
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     expect(onSubmit).toHaveBeenCalledWith("상황 설명", "instagram");

@@ -12,28 +12,28 @@ interface Props {
 }
 
 const CHANNELS: { value: Channel; label: string }[] = [
-  { value: "general", label: "일반" },
-  { value: "instagram", label: "인스타그램" },
-  { value: "naver-blog", label: "네이버 블로그" },
-  { value: "youtube", label: "유튜브" },
+  { value: "general", label: "General" },
+  { value: "instagram", label: "Instagram" },
+  { value: "naver-blog", label: "Naver Blog" },
+  { value: "youtube", label: "YouTube" },
 ];
 
 const CHANNEL_CONFIG: Record<Channel, { guide: string; placeholder: string }> = {
   general: {
-    guide: "현재 수치(팔로워·매출 등) + 하고 있는 것 + 원하는 결과를 함께 적으면 더 정확한 액션이 나와요.",
-    placeholder: "e.g. 인스타 팔로워 800명인데 구매 문의가 없어요. 주 3회 홈트레이닝 콘텐츠 올리는 중이고, 1:1 PT 프로그램 팔고 싶어요.",
+    guide: "Include current metrics (followers, revenue, etc.) + what you're doing + desired outcome for more accurate actions.",
+    placeholder: "e.g. 800 Instagram followers but no purchase inquiries. Posting home workout content 3x/week. Want to sell 1:1 PT program.",
   },
   instagram: {
-    guide: "게시물·릴스 주제, 현재 팔로워 상황, 원하는 행동(팔로우·문의·구매)을 적어주세요.",
-    placeholder: "e.g. 팔로워 800명인데 게시물 저장은 많은데 문의가 없어요. 릴스로 전환율 높이고 싶어요.",
+    guide: "Describe your post/reel topic, current follower situation, and desired action (follow, inquiry, purchase).",
+    placeholder: "e.g. Posts get saved a lot but no inquiries. 800 followers. Want to improve conversion through reels.",
   },
   "naver-blog": {
-    guide: "블로그 주제, 현재 방문자 상황, 원하는 전환(문의·구매·구독)을 적어주세요.",
-    placeholder: "e.g. 블로그 방문자는 있는데 실제 문의로 연결이 안 돼요. 글 주제는 다이어트 식단이에요.",
+    guide: "Describe your blog topic, current traffic situation, and desired conversion (inquiry, purchase, subscription).",
+    placeholder: "e.g. Getting traffic but visitors don't convert to inquiries. Blog topic is diet and nutrition.",
   },
   youtube: {
-    guide: "채널 주제, 현재 조회수·구독자 상황, 시청자에게 원하는 행동을 함께 적어주세요.",
-    placeholder: "e.g. 조회수는 나오는데 구독자 전환이 안 돼요. 영상 말미에 뭔가 행동을 유도하고 싶어요.",
+    guide: "Describe your channel topic, current views/subscribers, and desired viewer action.",
+    placeholder: "e.g. Getting views but poor subscriber conversion. Want to add a stronger CTA at the end of videos.",
   },
 };
 

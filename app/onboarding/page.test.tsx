@@ -80,7 +80,7 @@ describe("OnboardingPage", () => {
     await userEvent.click(screen.getByText("Creator"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: /이전으로/i }));
+    await userEvent.click(screen.getByRole("button", { name: /BACK/i }));
     expect(screen.getByText("1 / 4")).toBeInTheDocument();
     expect(screen.getByText("USER_TYPE")).toBeInTheDocument();
   });

@@ -35,7 +35,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
 
 function BarChart({ items }: { items: { label: string; count: number; pct: number }[] }) {
   if (items.length === 0) {
-    return <p className="font-mono text-xs text-zinc-700">데이터 없음</p>;
+    return <p className="font-mono text-xs text-zinc-700">no data</p>;
   }
   return (
     <div className="space-y-2">
@@ -107,33 +107,33 @@ export default function StatsPage() {
         <h1 className="mb-6 text-2xl font-semibold text-foreground">Stats</h1>
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard label="현재 스트릭" value={kpiData.streak} sub="연속 실행 중" />
-          <StatCard label="최장 스트릭" value={longestStreak} sub="역대 최고" />
-          <StatCard label="총 완료" value={kpiData.completed} sub="누적" />
-          <StatCard label="완료율" value={`${kpiData.rate}%`} sub="전체 세션 대비" />
+          <StatCard label="Current Streak" value={kpiData.streak} sub="days in a row" />
+          <StatCard label="Longest Streak" value={longestStreak} sub="all time" />
+          <StatCard label="Total Done" value={kpiData.completed} sub="cumulative" />
+          <StatCard label="Completion Rate" value={`${kpiData.rate}%`} sub="of all sessions" />
         </div>
 
         <div className="mb-6 rounded border border-zinc-800 bg-surface p-4">
           <p className="mb-3 font-mono text-xs uppercase tracking-widest text-zinc-600">
-            30일 활동 히트맵
+            30-day activity
           </p>
           <HeatmapGrid data={heatmapData} />
           <div className="mt-3 flex items-center justify-end gap-1 font-mono text-xs text-zinc-700">
-            <span>적음</span>
+            <span>less</span>
             <div className="h-3 w-3 rounded-sm bg-zinc-800" />
             <div className="h-3 w-3 rounded-sm bg-neon/20" />
             <div className="h-3 w-3 rounded-sm bg-neon/50" />
             <div className="h-3 w-3 rounded-sm bg-neon" />
-            <span>많음</span>
+            <span>more</span>
           </div>
         </div>
 
         <div className="mb-6 rounded border border-zinc-800 bg-surface p-4">
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-zinc-600">
-            주별 채널 분포
+            weekly channel distribution
           </p>
           {weeklyChannelDist.every((w) => Object.keys(w.channels).length === 0) ? (
-            <p className="font-mono text-xs text-zinc-700">데이터 없음</p>
+            <p className="font-mono text-xs text-zinc-700">no data</p>
           ) : (
             <div className="space-y-2">
               {weeklyChannelDist.map(({ week, channels }) => {
@@ -179,7 +179,7 @@ export default function StatsPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded border border-zinc-800 bg-surface p-4">
             <p className="mb-4 font-mono text-xs uppercase tracking-widest text-zinc-600">
-              채널별 분포
+              channel distribution
             </p>
             <BarChart
               items={channelDist.map((d) => ({
@@ -191,7 +191,7 @@ export default function StatsPage() {
           </div>
           <div className="rounded border border-zinc-800 bg-surface p-4">
             <p className="mb-4 font-mono text-xs uppercase tracking-widest text-zinc-600">
-              카테고리별 분포
+              category distribution
             </p>
             <BarChart
               items={categoryDist.map((d) => ({

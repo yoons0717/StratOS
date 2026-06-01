@@ -8,24 +8,24 @@ import { CHANNEL_LABEL } from "@/lib/analytics/labels";
 
 function formatDuration(startIso: string, endIso: string): string {
   const mins = Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000);
-  if (mins < 60) return `${mins}분`;
+  if (mins < 60) return `${mins}m`;
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
 }
 
 function SessionTimestamp({ session }: { session: ActionSession }) {
-  const started = new Date(session.created_at).toLocaleString("ko-KR", {
+  const started = new Date(session.created_at).toLocaleString("en-US", {
     month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
 
   if (!session.completed_at) {
     return (
-      <p className="font-mono text-xs text-zinc-700">시작 {started}</p>
+      <p className="font-mono text-xs text-zinc-700">started {started}</p>
     );
   }
 
-  const ended = new Date(session.completed_at).toLocaleString("ko-KR", {
+  const ended = new Date(session.completed_at).toLocaleString("en-US", {
     month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
   const duration = formatDuration(session.created_at, session.completed_at);

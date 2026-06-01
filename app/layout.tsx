@@ -13,20 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StratOS — 오늘 하나, 실행하세요",
-  description: "솔로 크리에이터를 위한 AI 실행 OS. 막힌 상황을 입력하면 지금 당장 할 수 있는 액션을 돌려줍니다.",
+  title: "StratOS — One action. Execute today.",
+  description: "AI execution OS for solo creators. Input your situation, get one action you can do right now.",
   openGraph: {
-    title: "StratOS — 오늘 하나, 실행하세요",
-    description: "솔로 크리에이터를 위한 AI 실행 OS. 막힌 상황을 입력하면 지금 당장 할 수 있는 액션을 돌려줍니다.",
+    title: "StratOS — One action. Execute today.",
+    description: "AI execution OS for solo creators. Input your situation, get one action you can do right now.",
     url: "https://stratos-os.vercel.app",
     siteName: "StratOS",
-    locale: "ko_KR",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "StratOS — 오늘 하나, 실행하세요",
-    description: "솔로 크리에이터를 위한 AI 실행 OS.",
+    title: "StratOS — One action. Execute today.",
+    description: "AI execution OS for solo creators.",
   },
 };
 
@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background">{children}</body>
     </html>
   );

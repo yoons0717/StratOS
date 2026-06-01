@@ -43,7 +43,7 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 
 function DauChart({ entries }: { entries: { date: string; users: number }[] }) {
   if (entries.length === 0)
-    return <p className="font-mono text-xs text-zinc-700">데이터 없음</p>;
+    return <p className="font-mono text-xs text-zinc-700">no data</p>;
   const max = Math.max(...entries.map((e) => e.users), 1);
   return (
     <div className="space-y-1">
@@ -75,13 +75,13 @@ export default async function AdminPage() {
 
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-3">
-            <StatCard label="DAU 7일 평균" value={metrics.dauLast7Avg} />
-            <StatCard label="온보딩 완료율" value={`${metrics.onboardingRate}%`} />
-            <StatCard label="세션 완료율" value={`${metrics.sessionCompletionRate}%`} />
+            <StatCard label="DAU 7-day avg" value={metrics.dauLast7Avg} />
+            <StatCard label="Onboarding Rate" value={`${metrics.onboardingRate}%`} />
+            <StatCard label="Session Completion" value={`${metrics.sessionCompletionRate}%`} />
           </div>
 
           <div className="rounded border border-zinc-800 p-4">
-            <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">일별 활성 유저 (최근 7일)</p>
+            <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">daily active users (last 7 days)</p>
             <DauChart entries={metrics.dauEntries} />
           </div>
 

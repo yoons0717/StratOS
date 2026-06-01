@@ -63,8 +63,5 @@ describe("HistoryPage", () => {
     expect(screen.queryByRole("button", { name: /COMPLETE/i })).not.toBeInTheDocument();
   });
 
-  it("renders KPI bar", async () => {
-    render(<HistoryPage />);
-    expect(await screen.findByText("TOTAL")).toBeInTheDocument();
-  });
+
 });

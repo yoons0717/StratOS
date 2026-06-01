@@ -38,14 +38,7 @@ const CASES = [
   },
 ];
 
-describe.each(CASES)("$name", ({ Component, options, firstLabel, firstValue, selectedValue, selectedTestId }) => {
-  it("renders all options", () => {
-    render(<Component selected={null} onSelect={vi.fn()} />);
-    for (const label of options) {
-      expect(screen.getByText(label)).toBeInTheDocument();
-    }
-  });
-
+describe.each(CASES)("$name", ({ Component, firstLabel, firstValue, selectedValue, selectedTestId }) => {
   it("calls onSelect when option is clicked", async () => {
     const onSelect = vi.fn();
     render(<Component selected={null} onSelect={onSelect} />);

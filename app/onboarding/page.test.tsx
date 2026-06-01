@@ -15,6 +15,15 @@ vi.mock("@/lib/api", () => ({
   saveUserContext: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("@/lib/supabase/browser", () => ({
+  createSupabaseBrowserClient: () => ({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { email: "test@example.com" } } }),
+      signOut: vi.fn().mockResolvedValue({}),
+    },
+  }),
+}));
+
 beforeEach(() => {
   useStratosStore.setState({ userContext: null, sessions: [] });
 });

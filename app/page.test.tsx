@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/components/dashboard/FirstRunGuide", () => ({
   default: ({ onBegin }: { onBegin?: () => void }) => (
     <div>
-      <span>STRATOS_OS v1.0</span>
+      <span>STRATOS v1.0</span>
       {onBegin && <button onClick={onBegin}>[ + NEW ACTION ]</button>}
     </div>
   ),
@@ -71,14 +71,14 @@ describe("DashboardPage", () => {
 
   it("shows FirstRunGuide on first visit with no sessions", async () => {
     render(<DashboardPage />);
-    expect(await screen.findByText(/STRATOS_OS v1.0/i)).toBeInTheDocument();
+    expect(await screen.findByText(/STRATOS v1.0/i)).toBeInTheDocument();
   });
 
   it("does not show FirstRunGuide when already seen", async () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     render(<DashboardPage />);
     await screen.findByText("StratOS");
-    expect(screen.queryByText(/STRATOS_OS v1.0/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/STRATOS v1.0/i)).not.toBeInTheDocument();
   });
 
   it("shows active session titles in list", async () => {
@@ -109,17 +109,17 @@ describe("DashboardPage", () => {
 
   it("FirstRunGuide overlay: ESC dismisses without opening modal", async () => {
     render(<DashboardPage />);
-    await screen.findByText(/STRATOS_OS v1\.0/i);
+    await screen.findByText(/STRATOS v1\.0/i);
     fireEvent.keyDown(document, { key: "Escape" });
-    await waitFor(() => expect(screen.queryByText(/STRATOS_OS v1\.0/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/STRATOS v1\.0/i)).not.toBeInTheDocument());
     expect(screen.queryByText(/SITUATION \/\//i)).not.toBeInTheDocument();
   });
 
   it("FirstRunGuide overlay: backdrop click dismisses without opening modal", async () => {
     render(<DashboardPage />);
-    await screen.findByText(/STRATOS_OS v1\.0/i);
+    await screen.findByText(/STRATOS v1\.0/i);
     await userEvent.click(screen.getByTestId("firstrun-backdrop"));
-    await waitFor(() => expect(screen.queryByText(/STRATOS_OS v1\.0/i)).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText(/STRATOS v1\.0/i)).not.toBeInTheDocument());
     expect(screen.queryByText(/SITUATION \/\//i)).not.toBeInTheDocument();
   });
 

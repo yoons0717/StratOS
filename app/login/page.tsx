@@ -18,7 +18,7 @@ export default function LoginPage() {
       <ScanlineOverlay />
       <div className="flex flex-col items-center gap-6">
         <div className="font-mono text-xs tracking-widest text-neon">
-          STRATOS_OS
+          STRATOS
         </div>
         <h1 className="font-mono text-2xl font-bold text-white">EXECUTE._</h1>
         <p className="font-mono text-xs text-zinc-600">

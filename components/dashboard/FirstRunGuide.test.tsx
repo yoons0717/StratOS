@@ -6,7 +6,7 @@ import FirstRunGuide from "./FirstRunGuide";
 describe("FirstRunGuide", () => {
   it("shows first line immediately", () => {
     render(<FirstRunGuide lineDelay={0} />);
-    expect(screen.getByText(/STRATOS_OS/i)).toBeInTheDocument();
+    expect(screen.getByText(/STRATOS/i)).toBeInTheDocument();
   });
 
   it("reveals all lines after animation completes", async () => {

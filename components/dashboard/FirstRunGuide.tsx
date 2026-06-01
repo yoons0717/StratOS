@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 const LINES = [
-  "> STRATOS_OS v1.0",
+  "> STRATOS v1.0",
   "> BOOTING MISSION CORE...",
   ">",
   "> NO ACTIVE MISSIONS DETECTED.",

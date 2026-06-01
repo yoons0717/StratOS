@@ -14,7 +14,7 @@ export default function LandingPage() {
       <ScanlineOverlay />
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-between px-4 py-10">
         <div>
-          <p className="mb-4 font-mono text-xs tracking-widest text-neon">STRATOS_OS</p>
+          <p className="mb-4 font-mono text-xs tracking-widest text-neon">STRATOS</p>
           <h1 className="mb-2 font-mono text-3xl font-bold text-white leading-tight">
             오늘 하나,<br />실행하세요._
           </h1>

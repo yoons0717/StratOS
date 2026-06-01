@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
+import { logEvent } from "@/lib/events";
 
 export async function PATCH(
   _req: NextRequest,
@@ -17,5 +18,6 @@ export async function PATCH(
     .eq("user_id", user.id);
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  await logEvent("session_completed", user.id, supabase);
   return NextResponse.json({ ok: true });
 }

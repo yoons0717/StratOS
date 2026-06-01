@@ -3,6 +3,7 @@ import { getAuthUser } from "@/lib/auth";
 import { generateAction } from "@/lib/generate-action";
 import { generateActionRequestSchema } from "@/lib/schemas";
 import { buildUserPrompt } from "@/lib/prompts";
+import { logEvent } from "@/lib/events";
 
 export async function GET() {
   const auth = await getAuthUser();
@@ -42,5 +43,6 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  await logEvent("session_created", user.id, supabase);
   return NextResponse.json(data);
 }

@@ -64,21 +64,22 @@ export default function OnboardingPage() {
       <ScanlineOverlay />
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
-          <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
-          <div className="flex items-center gap-3">
+          <div>
+            <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
             {email && (
-              <>
-                <span className="font-mono text-xs text-zinc-600">{email}</span>
+              <div className="mt-0.5 flex items-center gap-2">
+                <span className="font-mono text-xs text-zinc-400">{email}</span>
+                <span className="font-mono text-xs text-zinc-600">·</span>
                 <button
                   onClick={handleSignOut}
-                  className="font-mono text-xs text-zinc-600 transition-colors hover:text-red-400"
+                  className="font-mono text-xs text-zinc-400 transition-colors hover:text-red-400"
                 >
                   SIGN_OUT
                 </button>
-              </>
+              </div>
             )}
-            <span className="font-mono text-xs text-zinc-700">{step + 1} / {TOTAL_STEPS}</span>
           </div>
+          <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">
           {STEP_LABELS[step]}

@@ -2,6 +2,7 @@
 
 import { useStratosStore } from "@/store";
 import { useInitStore } from "@/lib/hooks";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import {
   computeKpi,
   computeLongestStreak,
@@ -78,10 +79,10 @@ function HeatmapGrid({ data, days = 30 }: { data: Record<string, number>; days?:
 }
 
 export default function StatsPage() {
-  useInitStore(true);
+  const { isLoading } = useInitStore(true);
   const { userContext, sessions } = useStratosStore();
 
-  if (!userContext) return null;
+  if (isLoading || !userContext) return <LoadingScreen />;
 
   const kpiData = computeKpi(sessions);
   const longestStreak = computeLongestStreak(sessions);

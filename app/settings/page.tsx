@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
 import { fetchUserContext, saveUserContext } from "@/lib/api";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import AppShell from "@/components/layout/AppShell";
 import Button from "@/components/ui/Button";
 import StepType from "@/components/onboarding/StepType";
@@ -20,6 +21,7 @@ export default function SettingsPage() {
   const [stage, setStage] = useState<BusinessStage | null>(null);
   const [niche, setNiche] = useState("");
   const [reminderEmail, setReminderEmail] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -32,12 +34,13 @@ export default function SettingsPage() {
       setStage(ctx.businessStage);
       setNiche(ctx.niche);
       setReminderEmail(ctx.reminderEmail);
+      setIsLoading(false);
     }).catch(() => {
-      router.push("/onboarding");
+      setIsLoading(false);
     });
   }, [router, setUserContext]);
 
-  if (!userContext) return null;
+  if (isLoading || !userContext) return <LoadingScreen />;
 
   async function handleSave() {
     if (!type || !level || !stage || !niche.trim()) return;

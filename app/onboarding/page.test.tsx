@@ -74,4 +74,14 @@ describe("OnboardingPage", () => {
     render(<OnboardingPage />);
     expect(screen.getByRole("button", { name: /EXECUTE/i })).toBeDisabled();
   });
+
+  it("step 2에서 BACK 클릭 시 step 1로 돌아감", async () => {
+    render(<OnboardingPage />);
+    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /이전으로/i }));
+    expect(screen.getByText("1 / 4")).toBeInTheDocument();
+    expect(screen.getByText("USER_TYPE")).toBeInTheDocument();
+  });
 });

@@ -97,6 +97,14 @@ export default function OnboardingPage() {
         <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
           EXECUTE →
         </Button>
+        {step > 0 && (
+          <button
+            onClick={() => setStep((s) => s - 1)}
+            className="mt-3 w-full font-mono text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+          >
+            ← 이전으로
+          </button>
+        )}
         {error && (
           <p className="mt-3 font-mono text-xs text-red-400">{error}</p>
         )}

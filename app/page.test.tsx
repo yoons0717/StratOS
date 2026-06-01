@@ -97,6 +97,22 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
   });
 
+  it("feedback is hidden after creating a new action", async () => {
+    localStorage.setItem("stratos_welcome_seen", "1");
+    const newSession = makeSession({ id: "s2", action: { title: "새 액션" } });
+    const { createSession } = await import("@/lib/api");
+    (createSession as ReturnType<typeof vi.fn>).mockResolvedValue(newSession);
+    mockFetchSessions.mockResolvedValue([session]);
+    render(<DashboardPage />);
+    await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /\+ NEW ACTION/i }));
+    await userEvent.type(screen.getByPlaceholderText(/e\.g\./i), "새 상황");
+    await userEvent.click(screen.getByRole("button", { name: /^EXECUTE/i }));
+    await waitFor(() => expect(screen.queryByText(/ACTION_COMPLETE/)).not.toBeInTheDocument());
+  });
+
   it("FirstRunGuide overlay: ESC dismisses without opening modal", async () => {
     render(<DashboardPage />);
     await screen.findByText(/STRATOS v1\.0/i);

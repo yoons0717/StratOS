@@ -58,7 +58,7 @@ describe("OnboardingPage", () => {
     await userEvent.type(screen.getByTestId("niche-input"), "피트니스 코치");
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     const { userContext } = useStratosStore.getState();
-    expect(userContext).toEqual({ type: "creator", level: "0-1K", businessStage: "idea", niche: "피트니스 코치" });
+    expect(userContext).toEqual({ type: "creator", level: "0-1K", businessStage: "idea", niche: "피트니스 코치", reminderEmail: false });
   });
 
   it("EXECUTE 버튼은 선택하지 않으면 비활성화", () => {

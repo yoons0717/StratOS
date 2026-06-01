@@ -32,7 +32,7 @@ export async function POST() {
   for (const target of toNotify) {
     const { data: sessions } = await supabase
       .from("action_sessions")
-      .select("completed, created_at")
+      .select("id, created_at, completed_at, input, channel, action, completed")
       .eq("user_id", target.user_id);
 
     const { data: userRow } = await supabase.auth.admin.getUserById(target.user_id);

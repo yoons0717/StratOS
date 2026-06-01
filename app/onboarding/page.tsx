@@ -34,7 +34,7 @@ export default function OnboardingPage() {
       return;
     }
     if (!type || !level || !stage || !niche.trim()) return;
-    const ctx = { type, level, businessStage: stage, niche: niche.trim() };
+    const ctx = { type, level, businessStage: stage, niche: niche.trim(), reminderEmail: false };
     try {
       await saveUserContext(ctx);
       setUserContext(ctx);

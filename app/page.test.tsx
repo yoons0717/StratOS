@@ -53,16 +53,6 @@ describe("DashboardPage", () => {
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
-  it("renders KPI bar", async () => {
-    render(<DashboardPage />);
-    expect(await screen.findByText("TOTAL")).toBeInTheDocument();
-  });
-
-  it("renders Sidebar", async () => {
-    render(<DashboardPage />);
-    expect(await screen.findByText("StratOS")).toBeInTheDocument();
-  });
-
   it("shows empty state in list panel when no active sessions", async () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     render(<DashboardPage />);

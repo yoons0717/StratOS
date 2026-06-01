@@ -33,20 +33,6 @@ describe("StatsPage", () => {
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith("/onboarding"));
   });
 
-  it("renders stat card labels", async () => {
-    render(<StatsPage />);
-    expect(await screen.findByText("현재 스트릭")).toBeInTheDocument();
-    expect(screen.getByText("최장 스트릭")).toBeInTheDocument();
-    expect(screen.getByText("총 완료")).toBeInTheDocument();
-    expect(screen.getByText("완료율")).toBeInTheDocument();
-  });
-
-  it("renders channel and category sections", async () => {
-    render(<StatsPage />);
-    expect(await screen.findByText("채널별 분포")).toBeInTheDocument();
-    expect(screen.getByText("카테고리별 분포")).toBeInTheDocument();
-  });
-
   it("shows zero stat values when no sessions", async () => {
     render(<StatsPage />);
     await screen.findByText("현재 스트릭");

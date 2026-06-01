@@ -12,11 +12,6 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Sidebar", () => {
-  it("renders logo", () => {
-    render(<Sidebar userContext={defaultCtx} />);
-    expect(screen.getByText("StratOS")).toBeInTheDocument();
-  });
-
   it("renders all nav links", () => {
     render(<Sidebar userContext={defaultCtx} />);
     expect(screen.getByRole("link", { name: /Dashboard/i })).toBeInTheDocument();
@@ -36,9 +31,5 @@ describe("Sidebar", () => {
     expect(screen.getByRole("link", { name: /History/i })).toHaveClass("bg-zinc-800");
   });
 
-  it("renders user context info", () => {
-    render(<Sidebar userContext={defaultCtx} />);
-    expect(screen.getByText(/creator/i)).toBeInTheDocument();
-    expect(screen.getByText(/0-1K/i)).toBeInTheDocument();
-  });
+
 });

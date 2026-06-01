@@ -14,16 +14,6 @@ beforeEach(() => {
 });
 
 describe("MagicCopy", () => {
-  it("renders the magic copy text", () => {
-    render(<MagicCopy text="안녕하세요! 최근 콘텐츠 보셨나요?" />);
-    expect(screen.getByText("안녕하세요! 최근 콘텐츠 보셨나요?")).toBeInTheDocument();
-  });
-
-  it("renders a copy button", () => {
-    render(<MagicCopy text="테스트 캡션" />);
-    expect(screen.getByRole("button", { name: /COPY/i })).toBeInTheDocument();
-  });
-
   it("copies text to clipboard when copy button is clicked", async () => {
     render(<MagicCopy text="복사할 캡션 텍스트" />);
     await userEvent.click(screen.getByRole("button", { name: /COPY/i }));

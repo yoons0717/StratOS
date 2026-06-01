@@ -65,7 +65,20 @@ export default function OnboardingPage() {
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
-          <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
+          <div className="flex items-center gap-3">
+            {email && (
+              <>
+                <span className="font-mono text-xs text-zinc-600">{email}</span>
+                <button
+                  onClick={handleSignOut}
+                  className="font-mono text-xs text-zinc-600 transition-colors hover:text-red-400"
+                >
+                  SIGN_OUT
+                </button>
+              </>
+            )}
+            <span className="font-mono text-xs text-zinc-700">{step + 1} / {TOTAL_STEPS}</span>
+          </div>
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">
           {STEP_LABELS[step]}
@@ -87,17 +100,6 @@ export default function OnboardingPage() {
           <p className="mt-3 font-mono text-xs text-red-400">{error}</p>
         )}
 
-        {email && (
-          <div className="mt-auto flex items-center justify-between pt-8">
-            <span className="font-mono text-xs text-zinc-700">{email}</span>
-            <button
-              onClick={handleSignOut}
-              className="font-mono text-xs text-zinc-600 hover:text-red-400 transition-colors"
-            >
-              SIGN_OUT
-            </button>
-          </div>
-        )}
       </div>
     </main>
   );

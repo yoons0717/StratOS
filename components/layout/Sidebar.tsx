@@ -58,7 +58,7 @@ export default function Sidebar({ userContext }: Props) {
   }
 
   return (
-    <aside className="flex w-52 shrink-0 flex-col border-r border-zinc-800/60 bg-surface px-3 py-5">
+    <aside className="hidden md:flex w-52 shrink-0 flex-col border-r border-zinc-800/60 bg-surface px-3 py-5">
       <div className="mb-6 flex items-center gap-2 px-3">
         <div className="h-2 w-2 rounded-sm bg-neon" />
         <span className="text-sm font-semibold text-foreground">StratOS</span>

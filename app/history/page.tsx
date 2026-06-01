@@ -22,21 +22,33 @@ export default function HistoryPage() {
 
   return (
     <AppShell userContext={userContext} kpiData={kpiData}>
-      <div className="flex shrink-0 items-center border-b border-zinc-800/60 px-6 py-4">
+      <div className="flex shrink-0 items-center border-b border-zinc-800/60 px-4 py-4 md:px-6">
         <h1 className="text-2xl font-semibold text-foreground">History</h1>
       </div>
       <div className="flex flex-1 overflow-hidden">
-        <ActionListPanel
-          sessions={completed}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          emptyLabel="No completed actions"
-        />
-        <ActionDetailPanel
-          session={selected}
-          onComplete={() => {}}
-          readonly
-        />
+        <div className={selectedId ? "hidden md:flex" : "flex w-full md:w-auto"}>
+          <ActionListPanel
+            sessions={completed}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            emptyLabel="No completed actions"
+          />
+        </div>
+        <div className={`relative overflow-hidden ${selectedId ? "flex flex-1" : "hidden md:flex md:flex-1"}`}>
+          {selectedId && (
+            <button
+              onClick={() => setSelectedId(null)}
+              className="absolute left-4 top-4 z-10 font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300 md:hidden"
+            >
+              ← Back
+            </button>
+          )}
+          <ActionDetailPanel
+            session={selected}
+            onComplete={() => {}}
+            readonly
+          />
+        </div>
       </div>
     </AppShell>
   );

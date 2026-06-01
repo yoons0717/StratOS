@@ -79,17 +79,7 @@ export default function OnboardingPage() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            {step > 0 && (
-              <button
-                onClick={() => setStep((s) => s - 1)}
-                className="font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300"
-              >
-                ← BACK
-              </button>
-            )}
-            <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
-          </div>
+          <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">
           {STEP_LABELS[step]}
@@ -107,6 +97,14 @@ export default function OnboardingPage() {
         <Button onClick={handleExecute} disabled={!currentValue} className="mt-6 w-full">
           EXECUTE →
         </Button>
+        {step > 0 && (
+          <button
+            onClick={() => setStep((s) => s - 1)}
+            className="mt-3 w-full font-mono text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+          >
+            ← 이전으로
+          </button>
+        )}
         {error && (
           <p className="mt-3 font-mono text-xs text-red-400">{error}</p>
         )}

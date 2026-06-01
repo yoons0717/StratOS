@@ -28,5 +28,5 @@ export function computeOnboardingRate(
 export function computeSessionCompletionRate(rows: { name: string }[]) {
   const created = rows.filter((r) => r.name === "session_created").length;
   const completed = rows.filter((r) => r.name === "session_completed").length;
-  return created ? Math.round((completed / created) * 100) : 0;
+  return created ? Math.min(Math.round((completed / created) * 100), 100) : 0;
 }

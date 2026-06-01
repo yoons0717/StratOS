@@ -176,12 +176,12 @@ describe("computeSessionCompletionRate", () => {
     expect(computeSessionCompletionRate(rows)).toBe(33);
   });
 
-  it("completed > created (data anomaly) returns over 100%", () => {
+  it("completed > created (data anomaly) is capped at 100%", () => {
     const rows = [
       { name: "session_created" },
       { name: "session_completed" },
       { name: "session_completed" },
     ];
-    expect(computeSessionCompletionRate(rows)).toBe(200);
+    expect(computeSessionCompletionRate(rows)).toBe(100);
   });
 });

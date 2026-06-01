@@ -62,7 +62,7 @@ export default function DashboardPage() {
       setShowModal(false);
       setShowFeedback(false);
     } catch {
-      setModalError("EXECUTION_FAILED — Please try again");
+      setModalError("실행 실패 — 다시 시도해주세요");
     } finally {
       setModalLoading(false);
     }

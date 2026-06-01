@@ -86,7 +86,7 @@ export default function OnboardingPage() {
           <span className="animate-pulse text-neon">_</span>
         </div>
         <div className="mb-5 font-mono text-xs text-zinc-600">
-          {step === 3 ? "TYPE YOUR NICHE TO CONTINUE" : "SELECT ONE TO CONTINUE"}
+          {step === 3 ? "니치를 입력하고 계속하세요" : "하나를 선택하고 계속하세요"}
         </div>
 
         {step === 0 && <StepType selected={type} onSelect={setType} />}

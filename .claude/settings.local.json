@@ -25,7 +25,11 @@
       "Bash(gh repo *)",
       "Bash(xargs ls -la)",
       "Bash(gh pr *)",
-      "Bash(xargs sed -i '' 's/STRATOS_OS/STRATOS/g')"
+      "Bash(xargs sed -i '' 's/STRATOS_OS/STRATOS/g')",
+      "Bash(sed -i '' 's/No actions yet/아직 액션이 없어요/g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/page.test.tsx /Users/yoonmigoo/Desktop/myProject/StratOS/components/dashboard/ActionListPanel.test.tsx)",
+      "Bash(sed -i '' 's/No completed actions/완료된 액션이 없어요/g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/history/page.test.tsx /Users/yoonmigoo/Desktop/myProject/StratOS/components/dashboard/ActionListPanel.test.tsx)",
+      "Bash(sed -i '' 's/getByText\\(\"Creator\"\\)/getByText\\(\"크리에이터\"\\)/g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/onboarding/page.test.tsx)",
+      "Bash(sed -i '' 's/getByText\\(\"Idea Stage\"\\)/getByText\\(\"아이디어 단계\"\\)/g' /Users/yoonmigoo/Desktop/myProject/StratOS/app/onboarding/page.test.tsx)"
     ]
   }
 }

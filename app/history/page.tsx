@@ -30,7 +30,7 @@ export default function HistoryPage() {
           sessions={completed}
           selectedId={selectedId}
           onSelect={setSelectedId}
-          emptyLabel="No completed actions"
+          emptyLabel="완료된 액션이 없어요"
         />
         <ActionDetailPanel
           session={selected}

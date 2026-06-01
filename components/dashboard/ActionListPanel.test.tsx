@@ -12,7 +12,7 @@ const sessions = [
 describe("ActionListPanel", () => {
   it("shows empty state when no sessions", () => {
     render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} />);
-    expect(screen.getByText(/No actions yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/아직 액션이 없어요/i)).toBeInTheDocument();
   });
 
   it("renders session titles", () => {
@@ -34,8 +34,8 @@ describe("ActionListPanel", () => {
   });
 
   it("shows custom empty label", () => {
-    render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} emptyLabel="No completed actions" />);
-    expect(screen.getByText("No completed actions")).toBeInTheDocument();
+    render(<ActionListPanel sessions={[]} selectedId={null} onSelect={vi.fn()} emptyLabel="완료된 액션이 없어요" />);
+    expect(screen.getByText("완료된 액션이 없어요")).toBeInTheDocument();
   });
 
 });

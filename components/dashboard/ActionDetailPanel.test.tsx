@@ -30,7 +30,7 @@ function renderPanel(props: Partial<ComponentProps<typeof ActionDetailPanel>> = 
 describe("ActionDetailPanel", () => {
   it("shows empty state when session is null", () => {
     renderPanel({ session: null });
-    expect(screen.getByText(/Select an action/i)).toBeInTheDocument();
+    expect(screen.getByText(/액션을 선택/i)).toBeInTheDocument();
   });
 
   it("renders action title and category", () => {

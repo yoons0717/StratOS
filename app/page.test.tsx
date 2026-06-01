@@ -56,7 +56,7 @@ describe("DashboardPage", () => {
   it("shows empty state in list panel when no active sessions", async () => {
     localStorage.setItem("stratos_welcome_seen", "1");
     render(<DashboardPage />);
-    expect(await screen.findByText(/No actions yet/i)).toBeInTheDocument();
+    expect(await screen.findByText(/아직 액션이 없어요/i)).toBeInTheDocument();
   });
 
   it("shows FirstRunGuide on first visit with no sessions", async () => {

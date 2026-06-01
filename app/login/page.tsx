@@ -21,7 +21,7 @@ export default function LoginPage() {
         </div>
         <h1 className="font-mono text-2xl font-bold text-white">EXECUTE._</h1>
         <p className="font-mono text-xs text-zinc-600">
-          Start executing. One action today.
+          오늘 하나, 실행하세요.
         </p>
         <button
           onClick={handleGoogleLogin}

@@ -39,7 +39,7 @@ describe("HistoryPage", () => {
 
   it("shows empty state when no completed sessions", async () => {
     render(<HistoryPage />);
-    expect(await screen.findByText("No completed actions")).toBeInTheDocument();
+    expect(await screen.findByText("완료된 액션이 없어요")).toBeInTheDocument();
   });
 
   it("renders only completed sessions", async () => {

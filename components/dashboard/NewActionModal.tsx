@@ -103,7 +103,7 @@ export default function NewActionModal({ onSubmit, onClose, isLoading, error }: 
             onClick={() => onSubmit(input, channel)}
             disabled={!input.trim() || isLoading}
           >
-            {isLoading ? "ANALYZING..." : "EXECUTE →"}
+            {isLoading ? "분석 중..." : "EXECUTE →"}
           </Button>
         </div>
       </div>

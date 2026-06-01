@@ -37,7 +37,7 @@ describe("OnboardingPage", () => {
 
   it("advances to step 2 after selecting a type", async () => {
     render(<OnboardingPage />);
-    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByText("크리에이터"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
     expect(screen.getByText("AUDIENCE_SIZE")).toBeInTheDocument();
@@ -45,11 +45,11 @@ describe("OnboardingPage", () => {
 
   it("advances to niche step (4/4) after completing type, level, stage", async () => {
     render(<OnboardingPage />);
-    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByText("크리에이터"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     await userEvent.click(screen.getByText("0 ~ 1K"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await userEvent.click(screen.getByText("Idea Stage"));
+    await userEvent.click(screen.getByText("아이디어 단계"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     expect(screen.getByText("4 / 4")).toBeInTheDocument();
     expect(screen.getByText("YOUR_NICHE")).toBeInTheDocument();
@@ -58,11 +58,11 @@ describe("OnboardingPage", () => {
 
   it("saves userContext with niche after completing all 4 steps", async () => {
     render(<OnboardingPage />);
-    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByText("크리에이터"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     await userEvent.click(screen.getByText("0 ~ 1K"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
-    await userEvent.click(screen.getByText("Idea Stage"));
+    await userEvent.click(screen.getByText("아이디어 단계"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     await userEvent.type(screen.getByTestId("niche-input"), "피트니스 코치");
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
@@ -77,7 +77,7 @@ describe("OnboardingPage", () => {
 
   it("step 2에서 BACK 클릭 시 step 1로 돌아감", async () => {
     render(<OnboardingPage />);
-    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByText("크리에이터"));
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /이전으로/i }));

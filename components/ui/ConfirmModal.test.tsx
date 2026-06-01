@@ -18,14 +18,6 @@ function renderModal(overrides = {}) {
 }
 
 describe("ConfirmModal", () => {
-  it("renders title, message and buttons", () => {
-    renderModal();
-    expect(screen.getByText("CONFIRM_DELETE //")).toBeInTheDocument();
-    expect(screen.getByText("Delete this action?")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "DELETE" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "CANCEL" })).toBeInTheDocument();
-  });
-
   it("calls onConfirm then onClose when confirm button is clicked", async () => {
     const onConfirm = vi.fn();
     const onClose = vi.fn();

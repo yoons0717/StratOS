@@ -60,10 +60,28 @@ describe("ActionDetailPanel", () => {
     expect(screen.getByText("안녕하세요!")).toBeInTheDocument();
   });
 
-  it("calls onComplete with id when COMPLETE is clicked", async () => {
+  it("clicking COMPLETE opens confirm modal", async () => {
     const onComplete = vi.fn();
     renderPanel({ onComplete });
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    expect(screen.getByText(/CONFIRM_COMPLETE/i)).toBeInTheDocument();
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it("CANCEL on complete modal closes without calling onComplete", async () => {
+    const onComplete = vi.fn();
+    renderPanel({ onComplete });
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getByRole("button", { name: /CANCEL/i }));
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(screen.queryByText(/CONFIRM_COMPLETE/i)).not.toBeInTheDocument();
+  });
+
+  it("confirm on complete modal calls onComplete with id", async () => {
+    const onComplete = vi.fn();
+    renderPanel({ onComplete });
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getAllByRole("button", { name: /COMPLETE/i })[1]);
     expect(onComplete).toHaveBeenCalledWith("s1");
   });
 

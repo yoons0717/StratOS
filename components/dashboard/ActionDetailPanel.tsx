@@ -52,6 +52,7 @@ export default function ActionDetailPanel({
   readonly = false,
 }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmComplete, setConfirmComplete] = useState(false);
 
   if (!session) {
     return (
@@ -108,10 +109,20 @@ export default function ActionDetailPanel({
               ✕ DELETE
             </Button>
           )}
-          <Button className="flex-1" onClick={() => onComplete(session.id)}>
+          <Button className="flex-1" onClick={() => setConfirmComplete(true)}>
             COMPLETE ✓
           </Button>
         </div>
+      )}
+
+      {confirmComplete && (
+        <ConfirmModal
+          title="CONFIRM_COMPLETE //"
+          message={session.action.title}
+          confirmLabel="COMPLETE"
+          onConfirm={() => onComplete(session.id)}
+          onClose={() => setConfirmComplete(false)}
+        />
       )}
 
       {confirmDelete && (

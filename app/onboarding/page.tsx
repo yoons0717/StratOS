@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
 import { saveUserContext } from "@/lib/api";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
@@ -25,6 +26,20 @@ export default function OnboardingPage() {
   const [level, setLevel] = useState<UserLevel | null>(null);
   const [stage, setStage] = useState<BusinessStage | null>(null);
   const [niche, setNiche] = useState("");
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setEmail(data.user?.email ?? null);
+    });
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   const currentValue = step === 3 ? niche.trim() : [type, level, stage][step];
 
@@ -44,17 +59,27 @@ export default function OnboardingPage() {
     }
   }
 
-  const headerRight = (
-    <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
-  );
-
   return (
     <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <ScanlineOverlay />
       <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
-          <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
-          {headerRight}
+          <div>
+            <span className="font-mono text-xs tracking-widest text-neon">STRATOS</span>
+            {email && (
+              <div className="mt-0.5 flex items-center gap-2">
+                <span className="font-mono text-xs text-zinc-400">{email}</span>
+                <span className="font-mono text-xs text-zinc-600">·</span>
+                <button
+                  onClick={handleSignOut}
+                  className="font-mono text-xs text-zinc-400 transition-colors hover:text-red-400"
+                >
+                  SIGN_OUT
+                </button>
+              </div>
+            )}
+          </div>
+          <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">
           {STEP_LABELS[step]}
@@ -75,6 +100,7 @@ export default function OnboardingPage() {
         {error && (
           <p className="mt-3 font-mono text-xs text-red-400">{error}</p>
         )}
+
       </div>
     </main>
   );

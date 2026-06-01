@@ -41,9 +41,9 @@ describe("createSession", () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify(mockSession), { status: 200 })
     );
-    await createSession("test", defaultCtx, "instagram-dm");
+    await createSession("test", defaultCtx, "instagram");
     const body = JSON.parse((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
-    expect(body.channel).toBe("instagram-dm");
+    expect(body.channel).toBe("instagram");
   });
 });
 

@@ -5,7 +5,7 @@ export type BusinessStage =
   | "first-customers"
   | "consistent-income"
   | "scaling";
-export type Channel = "instagram-dm" | "linkedin" | "naver-blog" | "youtube" | "general";
+export type Channel = "instagram" | "naver-blog" | "youtube" | "general";
 
 export interface UserContext {
   type: UserType;

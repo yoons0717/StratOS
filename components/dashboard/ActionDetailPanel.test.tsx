@@ -41,13 +41,13 @@ describe("ActionDetailPanel", () => {
   });
 
   it("shows channel tag for non-general sessions", () => {
-    renderPanel({ session: makeSession({ id: "s1", channel: "instagram-dm" }) });
-    expect(screen.getByText("인스타 DM")).toBeInTheDocument();
+    renderPanel({ session: makeSession({ id: "s1", channel: "instagram" }) });
+    expect(screen.getByText("인스타그램")).toBeInTheDocument();
   });
 
   it("does not show channel tag for general sessions", () => {
     renderPanel({ session: makeSession({ id: "s1", channel: "general" }) });
-    expect(screen.queryByText("인스타 DM")).not.toBeInTheDocument();
+    expect(screen.queryByText("인스타그램")).not.toBeInTheDocument();
   });
 
   it("renders all steps", () => {

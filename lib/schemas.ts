@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const channelSchema = z.enum(["instagram-dm", "linkedin", "naver-blog", "youtube", "general"]);
+export const channelSchema = z.enum(["instagram", "naver-blog", "youtube", "general"]);
 
 export const actionStepSchema = z.object({
   order: z.number().int().min(1).max(3),

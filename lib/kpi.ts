@@ -85,6 +85,37 @@ export function computeCategoryDist(sessions: ActionSession[]): { category: Acti
     .map(({ key, count, pct }) => ({ category: key, count, pct }));
 }
 
+export interface WeeklyChannelEntry {
+  week: string;
+  channels: Partial<Record<Channel, number>>;
+}
+
+export function computeWeeklyChannelDist(sessions: ActionSession[], weeks = 8): WeeklyChannelEntry[] {
+  const done = completedSessions(sessions);
+  const now = new Date();
+  const result: WeeklyChannelEntry[] = [];
+
+  for (let i = weeks - 1; i >= 0; i--) {
+    const weekStart = new Date(now);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay() - i * 7);
+    const weekEnd = new Date(weekStart.getTime() + 7 * DAY_MS);
+
+    const channels: Partial<Record<Channel, number>> = {};
+    for (const s of done) {
+      const d = new Date(s.created_at);
+      if (d >= weekStart && d < weekEnd) {
+        channels[s.channel] = (channels[s.channel] ?? 0) + 1;
+      }
+    }
+
+    const label = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
+    result.push({ week: label, channels });
+  }
+
+  return result;
+}
+
 function computeStreak(sessions: ActionSession[]): number {
   if (sessions.length === 0) return 0;
 

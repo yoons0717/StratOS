@@ -1,8 +1,7 @@
 import type { Channel, ActionCategory } from "@/types";
 
 export const CHANNEL_LABEL: Record<Channel, string> = {
-  "instagram-dm": "인스타 DM",
-  linkedin: "LinkedIn",
+  instagram: "인스타그램",
   "naver-blog": "네이버 블로그",
   youtube: "유튜브",
   general: "일반",

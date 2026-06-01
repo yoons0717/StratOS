@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
+import RemindButton from "@/app/admin/_components/RemindButton";
 import {
   computeDauEntries,
   computeDauAvg,
@@ -83,6 +84,8 @@ export default async function AdminPage() {
             <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">일별 활성 유저 (최근 7일)</p>
             <DauChart entries={metrics.dauEntries} />
           </div>
+
+          <RemindButton />
         </div>
       </div>
     </main>

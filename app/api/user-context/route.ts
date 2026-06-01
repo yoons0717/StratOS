@@ -10,7 +10,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("user_contexts")
-    .select("type, level, business_stage, niche")
+    .select("type, level, business_stage, niche, reminder_email")
     .eq("user_id", user.id)
     .single();
 
@@ -24,6 +24,7 @@ export async function GET() {
     level: parsed.data.level,
     businessStage: parsed.data.business_stage,
     niche: parsed.data.niche,
+    reminderEmail: parsed.data.reminder_email,
   });
 }
 
@@ -37,7 +38,7 @@ export async function PUT(req: NextRequest) {
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid" }, { status: 400 });
 
-  const { type, level, businessStage, niche } = parsed.data;
+  const { type, level, businessStage, niche, reminderEmail } = parsed.data;
 
   const { data: existing } = await supabase
     .from("user_contexts")
@@ -51,6 +52,7 @@ export async function PUT(req: NextRequest) {
     level,
     business_stage: businessStage,
     niche,
+    reminder_email: reminderEmail,
   });
 
   if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });

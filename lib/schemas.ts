@@ -19,6 +19,7 @@ export const userContextInputSchema = z.object({
   level: z.enum(["0-1K", "1K-10K", "10K+"]),
   businessStage: z.enum(["idea", "first-customers", "consistent-income", "scaling"]),
   niche: z.string().min(1).max(100),
+  reminderEmail: z.boolean().default(false),
 });
 
 export const generateActionRequestSchema = z.object({
@@ -39,4 +40,5 @@ export const userContextRowSchema = z.object({
     "scaling",
   ]),
   niche: z.string().min(1).max(100),
+  reminder_email: z.boolean().default(false),
 });

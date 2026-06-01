@@ -7,6 +7,7 @@ export const defaultCtx: UserContext = {
   level: "0-1K",
   businessStage: "idea",
   niche: "피트니스 코치",
+  reminderEmail: false,
 };
 
 export function makeSession(overrides: SessionOverrides = {}): ActionSession {

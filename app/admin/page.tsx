@@ -71,6 +71,7 @@ export default async function AdminPage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  if (user.email !== process.env.ADMIN_EMAIL) redirect("/");
 
   const metrics = await fetchMetrics();
 

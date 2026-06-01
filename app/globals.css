@@ -59,6 +59,7 @@ body {
 
 /* 동적 바 너비 (CategoryChart) */
 .bar-fill { width: var(--bar-width); }
+.bar-segment { width: var(--bar-segment-width); }
 
 /* 완료 피드백 라인별 순차 등장 */
 @keyframes revealLine {

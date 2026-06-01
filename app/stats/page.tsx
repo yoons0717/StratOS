@@ -13,6 +13,15 @@ import {
 } from "@/lib/kpi";
 import AppShell from "@/components/layout/AppShell";
 import { CHANNEL_LABEL, CATEGORY_LABEL } from "@/lib/labels";
+import type { Channel } from "@/types";
+
+const CHANNEL_ORDER: Channel[] = ["instagram", "naver-blog", "youtube", "general"];
+const CHANNEL_COLOR: Record<Channel, string> = {
+  instagram: "bg-pink-500/70",
+  "naver-blog": "bg-green-500/70",
+  youtube: "bg-red-500/70",
+  general: "bg-zinc-600",
+};
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
@@ -136,21 +145,15 @@ export default function StatsPage() {
                       {total === 0 ? (
                         <div className="h-full w-full bg-zinc-800" />
                       ) : (
-                        (["instagram", "naver-blog", "youtube", "general"] as const).map((ch) => {
+                        CHANNEL_ORDER.map((ch) => {
                           const count = channels[ch] ?? 0;
                           if (count === 0) return null;
                           const pct = Math.round((count / total) * 100);
-                          const colors: Record<string, string> = {
-                            instagram: "bg-pink-500/70",
-                            "naver-blog": "bg-green-500/70",
-                            youtube: "bg-red-500/70",
-                            general: "bg-zinc-600",
-                          };
                           return (
                             <div
                               key={ch}
-                              className={`h-full ${colors[ch]}`}
-                              style={{ width: `${pct}%` }}
+                              className={`bar-segment h-full ${CHANNEL_COLOR[ch]}`}
+                              style={{ "--bar-segment-width": `${pct}%` } as React.CSSProperties}
                               title={`${CHANNEL_LABEL[ch]}: ${count}`}
                             />
                           );
@@ -162,9 +165,9 @@ export default function StatsPage() {
                 );
               })}
               <div className="mt-3 flex flex-wrap gap-3">
-                {(["instagram", "naver-blog", "youtube", "general"] as const).map((ch) => (
+                {CHANNEL_ORDER.map((ch) => (
                   <div key={ch} className="flex items-center gap-1">
-                    <div className={`h-2 w-2 rounded-sm ${{ instagram: "bg-pink-500/70", "naver-blog": "bg-green-500/70", youtube: "bg-red-500/70", general: "bg-zinc-600" }[ch]}`} />
+                    <div className={`h-2 w-2 rounded-sm ${CHANNEL_COLOR[ch]}`} />
                     <span className="font-mono text-xs text-zinc-600">{CHANNEL_LABEL[ch]}</span>
                   </div>
                 ))}

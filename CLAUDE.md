@@ -11,53 +11,57 @@ npm run test:run     # vitest single run
 npx vitest run path/to/file.test.ts
 ```
 
-## Architecture
+## Key Patterns
 
-```
-app/
-  api/sessions/route.ts               # GET (list), POST (create + Groq)
-  api/sessions/[id]/route.ts          # PATCH (reroll)
-  api/sessions/[id]/complete/route.ts # PATCH (complete)
-  api/user-context/route.ts           # GET / PUT
-  login/page.tsx                      # Google OAuth login
-  auth/callback/route.ts              # OAuth callback
-  page.tsx                            # Dashboard
-lib/
-  groq.ts      # Server-only Groq client. Never import in Client Components.
-  prompts.ts   # Shared SYSTEM_PROMPT, STAGE_MAP, buildUserPrompt for session route handlers.
-  schemas.ts   # Zod schemas shared across API request/response boundaries.
-  hooks.ts     # useInitStore — fetch ctx + sessions, redirect to /onboarding if null.
-  supabase/    # browser.ts (client-side), server.ts (server-side)
-store/
-  index.ts     # Zustand (no persist). All client state lives here.
-types/
-  index.ts     # Project-wide TypeScript interfaces.
-tests/
-  fixtures.ts  # Shared test fixtures: defaultCtx, makeSession(overrides?).
-middleware.ts  # Redirects unauthenticated requests to /login.
+**Server/client boundary:**
+- `lib/groq.ts`, `lib/supabase/server.ts`, `lib/supabase/admin.ts` — server-only. Never import in Client Components.
+- `lib/supabase/browser.ts` — client-only. Use in `"use client"` components.
+- `GROQ_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` must never reach the client bundle.
+
+**Supabase clients:**
+- `createSupabaseServerClient()` — user session context, respects RLS. Use in API routes and server components for user-scoped queries.
+- `createSupabaseAdminClient()` — service role, bypasses RLS. Use only in admin-only routes (`/api/notifications/remind`, `/admin`).
+
+**Admin auth guard:**
+```ts
+if (auth.user.email !== process.env.ADMIN_EMAIL) return redirect("/");
 ```
 
-**Server/client boundary — common mistakes:**
-- `lib/groq.ts` is server-only. Importing it in a Client Component will break the build.
-- `lib/supabase/server.ts` is server-only. Use `lib/supabase/browser.ts` in client code.
-- `GROQ_API_KEY` must never reach the client bundle — only in `.env.local`.
+**New tables need RLS policies.** After creating a table via migration, add `insert`/`select` policies in Supabase dashboard or migration SQL. Without policies, all operations silently fail.
+
+**Event logging** (`lib/events.ts`):
+```ts
+await logEvent("session_created", user.id, supabase);
+```
+Events: `onboarding_completed` (first save only), `session_created`, `session_completed`.
+
+**Pure computation functions** go in `lib/` (e.g., `lib/kpi.ts`, `lib/metrics.ts`). Keep DB queries out of computation logic so functions are unit-testable without mocking Supabase.
+
+**Next.js 16:** `middleware.ts` → `proxy.ts`, export function name `proxy` (not `middleware`).
 
 ## Code Conventions
 
 - **Path alias**: `@/` → project root. No relative paths (`../`).
-- **Zod**: Validate at all external boundaries — API requests, AI responses, and DB row reads. Always `safeParse`, never `parse`. Do not use `as SomeType` casting; validate and extract the type instead.
-- **Schemas**: Define types in `lib/schemas.ts`, extract with `z.infer<>`.
-- **No inline styles**: `style={{...}}` is banned. For dynamic values, define a utility class in `globals.css` that reads a CSS custom property, then pass the value via style:
+- **Zod**: Validate at all external boundaries — API requests, AI responses, and DB row reads. Always `safeParse`, never `parse`. Do not use `as SomeType` casting.
+- **Schemas**: Define shared types in `lib/schemas.ts`, extract with `z.infer<>`.
+- **No inline styles**: `style={{...}}` is banned. For dynamic values, use CSS custom property pattern:
   ```tsx
   // globals.css: .bar-fill { width: var(--bar-width); }
   <div className="bar-fill" style={{ "--bar-width": `${pct}%` } as React.CSSProperties} />
   ```
-- **No dynamic Tailwind arbitrary values**: `w-[${value}%]` will not work — Tailwind's scanner is static and won't generate the class. Use the CSS custom property pattern above.
+- **No dynamic Tailwind arbitrary values**: `w-[${value}%]` won't work. Use the CSS custom property pattern above.
 - **`"use client"`**: Only on components that need state or event handlers.
+- **Comments**: Only when WHY is non-obvious. Never explain WHAT the code does.
+
+## PR Workflow
+
+- Branch per feature: `feat/`, `fix/`, `refactor/`, `chore/`
+- PR description format: **Why** (motivation) → **Summary** (what changed) → **Test plan** (checklist)
+- Never commit without explicit user instruction.
 
 ## Working Style
 
-- **Plans**: filename + one-line description only. No code in plans.
+- **Plans**: feature description only. No code in plans. 100줄 이하.
 - **Tasks**: one at a time. Confirm before moving to the next.
 
 ## TDD Rules
@@ -72,12 +76,11 @@ Write tests first for all new features and bug fixes.
 
 **Test file location**: same directory as the source file, `*.test.ts(x)`.
 
-**Shared fixtures**: use `defaultCtx` and `makeSession(overrides?)` from `@/tests/fixtures` instead of defining fixtures locally in each test file.
+**Shared fixtures**: use `defaultCtx` and `makeSession(overrides?)` from `@/tests/fixtures`.
+
+**What NOT to test**: hardcoded label text, prop rendering (e.g. `getByText("TOTAL")`). Only test logic and behavior.
 
 **Critical: stable router mock to prevent infinite re-render**
-
-Using `useRouter: () => ({ push: vi.fn() })` creates a new object every render, causing useEffect to re-run infinitely and the test to hang. Always use `vi.hoisted()`:
-
 ```ts
 const pushMock = vi.hoisted(() => vi.fn());
 const routerMock = vi.hoisted(() => ({ push: pushMock }));

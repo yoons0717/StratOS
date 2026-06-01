@@ -4,9 +4,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 
 export default function LoginPage() {
-  const supabase = createSupabaseBrowserClient();
-
   async function handleGoogleLogin() {
+    const supabase = createSupabaseBrowserClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },

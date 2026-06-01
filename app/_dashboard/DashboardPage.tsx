@@ -60,6 +60,7 @@ export default function DashboardPage() {
       addSession(session);
       setSelectedId(session.id);
       setShowModal(false);
+      setShowFeedback(false);
     } catch {
       setModalError("EXECUTION_FAILED — Please try again");
     } finally {

@@ -1,4 +1,4 @@
-import groq from "@/lib/groq";
+import { createGroqClient } from "@/lib/groq";
 import { generatedActionSchema } from "@/lib/schemas";
 import { SYSTEM_PROMPT } from "@/lib/prompts";
 import type { GeneratedAction } from "@/types";
@@ -11,7 +11,7 @@ export async function generateAction(
   userPrompt: string,
   temperature = 0.7
 ): Promise<GenerateResult> {
-  const completion = await groq.chat.completions.create({
+  const completion = await createGroqClient().chat.completions.create({
     model: "llama-3.1-8b-instant",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },

@@ -74,4 +74,19 @@ describe("OnboardingPage", () => {
     render(<OnboardingPage />);
     expect(screen.getByRole("button", { name: /EXECUTE/i })).toBeDisabled();
   });
+
+  it("step 1에서는 BACK 버튼이 없음", () => {
+    render(<OnboardingPage />);
+    expect(screen.queryByRole("button", { name: /BACK/i })).not.toBeInTheDocument();
+  });
+
+  it("step 2에서 BACK 클릭 시 step 1로 돌아감", async () => {
+    render(<OnboardingPage />);
+    await userEvent.click(screen.getByText("Creator"));
+    await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
+    expect(screen.getByText("2 / 4")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /BACK/i }));
+    expect(screen.getByText("1 / 4")).toBeInTheDocument();
+    expect(screen.getByText("USER_TYPE")).toBeInTheDocument();
+  });
 });

@@ -79,7 +79,17 @@ export default function OnboardingPage() {
               </div>
             )}
           </div>
-          <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
+          <div className="flex items-center gap-3">
+            {step > 0 && (
+              <button
+                onClick={() => setStep((s) => s - 1)}
+                className="font-mono text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+              >
+                ← BACK
+              </button>
+            )}
+            <span className="font-mono text-xs text-zinc-600">{step + 1} / {TOTAL_STEPS}</span>
+          </div>
         </div>
         <div className="mb-1 font-mono text-lg font-bold text-white">
           {STEP_LABELS[step]}

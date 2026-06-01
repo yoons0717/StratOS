@@ -13,8 +13,22 @@ npx vitest run path/to/file.test.ts
 
 ## Key Patterns
 
+**lib/ 구조:**
+```
+lib/
+  ai/          # Groq 클라이언트, 프롬프트, 액션 생성 — 서버 전용
+  analytics/   # KPI, 어드민 지표, 채널/카테고리 레이블
+  supabase/    # admin.ts (service role), server.ts (SSR), browser.ts (client)
+  schemas.ts   # Zod 스키마 (API 경계)
+  auth.ts      # 서버 인증 가드
+  api.ts       # 클라이언트 HTTP 함수
+  events.ts    # 이벤트 로깅
+  email.ts     # Resend 이메일
+  hooks.ts     # React 훅
+```
+
 **Server/client boundary:**
-- `lib/groq.ts`, `lib/supabase/server.ts`, `lib/supabase/admin.ts` — server-only. Never import in Client Components.
+- `lib/ai/*`, `lib/supabase/server.ts`, `lib/supabase/admin.ts` — server-only. Never import in Client Components.
 - `lib/supabase/browser.ts` — client-only. Use in `"use client"` components.
 - `GROQ_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY` must never reach the client bundle.
 

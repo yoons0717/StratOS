@@ -10,9 +10,9 @@ import {
   computeChannelDist,
   computeCategoryDist,
   computeWeeklyChannelDist,
-} from "@/lib/kpi";
+} from "@/lib/analytics/kpi";
 import AppShell from "@/components/layout/AppShell";
-import { CHANNEL_LABEL, CATEGORY_LABEL } from "@/lib/labels";
+import { CHANNEL_LABEL, CATEGORY_LABEL } from "@/lib/analytics/labels";
 import type { Channel } from "@/types";
 
 const CHANNEL_ORDER: Channel[] = ["instagram", "naver-blog", "youtube", "general"];

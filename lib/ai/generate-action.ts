@@ -1,6 +1,6 @@
-import { createGroqClient } from "@/lib/groq";
+import { createGroqClient } from "@/lib/ai/groq";
 import { generatedActionSchema } from "@/lib/schemas";
-import { SYSTEM_PROMPT } from "@/lib/prompts";
+import { SYSTEM_PROMPT } from "@/lib/ai/prompts";
 import type { GeneratedAction } from "@/types";
 
 type GenerateResult =

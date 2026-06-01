@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import AppShell from "./AppShell";
-import type { KpiData } from "@/lib/kpi";
+import type { KpiData } from "@/lib/analytics/kpi";
 import { defaultCtx } from "@/tests/fixtures";
 
 const pushMock = vi.hoisted(() => vi.fn());

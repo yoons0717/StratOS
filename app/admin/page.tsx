@@ -8,7 +8,7 @@ import {
   computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
-} from "@/lib/metrics";
+} from "@/lib/analytics/metrics";
 
 async function fetchMetrics() {
   const supabase = createSupabaseAdminClient();

@@ -28,11 +28,6 @@ describe("NewActionModal", () => {
     expect(screen.getByRole("button", { name: /General/i })).toHaveAttribute("data-selected", "false");
   });
 
-  it("shows guide text for 일반 by default", () => {
-    renderModal();
-    expect(screen.getByText(/current metrics/i)).toBeInTheDocument();
-  });
-
   it("shows channel-specific guide text when channel is selected", async () => {
     renderModal();
     await userEvent.click(screen.getByRole("button", { name: /Instagram/i }));

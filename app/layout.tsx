@@ -13,8 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StratOS",
-  description: "Take one real action today.",
+  title: "StratOS — 오늘 하나, 실행하세요",
+  description: "솔로 크리에이터를 위한 AI 실행 OS. 막힌 상황을 입력하면 지금 당장 할 수 있는 액션을 돌려줍니다.",
+  openGraph: {
+    title: "StratOS — 오늘 하나, 실행하세요",
+    description: "솔로 크리에이터를 위한 AI 실행 OS. 막힌 상황을 입력하면 지금 당장 할 수 있는 액션을 돌려줍니다.",
+    url: "https://stratos-os.vercel.app",
+    siteName: "StratOS",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "StratOS — 오늘 하나, 실행하세요",
+    description: "솔로 크리에이터를 위한 AI 실행 OS.",
+  },
 };
 
 export const viewport: Viewport = {

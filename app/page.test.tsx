@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import { defaultCtx, makeSession } from "@/tests/fixtures";
-import DashboardPage from "./page";
+import DashboardPage from "./_dashboard/DashboardPage";
 
 const pushMock = vi.hoisted(() => vi.fn());
 const routerMock = vi.hoisted(() => ({ push: pushMock }));

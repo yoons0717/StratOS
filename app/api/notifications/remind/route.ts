@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendReminderEmail } from "@/lib/email";
-import { computeKpi } from "@/lib/kpi";
+import { computeKpi } from "@/lib/analytics/kpi";
 
 export async function POST() {
   const auth = await getAuthUser();

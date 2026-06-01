@@ -5,7 +5,7 @@ import type { ActionSession } from "@/types";
 import Button from "@/components/ui/Button";
 import MagicCopy from "@/components/result/MagicCopy";
 import CategoryChart from "./CategoryChart";
-import { CHANNEL_LABEL } from "@/lib/labels";
+import { CHANNEL_LABEL } from "@/lib/analytics/labels";
 
 function formatDuration(startIso: string, endIso: string): string {
   const mins = Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000);

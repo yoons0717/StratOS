@@ -5,7 +5,7 @@ import { useStratosStore } from "@/store";
 import { createSession, completeSession, deleteSession } from "@/lib/api";
 import { useInitStore } from "@/lib/hooks";
 import LoadingScreen from "@/components/ui/LoadingScreen";
-import { computeKpi } from "@/lib/kpi";
+import { computeKpi } from "@/lib/analytics/kpi";
 import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
 import ActionDetailPanel from "@/components/dashboard/ActionDetailPanel";

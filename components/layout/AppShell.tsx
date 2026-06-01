@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { UserContext } from "@/types";
-import type { KpiData } from "@/lib/kpi";
+import type { KpiData } from "@/lib/analytics/kpi";
 import Sidebar from "./Sidebar";
 import KpiBar from "./KpiBar";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";

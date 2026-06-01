@@ -1,4 +1,4 @@
-import type { KpiData } from "@/lib/kpi";
+import type { KpiData } from "@/lib/analytics/kpi";
 
 interface Props {
   data: KpiData;

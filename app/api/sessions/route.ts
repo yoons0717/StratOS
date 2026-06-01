@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
-import { generateAction } from "@/lib/generate-action";
+import { generateAction } from "@/lib/ai/generate-action";
 import { generateActionRequestSchema } from "@/lib/schemas";
-import { buildUserPrompt } from "@/lib/prompts";
+import { buildUserPrompt } from "@/lib/ai/prompts";
 import { logEvent } from "@/lib/events";
 
 export async function GET() {

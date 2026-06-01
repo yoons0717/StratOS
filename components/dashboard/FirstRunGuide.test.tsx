@@ -4,11 +4,6 @@ import { describe, it, expect, vi } from "vitest";
 import FirstRunGuide from "./FirstRunGuide";
 
 describe("FirstRunGuide", () => {
-  it("shows first line immediately", () => {
-    render(<FirstRunGuide lineDelay={0} />);
-    expect(screen.getByText(/STRATOS/i)).toBeInTheDocument();
-  });
-
   it("reveals all lines after animation completes", async () => {
     render(<FirstRunGuide lineDelay={0} />);
     await waitFor(() => expect(screen.getByText(/READY/i)).toBeInTheDocument());

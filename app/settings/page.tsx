@@ -13,27 +13,42 @@ import StepStage from "@/components/onboarding/StepStage";
 import StepNiche from "@/components/onboarding/StepNiche";
 import type { UserType, UserLevel, BusinessStage } from "@/types";
 
+type FormState = {
+  type: UserType | null;
+  level: UserLevel | null;
+  stage: BusinessStage | null;
+  niche: string;
+  reminderEmail: boolean;
+};
+
 export default function SettingsPage() {
   const router = useRouter();
   const { userContext, setUserContext } = useStratosStore();
-  const [type, setType] = useState<UserType | null>(null);
-  const [level, setLevel] = useState<UserLevel | null>(null);
-  const [stage, setStage] = useState<BusinessStage | null>(null);
-  const [niche, setNiche] = useState("");
-  const [reminderEmail, setReminderEmail] = useState(false);
+  const [form, setForm] = useState<FormState>({
+    type: null,
+    level: null,
+    stage: null,
+    niche: "",
+    reminderEmail: false,
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const isValid = !!(form.type && form.level && form.stage && form.niche.trim());
 
   useEffect(() => {
     fetchUserContext().then((ctx) => {
       if (!ctx) { router.push("/onboarding"); return; }
       setUserContext(ctx);
-      setType(ctx.type);
-      setLevel(ctx.level);
-      setStage(ctx.businessStage);
-      setNiche(ctx.niche);
-      setReminderEmail(ctx.reminderEmail);
+      setForm({
+        type: ctx.type,
+        level: ctx.level,
+        stage: ctx.businessStage,
+        niche: ctx.niche,
+        reminderEmail: ctx.reminderEmail,
+      });
       setIsLoading(false);
     }).catch(() => {
       setIsLoading(false);
@@ -43,16 +58,26 @@ export default function SettingsPage() {
   if (isLoading || !userContext) return <LoadingScreen />;
 
   async function handleSave() {
-    if (!type || !level || !stage || !niche.trim()) return;
-    const ctx = { type, level, businessStage: stage, niche: niche.trim(), reminderEmail };
+    if (!isValid || isSaving) return;
+    setIsSaving(true);
+    const ctx = {
+      type: form.type!,
+      level: form.level!,
+      businessStage: form.stage!,
+      niche: form.niche.trim(),
+      reminderEmail: form.reminderEmail,
+    };
     try {
       await saveUserContext(ctx);
       setUserContext(ctx);
       setSaved(true);
       setSaveError(null);
       setTimeout(() => setSaved(false), 2000);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setSaveError("SAVE_FAILED — Please try again");
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -68,32 +93,32 @@ export default function SettingsPage() {
         <div className="flex max-w-lg flex-col gap-6">
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">USER_TYPE //</div>
-            <StepType selected={type} onSelect={setType} />
+            <StepType selected={form.type} onSelect={(v) => setForm((f) => ({ ...f, type: v }))} />
           </div>
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">AUDIENCE_SIZE //</div>
-            <StepLevel selected={level} onSelect={setLevel} />
+            <StepLevel selected={form.level} onSelect={(v) => setForm((f) => ({ ...f, level: v }))} />
           </div>
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">CURRENT_STAGE //</div>
-            <StepStage selected={stage} onSelect={setStage} />
+            <StepStage selected={form.stage} onSelect={(v) => setForm((f) => ({ ...f, stage: v }))} />
           </div>
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">YOUR_NICHE //</div>
-            <StepNiche value={niche} onChange={setNiche} />
+            <StepNiche value={form.niche} onChange={(v) => setForm((f) => ({ ...f, niche: v }))} />
           </div>
           <div>
             <div className="mb-2 font-mono text-xs tracking-widest text-zinc-600">NOTIFICATIONS //</div>
             <button
-              onClick={() => setReminderEmail((v) => !v)}
+              onClick={() => setForm((f) => ({ ...f, reminderEmail: !f.reminderEmail }))}
               className={`flex min-h-[44px] w-full items-center justify-between rounded border px-4 py-3 font-mono text-sm transition-colors ${
-                reminderEmail
+                form.reminderEmail
                   ? "border-neon bg-neon/10 text-neon"
                   : "border-zinc-700 text-zinc-500 hover:border-zinc-500"
               }`}
             >
-              <span>{reminderEmail ? "▶ " : "  "}REMINDER_EMAIL</span>
-              <span className="text-xs opacity-60">{reminderEmail ? "ON" : "OFF"}</span>
+              <span>{form.reminderEmail ? "▶ " : "  "}REMINDER_EMAIL</span>
+              <span className="text-xs opacity-60">{form.reminderEmail ? "ON" : "OFF"}</span>
             </button>
           </div>
           <div>
@@ -103,7 +128,7 @@ export default function SettingsPage() {
             {saveError && (
               <div className="mb-3 font-mono text-xs text-red-400">{saveError}</div>
             )}
-            <Button onClick={handleSave} disabled={!type || !level || !stage || !niche.trim()} className="w-full">
+            <Button onClick={handleSave} disabled={!isValid || isSaving} className="w-full">
               SAVE →
             </Button>
           </div>

@@ -58,4 +58,14 @@ describe("SettingsPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /SAVE/i }));
     await waitFor(() => expect(screen.getByText(/SETTINGS_SAVED/i)).toBeInTheDocument());
   });
+
+  it("SAVE button is disabled while saving", async () => {
+    mockSaveUserContext.mockImplementation(() => new Promise((r) => setTimeout(r, 100)));
+    render(<SettingsPage />);
+    await screen.findByText("StratOS");
+    const saveBtn = screen.getByRole("button", { name: /SAVE/i });
+    await userEvent.click(saveBtn);
+    expect(saveBtn).toBeDisabled();
+    await waitFor(() => expect(saveBtn).not.toBeDisabled());
+  });
 });

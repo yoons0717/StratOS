@@ -39,20 +39,24 @@ export default function SettingsPage() {
   const isValid = !!(form.type && form.level && form.stage && form.niche.trim());
 
   useEffect(() => {
-    fetchUserContext().then((ctx) => {
-      if (!ctx) { router.push("/onboarding"); return; }
-      setUserContext(ctx);
-      setForm({
-        type: ctx.type,
-        level: ctx.level,
-        stage: ctx.businessStage,
-        niche: ctx.niche,
-        reminderEmail: ctx.reminderEmail,
+    fetchUserContext()
+      .then((ctx) => {
+        if (!ctx) { router.push("/onboarding"); return; }
+        setUserContext(ctx);
+        setForm({
+          type: ctx.type,
+          level: ctx.level,
+          stage: ctx.businessStage,
+          niche: ctx.niche,
+          reminderEmail: ctx.reminderEmail,
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-      setIsLoading(false);
-    }).catch(() => {
-      setIsLoading(false);
-    });
   }, [router, setUserContext]);
 
   if (isLoading || !userContext) return <LoadingScreen />;

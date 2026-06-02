@@ -33,6 +33,7 @@ export default function HistoryPage() {
           emptyLabel="No completed actions"
         />
         <ActionDetailPanel
+          key={selected?.id}
           session={selected}
           onComplete={() => {}}
           readonly

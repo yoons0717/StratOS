@@ -92,6 +92,7 @@ describe("DashboardPage", () => {
     render(<DashboardPage />);
     await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getAllByRole("button", { name: /COMPLETE/i })[1]);
     expect(screen.queryByRole("button", { name: /팔로워 DM 보내기/ })).not.toBeInTheDocument();
     expect(useStratosStore.getState().sessions[0].completed).toBe(true);
     expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
@@ -106,6 +107,7 @@ describe("DashboardPage", () => {
     render(<DashboardPage />);
     await userEvent.click(await screen.findByRole("button", { name: /팔로워 DM 보내기/ }));
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getAllByRole("button", { name: /COMPLETE/i })[1]);
     expect(screen.getByText(/ACTION_COMPLETE/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /\+ NEW ACTION/i }));
     await userEvent.type(screen.getByPlaceholderText(/e\.g\./i), "새 상황");

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ActionSession } from "@/types";
 import Button from "@/components/ui/Button";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import MagicCopy from "@/components/result/MagicCopy";
 import { CHANNEL_LABEL } from "@/lib/analytics/labels";
 
@@ -51,6 +52,7 @@ export default function ActionDetailPanel({
   readonly = false,
 }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmComplete, setConfirmComplete] = useState(false);
 
   if (!session) {
     return (
@@ -107,33 +109,31 @@ export default function ActionDetailPanel({
               ✕ DELETE
             </Button>
           )}
-          <Button className="flex-1" onClick={() => onComplete(session.id)}>
+          <Button className="flex-1" onClick={() => setConfirmComplete(true)}>
             COMPLETE ✓
           </Button>
         </div>
       )}
 
+      {confirmComplete && (
+        <ConfirmModal
+          title="CONFIRM_COMPLETE //"
+          message={session.action.title}
+          confirmLabel="COMPLETE"
+          onConfirm={() => onComplete(session.id)}
+          onClose={() => setConfirmComplete(false)}
+        />
+      )}
+
       {confirmDelete && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-          onClick={() => setConfirmDelete(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded border border-zinc-800 bg-surface p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="mb-1 font-mono text-xs tracking-widest text-zinc-600">CONFIRM_DELETE //</p>
-            <p className="mb-6 font-mono text-sm text-white">{session.action.title}</p>
-            <div className="flex gap-3">
-              <Button variant="ghost" className="flex-1" onClick={() => setConfirmDelete(false)}>
-                CANCEL
-              </Button>
-              <Button className="flex-1" onClick={() => onDelete!(session.id)}>
-                CONFIRM
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ConfirmModal
+          title="CONFIRM_DELETE //"
+          message={session.action.title}
+          confirmLabel="DELETE"
+          confirmVariant="danger"
+          onConfirm={() => onDelete!(session.id)}
+          onClose={() => setConfirmDelete(false)}
+        />
       )}
     </div>
   );

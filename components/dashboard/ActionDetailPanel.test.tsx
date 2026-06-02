@@ -60,10 +60,28 @@ describe("ActionDetailPanel", () => {
     expect(screen.getByText("안녕하세요!")).toBeInTheDocument();
   });
 
-  it("calls onComplete with id when COMPLETE is clicked", async () => {
+  it("clicking COMPLETE opens confirm modal", async () => {
     const onComplete = vi.fn();
     renderPanel({ onComplete });
     await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    expect(screen.getByText(/CONFIRM_COMPLETE/i)).toBeInTheDocument();
+    expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  it("CANCEL on complete modal closes without calling onComplete", async () => {
+    const onComplete = vi.fn();
+    renderPanel({ onComplete });
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getByRole("button", { name: /CANCEL/i }));
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(screen.queryByText(/CONFIRM_COMPLETE/i)).not.toBeInTheDocument();
+  });
+
+  it("confirm on complete modal calls onComplete with id", async () => {
+    const onComplete = vi.fn();
+    renderPanel({ onComplete });
+    await userEvent.click(screen.getByRole("button", { name: /COMPLETE/i }));
+    await userEvent.click(screen.getAllByRole("button", { name: /COMPLETE/i })[1]);
     expect(onComplete).toHaveBeenCalledWith("s1");
   });
 
@@ -98,12 +116,23 @@ describe("ActionDetailPanel", () => {
     expect(screen.queryByText(/CONFIRM_DELETE/i)).not.toBeInTheDocument();
   });
 
-  it("CONFIRM calls onDelete with id", async () => {
+  it("confirm button calls onDelete with id", async () => {
     const onDelete = vi.fn();
     renderPanel({ onDelete });
     await userEvent.click(screen.getByRole("button", { name: /DELETE/i }));
-    await userEvent.click(screen.getByRole("button", { name: /CONFIRM/i }));
+    await userEvent.click(screen.getAllByRole("button", { name: /DELETE/i })[1]);
     expect(onDelete).toHaveBeenCalledWith("s1");
+  });
+
+  it("confirm modal closes when switching to a different session", async () => {
+    const s2 = makeSession({ id: "s2", action: { title: "새 액션" } });
+    const { rerender } = renderPanel({ onDelete: vi.fn() });
+    await userEvent.click(screen.getByRole("button", { name: /DELETE/i }));
+    expect(screen.getByText(/CONFIRM_DELETE/i)).toBeInTheDocument();
+    rerender(
+      <ActionDetailPanel key={s2.id} session={s2} onComplete={vi.fn()} onDelete={vi.fn()} />
+    );
+    expect(screen.queryByText(/CONFIRM_DELETE/i)).not.toBeInTheDocument();
   });
 
 });

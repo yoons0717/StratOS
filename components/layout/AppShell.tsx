@@ -16,7 +16,7 @@ export default function AppShell({ userContext, kpiData, children }: Props) {
     <div className="flex h-screen bg-background">
       <ScanlineOverlay />
       <Sidebar userContext={userContext} />
-      <div className="flex flex-1 min-h-0 flex-col">
+      <div className="flex flex-1 min-h-0 flex-col overflow-y-auto">
         <div className="flex h-12 shrink-0 items-center gap-2 border-b border-zinc-800/60 px-6">
           <span className="text-sm text-zinc-300">{userContext.niche}</span>
           <span className="text-zinc-700">·</span>

@@ -63,7 +63,8 @@ export default function DashboardPage() {
       setSelectedId(session.id);
       setShowModal(false);
       setShowFeedback(false);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setModalError("EXECUTION_FAILED — Please try again");
     } finally {
       setModalLoading(false);
@@ -75,7 +76,8 @@ export default function DashboardPage() {
       await deleteSession(id);
       removeSession(id);
       if (selectedId === id) setSelectedId(null);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setActionError("DELETE_FAILED — Please try again");
     }
   }
@@ -86,7 +88,8 @@ export default function DashboardPage() {
       markCompleted(id);
       setSelectedId(null);
       setShowFeedback(true);
-    } catch {
+    } catch (error) {
+      console.error(error);
       setActionError("COMPLETE_FAILED — Please try again");
     }
   }

@@ -9,6 +9,13 @@ beforeEach(() => {
 });
 
 describe("fetchSessions", () => {
+  it("invalid response schema throws", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify([{ invalid: true }]), { status: 200 })
+    );
+    await expect(fetchSessions()).rejects.toThrow("Invalid response format");
+  });
+
   it("GET /api/sessions 호출 후 목록 반환", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify([mockSession]), { status: 200 })
@@ -28,6 +35,13 @@ describe("fetchSessions", () => {
 });
 
 describe("createSession", () => {
+  it("invalid response schema throws", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ invalid: true }), { status: 200 })
+    );
+    await expect(createSession("test", defaultCtx)).rejects.toThrow("Invalid response format");
+  });
+
   it("POST /api/sessions 호출 후 세션 반환", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify(mockSession), { status: 200 })
@@ -58,6 +72,13 @@ describe("completeSession", () => {
 });
 
 describe("fetchUserContext", () => {
+  it("invalid response schema throws", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify({ type: "invalid_type" }), { status: 200 })
+    );
+    await expect(fetchUserContext()).rejects.toThrow("Invalid response format");
+  });
+
   it("GET /api/user-context 호출 후 컨텍스트 반환", async () => {
     vi.spyOn(global, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify(defaultCtx), { status: 200 })

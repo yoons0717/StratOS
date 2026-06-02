@@ -55,7 +55,7 @@ export async function PUT(req: NextRequest) {
     reminder_email: reminderEmail,
   });
 
-  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  if (error) { console.error(error); return NextResponse.json({ error: "DB error" }, { status: 500 }); }
   if (!existing) await logEvent("onboarding_completed", user.id, supabase);
   return NextResponse.json({ ok: true });
 }

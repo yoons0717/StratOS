@@ -54,7 +54,8 @@ export default function OnboardingPage() {
       await saveUserContext(ctx);
       setUserContext(ctx);
       router.push("/");
-    } catch {
+    } catch (error) {
+      console.error(error);
       setError("SAVE_FAILED — Please try again");
     }
   }

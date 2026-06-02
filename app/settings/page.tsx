@@ -62,15 +62,10 @@ export default function SettingsPage() {
   if (isLoading || !userContext) return <LoadingScreen />;
 
   async function handleSave() {
-    if (!isValid || isSaving) return;
+    const { type, level, stage, niche, reminderEmail } = form;
+    if (!type || !level || !stage || !niche.trim() || isSaving) return;
     setIsSaving(true);
-    const ctx = {
-      type: form.type!,
-      level: form.level!,
-      businessStage: form.stage!,
-      niche: form.niche.trim(),
-      reminderEmail: form.reminderEmail,
-    };
+    const ctx = { type, level, businessStage: stage, niche: niche.trim(), reminderEmail };
     try {
       await saveUserContext(ctx);
       setUserContext(ctx);

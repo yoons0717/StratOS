@@ -19,12 +19,12 @@ lib/
   ai/          # Groq 클라이언트, 프롬프트, 액션 생성 — 서버 전용
   analytics/   # KPI, 어드민 지표, 채널/카테고리 레이블
   supabase/    # admin.ts (service role), server.ts (SSR), browser.ts (client)
-  schemas.ts   # Zod 스키마 (API 경계)
+  schemas.ts   # Zod 스키마 (API 경계) — actionSessionSchema, userContextInputSchema 등
   auth.ts      # 서버 인증 가드
-  api.ts       # 클라이언트 HTTP 함수
+  api.ts       # 클라이언트 HTTP 함수 (응답 Zod 검증 포함)
   events.ts    # 이벤트 로깅
   email.ts     # Resend 이메일
-  hooks.ts     # React 훅
+  hooks.ts     # React 훅 (useInitStore)
 ```
 
 **Server/client boundary:**
@@ -49,7 +49,14 @@ await logEvent("session_created", user.id, supabase);
 ```
 Events: `onboarding_completed` (first save only), `session_created`, `session_completed`.
 
-**Pure computation functions** go in `lib/` (e.g., `lib/kpi.ts`, `lib/metrics.ts`). Keep DB queries out of computation logic so functions are unit-testable without mocking Supabase.
+**`useInitStore(withSessions?)`** — 페이지 초기화 훅. `{ isLoading, initError }` 반환. fetch 실패 시 `initError: true`. 반드시 두 상태 모두 처리:
+```ts
+const { isLoading, initError } = useInitStore(true);
+if (initError) return <ErrorScreen />;
+if (isLoading || !userContext) return <LoadingScreen />;
+```
+
+**Pure computation functions** go in `lib/` (e.g., `lib/analytics/kpi.ts`). Keep DB queries out of computation logic so functions are unit-testable without mocking Supabase.
 
 **Next.js 16:** `middleware.ts` → `proxy.ts`, export function name `proxy` (not `middleware`).
 
@@ -57,7 +64,7 @@ Events: `onboarding_completed` (first save only), `session_created`, `session_co
 
 - **Path alias**: `@/` → project root. No relative paths (`../`).
 - **Zod**: Validate at all external boundaries — API requests, AI responses, and DB row reads. Always `safeParse`, never `parse`. Do not use `as SomeType` casting.
-- **Schemas**: Define shared types in `lib/schemas.ts`, extract with `z.infer<>`.
+- **Schemas**: Define shared types in `lib/schemas.ts`, extract with `z.infer<>`. API 응답 검증도 `lib/api.ts` 안에서 처리.
 - **No inline styles**: `style={{...}}` is banned. For dynamic values, use CSS custom property pattern:
   ```tsx
   // globals.css: .bar-fill { width: var(--bar-width); }
@@ -66,6 +73,22 @@ Events: `onboarding_completed` (first save only), `session_created`, `session_co
 - **No dynamic Tailwind arbitrary values**: `w-[${value}%]` won't work. Use the CSS custom property pattern above.
 - **`"use client"`**: Only on components that need state or event handlers.
 - **Comments**: Only when WHY is non-obvious. Never explain WHAT the code does.
+- **Non-null assertion (`!`)**: 사용 금지. 개별 조건 체크 + 구조분해로 TypeScript narrowing:
+  ```ts
+  // ❌
+  const ctx = { type: form.type!, level: form.level! };
+  // ✅
+  const { type, level } = form;
+  if (!type || !level) return;
+  const ctx = { type, level };
+  ```
+- **Error handling**: 항상 `catch (error)` + `console.error(error)`. `catch {}` 금지.
+  ```ts
+  } catch (error) {
+    console.error(error);
+    setError("...");
+  }
+  ```
 
 ## PR Workflow
 
@@ -94,6 +117,8 @@ Write tests first for all new features and bug fixes.
 
 **What NOT to test**: hardcoded label text, prop rendering (e.g. `getByText("TOTAL")`). Only test logic and behavior.
 
+**Test 작성 기준**: "이 테스트가 실패하면 실제 버그가 있다는 뜻인가?" — 인터랙션 → 결과 패턴만 작성.
+
 **Critical: stable router mock to prevent infinite re-render**
 ```ts
 const pushMock = vi.hoisted(() => vi.fn());
@@ -110,12 +135,5 @@ vi.mock("@/lib/supabase/browser", () => ({
   createSupabaseBrowserClient: () => ({
     auth: { signOut: vi.fn().mockResolvedValue({}) },
   }),
-}));
-```
-
-**Groq mock**:
-```ts
-vi.mock("@/lib/groq", () => ({
-  default: { chat: { completions: { create: vi.fn() } } },
 }));
 ```

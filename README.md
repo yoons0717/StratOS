@@ -10,7 +10,7 @@
 상황을 입력하면 AI가 실행 가능한 태스크를 최대 3단계로 반환합니다.
 
 **Magic Copy**
-채널별(인스타그램 DM, LinkedIn, 네이버 블로그, 유튜브)로 바로 붙여넣을 수 있는 문구를 자동 생성합니다.
+채널별(인스타그램, 네이버 블로그, 유튜브, General)로 바로 붙여넣을 수 있는 문구를 자동 생성합니다.
 
 **실행 추적**
 완료한 액션을 히스토리에 기록하고, 연속 실행 일수(스트릭)와 채널·카테고리별 분포를 통계로 제공합니다.
@@ -24,7 +24,7 @@
 
 ```
 랜딩 → 구글 로그인 → 온보딩 (유형/규모/단계/니치)
-    → 대시보드 → 상황 입력 → 액션 수령 → Magic Copy → 완료
+    → 대시보드 → 상황 입력 → 채널 선택 → 액션 수령 → Magic Copy → 완료
 ```
 
 ---
@@ -34,7 +34,7 @@
 | 레이어 | 기술 |
 |--------|------|
 | 프레임워크 | Next.js 16 (App Router) |
-| 인증 + DB | Supabase (Google OAuth, PostgreSQL) |
+| 인증 + DB | Supabase (Google OAuth, PostgreSQL, RLS) |
 | AI | Groq (`llama-3.1-8b-instant`) |
 | 이메일 | Resend |
 | 상태 관리 | Zustand |
@@ -62,6 +62,8 @@ ADMIN_EMAIL=
 ```
 
 **3. 데이터베이스** — `supabase/migrations/` 파일을 순서대로 Supabase SQL Editor에서 실행
+
+> 새 테이블 생성 시 반드시 RLS 정책을 추가해야 합니다. 정책 없이는 모든 쿼리가 silently fail합니다.
 
 **4. Google OAuth** — Supabase 대시보드 → Authentication → Providers → Google 활성화
 리다이렉트 URL: `http://localhost:3000/auth/callback`

@@ -16,6 +16,6 @@ export async function DELETE(
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  if (error) { console.error(error); return NextResponse.json({ error: "DB error" }, { status: 500 }); }
   return new NextResponse(null, { status: 204 });
 }

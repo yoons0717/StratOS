@@ -30,6 +30,16 @@ export const generateActionRequestSchema = z.object({
 
 export type GenerateActionRequest = z.infer<typeof generateActionRequestSchema>;
 
+export const actionSessionSchema = z.object({
+  id: z.string(),
+  created_at: z.string(),
+  completed_at: z.string().nullable(),
+  input: z.string(),
+  channel: channelSchema,
+  action: generatedActionSchema,
+  completed: z.boolean(),
+});
+
 export const userContextRowSchema = z.object({
   type: z.enum(["creator", "seller", "service", "side"]),
   level: z.enum(["0-1K", "1K-10K", "10K+"]),

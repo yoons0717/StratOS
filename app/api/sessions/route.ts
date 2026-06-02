@@ -16,7 +16,7 @@ export async function GET() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  if (error) { console.error(error); return NextResponse.json({ error: "DB error" }, { status: 500 }); }
   return NextResponse.json(data);
 }
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     .select("id, created_at, completed_at, input, channel, action, completed")
     .single();
 
-  if (error) return NextResponse.json({ error: "DB error" }, { status: 500 });
+  if (error) { console.error(error); return NextResponse.json({ error: "DB error" }, { status: 500 }); }
   await logEvent("session_created", user.id, supabase);
   return NextResponse.json(data);
 }

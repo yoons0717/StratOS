@@ -9,6 +9,7 @@ export function useInitStore(withSessions = false) {
   const router = useRouter();
   const { setUserContext, setSessions } = useStratosStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [initError, setInitError] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -22,10 +23,15 @@ export function useInitStore(withSessions = false) {
         if (!ctx) { router.push("/onboarding"); return; }
         setUserContext(ctx);
       }
-      setIsLoading(false);
     }
-    init().catch(() => setIsLoading(false));
+    init()
+      .then(() => setIsLoading(false))
+      .catch((error) => {
+        console.error(error);
+        setInitError(true);
+        setIsLoading(false);
+      });
   }, [router, setUserContext, setSessions, withSessions]);
 
-  return { isLoading };
+  return { isLoading, initError };
 }

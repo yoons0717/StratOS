@@ -5,6 +5,7 @@ import { useStratosStore } from "@/store";
 import { createSession, completeSession, deleteSession } from "@/lib/api";
 import { useInitStore } from "@/lib/hooks";
 import LoadingScreen from "@/components/ui/LoadingScreen";
+import ErrorScreen from "@/components/ui/ErrorScreen";
 import { computeKpi } from "@/lib/analytics/kpi";
 import AppShell from "@/components/layout/AppShell";
 import ActionListPanel from "@/components/dashboard/ActionListPanel";
@@ -16,7 +17,7 @@ import NewActionModal from "@/components/dashboard/NewActionModal";
 const WELCOME_KEY = "stratos_welcome_seen";
 
 export default function DashboardPage() {
-  const { isLoading } = useInitStore(true);
+  const { isLoading, initError } = useInitStore(true);
   const { userContext, sessions, addSession, markCompleted, removeSession } = useStratosStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -35,6 +36,7 @@ export default function DashboardPage() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [showFirstRun]);
 
+  if (initError) return <ErrorScreen />;
   if (isLoading || !userContext) return <LoadingScreen />;
 
   const activeSessions = sessions.filter((s) => !s.completed);

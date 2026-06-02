@@ -47,7 +47,7 @@ if (auth.user.email !== process.env.ADMIN_EMAIL) return redirect("/");
 ```ts
 await logEvent("session_created", user.id, supabase);
 ```
-Events: `onboarding_completed` (first save only), `session_created`, `session_completed`.
+Events: `onboarding_started` (onboarding 페이지 마운트 시), `onboarding_completed` (첫 저장 시), `session_created`, `session_completed`.
 
 **`useInitStore(withSessions?)`** — 페이지 초기화 훅. `{ isLoading, initError }` 반환. fetch 실패 시 `initError: true`. 반드시 두 상태 모두 처리:
 ```ts

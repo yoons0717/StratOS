@@ -1,8 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useStratosStore } from "@/store";
 import OnboardingPage from "./page";
+import { logEvent } from "@/lib/events";
+
+vi.mock("@/lib/events", () => ({
+  logEvent: vi.fn().mockResolvedValue(undefined),
+}));
 
 const pushMock = vi.hoisted(() => vi.fn());
 const routerMock = vi.hoisted(() => ({ push: pushMock }));
@@ -18,7 +23,7 @@ vi.mock("@/lib/api", () => ({
 vi.mock("@/lib/supabase/browser", () => ({
   createSupabaseBrowserClient: () => ({
     auth: {
-      getUser: vi.fn().mockResolvedValue({ data: { user: { email: "test@example.com" } } }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-123", email: "test@example.com" } } }),
       signOut: vi.fn().mockResolvedValue({}),
     },
   }),
@@ -68,6 +73,13 @@ describe("OnboardingPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /EXECUTE/i }));
     const { userContext } = useStratosStore.getState();
     expect(userContext).toEqual({ type: "creator", level: "0-1K", businessStage: "idea", niche: "피트니스 코치", reminderEmail: false });
+  });
+
+  it("마운트 시 onboarding_started 이벤트를 로깅한다", async () => {
+    render(<OnboardingPage />);
+    await waitFor(() => {
+      expect(logEvent).toHaveBeenCalledWith("onboarding_started", "user-123", expect.anything());
+    });
   });
 
   it("EXECUTE 버튼은 선택하지 않으면 비활성화", () => {

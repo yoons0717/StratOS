@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStratosStore } from "@/store";
 import { saveUserContext } from "@/lib/api";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { logEvent } from "@/lib/events";
 import StepType from "@/components/onboarding/StepType";
 import StepLevel from "@/components/onboarding/StepLevel";
 import StepStage from "@/components/onboarding/StepStage";
@@ -31,7 +32,9 @@ export default function OnboardingPage() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     supabase.auth.getUser().then(({ data }) => {
-      setEmail(data.user?.email ?? null);
+      const { user } = data;
+      setEmail(user?.email ?? null);
+      if (user) logEvent("onboarding_started", user.id, supabase);
     });
   }, []);
 

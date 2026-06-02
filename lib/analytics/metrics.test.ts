@@ -4,6 +4,7 @@ import {
   computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
+  computeFunnel,
 } from "./metrics";
 
 describe("computeDauEntries", () => {
@@ -183,5 +184,99 @@ describe("computeSessionCompletionRate", () => {
       { name: "session_completed" },
     ];
     expect(computeSessionCompletionRate(rows)).toBe(100);
+  });
+});
+
+describe("computeFunnel", () => {
+  const make = (n: number, name: string) =>
+    Array.from({ length: n }, (_, i) => ({ user_id: `${name}-u${i}`, name }));
+
+  it("empty input: 4 steps with count 0, first drop null", () => {
+    const result = computeFunnel([]);
+    expect(result).toHaveLength(4);
+    result.forEach((s) => expect(s.count).toBe(0));
+    expect(result[0].drop).toBeNull();
+  });
+
+  it("step labels are in correct order", () => {
+    expect(computeFunnel([]).map((s) => s.label)).toEqual([
+      "onboarding_started",
+      "onboarding_completed",
+      "session_created",
+      "session_completed",
+    ]);
+  });
+
+  it("all pct 0 when no onboarding_started", () => {
+    expect(computeFunnel([{ user_id: "u1", name: "session_created" }])[0].pct).toBe(0);
+  });
+
+  it("counts unique users per step and deduplicates", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_started" }, // dup
+      { user_id: "u2", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u1", name: "session_completed" },
+    ];
+    const [s0, s1, s2, s3] = computeFunnel(rows);
+    expect([s0.count, s1.count, s2.count, s3.count]).toEqual([2, 1, 1, 1]);
+  });
+
+  it("pct is relative to base and drop is step-over-step", () => {
+    const rows = [...make(4, "onboarding_started"), ...make(3, "onboarding_completed")];
+    const result = computeFunnel(rows);
+    expect(result[0]).toMatchObject({ pct: 100, drop: null });
+    expect(result[1]).toMatchObject({ pct: 75, drop: 25 });
+    expect(result[2]).toMatchObject({ pct: 0, drop: 75 });
+  });
+
+  it.each([
+    [3, 1, 33, 67],
+    [3, 2, 67, 33],
+  ])("rounding: %i started %i completed → pct %i%% drop %i%%", (started, completed, pct, drop) => {
+    const rows = [...make(started, "onboarding_started"), ...make(completed, "onboarding_completed")];
+    const result = computeFunnel(rows);
+    expect(result[1].pct).toBe(pct);
+    expect(result[1].drop).toBe(drop);
+  });
+
+  it("zero drop when all users proceed to next step", () => {
+    const rows = [...make(2, "onboarding_started"), ...make(2, "onboarding_completed")];
+    expect(computeFunnel(rows)[1]).toMatchObject({ pct: 100, drop: 0 });
+  });
+
+  it("realistic dropout: 100→74→58→31", () => {
+    const rows = [
+      ...make(100, "onboarding_started"),
+      ...make(74, "onboarding_completed"),
+      ...make(58, "session_created"),
+      ...make(31, "session_completed"),
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0]).toMatchObject({ count: 100, pct: 100, drop: null });
+    expect(result[1]).toMatchObject({ count: 74, pct: 74, drop: 26 });
+    expect(result[2]).toMatchObject({ count: 58, pct: 58, drop: 16 });
+    expect(result[3]).toMatchObject({ count: 31, pct: 31, drop: 27 });
+  });
+
+  it("anomalous data: user in later step without earlier does not crash", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u99", name: "session_completed" },
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0].count).toBe(1);
+    expect(result[3].count).toBe(1);
+    expect(result[3].pct).toBe(100);
+  });
+
+  it("single user completes all steps: all pct 100, drops 0", () => {
+    const rows = ["onboarding_started", "onboarding_completed", "session_created", "session_completed"]
+      .map((name) => ({ user_id: "u1", name }));
+    const result = computeFunnel(rows);
+    result.forEach((s) => expect(s.pct).toBe(100));
+    result.slice(1).forEach((s) => expect(s.drop).toBe(0));
   });
 });

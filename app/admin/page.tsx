@@ -8,6 +8,8 @@ import {
   computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
+  computeFunnel,
+  type FunnelStep,
 } from "@/lib/analytics/metrics";
 
 async function fetchMetrics() {
@@ -16,10 +18,11 @@ async function fetchMetrics() {
   const since7 = new Date(Date.now() - 7 * 86400000).toISOString();
   const since30 = new Date(Date.now() - 30 * 86400000).toISOString();
 
-  const [{ data: dauRaw }, { data: onboardingRaw }, { data: sessionRaw }] = await Promise.all([
+  const [{ data: dauRaw }, { data: onboardingRaw }, { data: sessionRaw }, { data: funnelRaw }] = await Promise.all([
     supabase.from("events").select("user_id, created_at").gte("created_at", since7),
     supabase.from("events").select("user_id, name").gte("created_at", since30).in("name", ["onboarding_completed", "session_created"]),
     supabase.from("events").select("name").gte("created_at", since30).in("name", ["session_created", "session_completed"]),
+    supabase.from("events").select("user_id, name").gte("created_at", since30).in("name", ["onboarding_started", "onboarding_completed", "session_created", "session_completed"]),
   ]);
 
   const dauEntries = computeDauEntries(dauRaw ?? []);
@@ -29,6 +32,7 @@ async function fetchMetrics() {
     dauEntries,
     onboardingRate: computeOnboardingRate(onboardingRaw ?? []),
     sessionCompletionRate: computeSessionCompletionRate(sessionRaw ?? []),
+    funnelSteps: computeFunnel(funnelRaw ?? []),
   };
 }
 
@@ -37,6 +41,27 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
     <div className="rounded border border-zinc-800 bg-surface p-4">
       <p className="mb-2 font-mono text-xs tracking-widest text-zinc-600">{label}</p>
       <p className="font-mono text-2xl font-bold text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function FunnelChart({ steps }: { steps: FunnelStep[] }) {
+  if (steps.every((s) => s.count === 0))
+    return <p className="font-mono text-xs text-zinc-700">no data</p>;
+  return (
+    <div className="space-y-2">
+      {steps.map((s) => (
+        <div key={s.label} className="flex items-center gap-3">
+          <span className="w-44 shrink-0 font-mono text-xs text-zinc-600">{s.label}</span>
+          <div className="bar-fill h-4 rounded bg-neon/20" style={{ "--bar-width": `${s.pct}%` } as React.CSSProperties} />
+          <span className="w-6 shrink-0 font-mono text-xs text-zinc-400">{s.count}</span>
+          <span className="font-mono text-xs text-zinc-500">
+            {s.drop === null
+              ? `${s.pct}% (base)`
+              : `${s.pct}% (-${s.drop}%)`}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -83,6 +108,11 @@ export default async function AdminPage() {
           <div className="rounded border border-zinc-800 p-4">
             <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">daily active users (last 7 days)</p>
             <DauChart entries={metrics.dauEntries} />
+          </div>
+
+          <div className="rounded border border-zinc-800 p-4">
+            <p className="mb-4 font-mono text-xs tracking-widest text-zinc-600">funnel (last 30 days)</p>
+            <FunnelChart steps={metrics.funnelSteps} />
           </div>
 
           <RemindButton />

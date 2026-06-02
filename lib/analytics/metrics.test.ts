@@ -4,6 +4,7 @@ import {
   computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
+  computeFunnel,
 } from "./metrics";
 
 describe("computeDauEntries", () => {
@@ -183,5 +184,89 @@ describe("computeSessionCompletionRate", () => {
       { name: "session_completed" },
     ];
     expect(computeSessionCompletionRate(rows)).toBe(100);
+  });
+});
+
+describe("computeFunnel", () => {
+  it("returns 4 steps for empty input with count 0", () => {
+    const result = computeFunnel([]);
+    expect(result).toHaveLength(4);
+    result.forEach((s) => expect(s.count).toBe(0));
+  });
+
+  it("first step has drop null", () => {
+    const result = computeFunnel([]);
+    expect(result[0].drop).toBeNull();
+  });
+
+  it("all pct 0 when no onboarding_started", () => {
+    const rows = [{ user_id: "u1", name: "session_created" }];
+    const result = computeFunnel(rows);
+    expect(result[0].pct).toBe(0);
+  });
+
+  it("counts unique users per step", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u2", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u1", name: "session_completed" },
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0].count).toBe(2);
+    expect(result[1].count).toBe(1);
+    expect(result[2].count).toBe(1);
+    expect(result[3].count).toBe(1);
+  });
+
+  it("pct is relative to onboarding_started count", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u2", name: "onboarding_started" },
+      { user_id: "u3", name: "onboarding_started" },
+      { user_id: "u4", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u2", name: "onboarding_completed" },
+      { user_id: "u3", name: "onboarding_completed" },
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0].pct).toBe(100);
+    expect(result[1].pct).toBe(75);
+  });
+
+  it("drop is step-over-step loss relative to base", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u2", name: "onboarding_started" },
+      { user_id: "u3", name: "onboarding_started" },
+      { user_id: "u4", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_completed" },
+      { user_id: "u2", name: "onboarding_completed" },
+      { user_id: "u3", name: "onboarding_completed" },
+    ];
+    const result = computeFunnel(rows);
+    // step 0→1: 4→3, drop = 1/4 = 25%
+    expect(result[1].drop).toBe(25);
+    // step 1→2: 3→0, drop = 3/4 = 75%
+    expect(result[2].drop).toBe(75);
+  });
+
+  it("deduplicates same user duplicate events", () => {
+    const rows = [
+      { user_id: "u1", name: "onboarding_started" },
+      { user_id: "u1", name: "onboarding_started" },
+    ];
+    expect(computeFunnel(rows)[0].count).toBe(1);
+  });
+
+  it("step labels are in correct order", () => {
+    const result = computeFunnel([]);
+    expect(result.map((s) => s.label)).toEqual([
+      "onboarding_started",
+      "onboarding_completed",
+      "session_created",
+      "session_completed",
+    ]);
   });
 });

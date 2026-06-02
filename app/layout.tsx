@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: "AI execution OS for solo creators. Input your situation, get one action you can do right now.",
     url: "https://stratos-os.vercel.app",
     siteName: "StratOS",
-    locale: "en_US",
+    locale: "ko_KR",
     type: "website",
   },
   twitter: {
@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="ko" className={`${inter.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background">{children}</body>
     </html>
   );

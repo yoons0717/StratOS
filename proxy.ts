@@ -32,7 +32,8 @@ export async function proxy(request: NextRequest) {
   const isPublic =
     pathname === "/" ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/auth");
+    pathname.startsWith("/auth") ||
+    (process.env.NODE_ENV !== "production" && pathname.startsWith("/e2e-login"));
 
   if (!user && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));

@@ -11,10 +11,6 @@ export function computeDauEntries(rows: { user_id: string; created_at: string }[
     .map(([date, users]) => ({ date, users: users.size }));
 }
 
-export function computeDauAvg(entries: { users: number }[], windowDays: number) {
-  if (entries.length === 0) return 0;
-  return Math.round(entries.reduce((s, e) => s + e.users, 0) / windowDays);
-}
 
 export function computeOnboardingRate(
   rows: { user_id: string; name: string }[],

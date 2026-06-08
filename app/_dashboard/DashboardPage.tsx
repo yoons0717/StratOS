@@ -55,10 +55,11 @@ export default function DashboardPage() {
   }
 
   async function handleNewAction(input: string, channel: import("@/types").Channel) {
+    if (!userContext) return;
     setModalLoading(true);
     setModalError(null);
     try {
-      const session = await createSession(input, userContext!, channel);
+      const session = await createSession(input, userContext, channel);
       addSession(session);
       setSelectedId(session.id);
       setShowModal(false);

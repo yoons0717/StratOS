@@ -14,7 +14,8 @@ export default function RemindButton() {
       const data = await res.json();
       setSent(data.sent);
       setStatus("done");
-    } catch {
+    } catch (error) {
+      console.error(error);
       setStatus("error");
     }
   }

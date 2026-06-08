@@ -28,7 +28,8 @@ export async function generateAction(
   let json: unknown;
   try {
     json = JSON.parse(raw);
-  } catch {
+  } catch (error) {
+    console.error(error);
     return { ok: false, error: "Invalid AI response format", status: 502 };
   }
 

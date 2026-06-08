@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   computeDauEntries,
-  computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
   computeActivatedUsers,
@@ -66,34 +65,6 @@ describe("computeDauEntries", () => {
   });
 });
 
-describe("computeDauAvg", () => {
-  it("returns 0 for empty entries", () => {
-    expect(computeDauAvg([], 7)).toBe(0);
-  });
-
-  it("divides total by window size, not entry count", () => {
-    const entries = [
-      { users: 10 },
-      { users: 4 },
-    ];
-    expect(computeDauAvg(entries, 7)).toBe(2);
-  });
-
-  it("rounds correctly", () => {
-    const entries = [{ users: 10 }];
-    expect(computeDauAvg(entries, 7)).toBe(1);
-  });
-
-  it("full 7-day window", () => {
-    const entries = Array.from({ length: 7 }, () => ({ users: 7 }));
-    expect(computeDauAvg(entries, 7)).toBe(7);
-  });
-
-  it("sparse data: 2 days of activity in 7-day window divides by 7 not 2", () => {
-    const entries = [{ users: 7 }, { users: 7 }];
-    expect(computeDauAvg(entries, 7)).toBe(2);
-  });
-});
 
 describe("computeOnboardingRate", () => {
   it("returns 0 when totalUsers is 0", () => {

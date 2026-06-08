@@ -24,15 +24,26 @@ export async function proxy(request: NextRequest) {
     }
   );
 
+  const { pathname } = request.nextUrl;
+
+  // Admin 라우트는 Supabase auth와 분리 — 쿠키만 확인
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const adminSession = request.cookies.get("admin_session");
+    if (adminSession?.value !== process.env.ADMIN_PASSWORD) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    return response;
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
   const isPublic =
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
+    pathname.startsWith("/admin/login") ||
     (process.env.NODE_ENV !== "production" && pathname.startsWith("/e2e-login"));
 
   if (!user && !isPublic) {

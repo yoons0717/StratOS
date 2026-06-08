@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 import RemindButton from "@/app/admin/_components/RemindButton";
@@ -112,20 +112,30 @@ function DauChart({ entries }: { entries: { date: string; users: number }[] }) {
   );
 }
 
-export default async function AdminPage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  if (user.email !== process.env.ADMIN_EMAIL) redirect("/");
+async function logout() {
+  "use server";
+  (await cookies()).delete("admin_session");
+  redirect("/admin/login");
+}
 
+export default async function AdminPage() {
   const metrics = await fetchMetrics();
 
   return (
     <main className="flex min-h-dvh flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <ScanlineOverlay />
       <div className="mx-auto w-full max-w-xl px-4 py-8">
-        <p className="mb-1 font-mono text-xs tracking-widest text-neon">STRATOS</p>
-        <h1 className="mb-6 font-mono text-xl font-bold text-white">GROWTH_METRICS</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <p className="mb-1 font-mono text-xs tracking-widest text-neon">STRATOS</p>
+            <h1 className="font-mono text-xl font-bold text-white">GROWTH_METRICS</h1>
+          </div>
+          <form action={logout}>
+            <button type="submit" className="font-mono text-xs text-zinc-600 transition-colors hover:text-zinc-400">
+              LOGOUT
+            </button>
+          </form>
+        </div>
 
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

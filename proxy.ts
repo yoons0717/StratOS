@@ -33,6 +33,7 @@ export async function proxy(request: NextRequest) {
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
+    pathname.startsWith("/admin/login") ||
     (process.env.NODE_ENV !== "production" && pathname.startsWith("/e2e-login"));
 
   if (!user && !isPublic) {
@@ -43,8 +44,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (pathname.startsWith("/admin") && user?.email !== process.env.ADMIN_EMAIL) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const adminSession = request.cookies.get("admin_session");
+    if (adminSession?.value !== process.env.ADMIN_PASSWORD) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
   }
 
   return response;

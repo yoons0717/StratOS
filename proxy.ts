@@ -43,6 +43,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  if (pathname.startsWith("/admin") && user?.email !== process.env.ADMIN_EMAIL) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   return response;
 }
 

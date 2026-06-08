@@ -58,7 +58,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GROQ_API_KEY=
 RESEND_API_KEY=
-ADMIN_EMAIL=
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
 ```
 
 **3. 데이터베이스** — `supabase/migrations/` 파일을 순서대로 Supabase SQL Editor에서 실행
@@ -77,4 +78,6 @@ npm run dev
 
 ## 어드민
 
-`/admin` — DAU, 온보딩 완료율, 세션 완료율 확인 및 리마인더 이메일 수동 발송. `ADMIN_EMAIL`로 지정된 계정만 접근 가능.
+`/admin/login` — username + password로 로그인 (Supabase auth와 분리). `ADMIN_USERNAME` / `ADMIN_PASSWORD` env var로 인증.
+
+`/admin` — 총 유저 수, Active(7d), 온보딩 완료율, 세션 완료율, 인게이지먼트 지표(Activated Users / Avg Sessions / Returning Users), DAU 차트, 퍼널, 리마인더 이메일 수동 발송.

@@ -6,6 +6,7 @@ import ScanlineOverlay from "@/components/ui/ScanlineOverlay";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
       if (!res.ok) {
         setError("비밀번호가 올바르지 않습니다.");
@@ -41,12 +42,22 @@ export default function AdminLoginPage() {
         <h1 className="font-mono text-xl font-bold text-white">ADMIN_ACCESS._</h1>
         <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3">
           <input
+            type="text"
+            placeholder="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            autoFocus
+            autoComplete="username"
+            className="w-full rounded border border-zinc-800 bg-transparent px-4 py-3 font-mono text-sm text-zinc-300 placeholder-zinc-700 outline-none focus:border-zinc-600"
+          />
+          <input
             type="password"
             placeholder="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            autoFocus
+            autoComplete="current-password"
             className="w-full rounded border border-zinc-800 bg-transparent px-4 py-3 font-mono text-sm text-zinc-300 placeholder-zinc-700 outline-none focus:border-zinc-600"
           />
           {error && <p className="font-mono text-xs text-red-500">{error}</p>}

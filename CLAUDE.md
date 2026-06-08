@@ -36,10 +36,7 @@ lib/
 - `createSupabaseServerClient()` — user session context, respects RLS. Use in API routes and server components for user-scoped queries.
 - `createSupabaseAdminClient()` — service role, bypasses RLS. Use only in admin-only routes (`/api/notifications/remind`, `/admin`).
 
-**Admin auth guard:**
-```ts
-if (auth.user.email !== process.env.ADMIN_EMAIL) return redirect("/");
-```
+**Admin auth:** `/admin/*` 는 Supabase auth와 분리. `proxy.ts`에서 `admin_session` 쿠키(`ADMIN_PASSWORD` 값)로 보호. `/admin/login` 에서 `ADMIN_USERNAME` + `ADMIN_PASSWORD` 검증 후 쿠키 세팅.
 
 **New tables need RLS policies.** After creating a table via migration, add `insert`/`select` policies in Supabase dashboard or migration SQL. Without policies, all operations silently fail.
 

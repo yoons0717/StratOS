@@ -4,6 +4,8 @@ import {
   computeDauAvg,
   computeOnboardingRate,
   computeSessionCompletionRate,
+  computeActivatedUsers,
+  computeSessionStats,
   computeFunnel,
 } from "./metrics";
 
@@ -94,49 +96,34 @@ describe("computeDauAvg", () => {
 });
 
 describe("computeOnboardingRate", () => {
-  it("returns 0 for empty rows", () => {
-    expect(computeOnboardingRate([])).toBe(0);
+  it("returns 0 when totalUsers is 0", () => {
+    expect(computeOnboardingRate([], 0)).toBe(0);
   });
 
-  it("100% when all users completed onboarding", () => {
+  it("100% when all registered users completed onboarding", () => {
     const rows = [
       { user_id: "u1", name: "onboarding_completed" },
       { user_id: "u2", name: "onboarding_completed" },
     ];
-    expect(computeOnboardingRate(rows)).toBe(100);
+    expect(computeOnboardingRate(rows, 2)).toBe(100);
   });
 
-  it("50% when half completed", () => {
-    const rows = [
-      { user_id: "u1", name: "onboarding_completed" },
-      { user_id: "u2", name: "session_created" },
-    ];
-    expect(computeOnboardingRate(rows)).toBe(50);
+  it("50% when half of registered users completed", () => {
+    const rows = [{ user_id: "u1", name: "onboarding_completed" }];
+    expect(computeOnboardingRate(rows, 2)).toBe(50);
   });
 
   it("0% when no one completed onboarding", () => {
-    const rows = [
-      { user_id: "u1", name: "session_created" },
-      { user_id: "u2", name: "session_created" },
-    ];
-    expect(computeOnboardingRate(rows)).toBe(0);
-  });
-
-  it("user with both onboarding_completed and session_created counts once", () => {
-    const rows = [
-      { user_id: "u1", name: "onboarding_completed" },
-      { user_id: "u1", name: "session_created" },
-    ];
-    expect(computeOnboardingRate(rows)).toBe(100);
+    const rows = [{ user_id: "u1", name: "session_created" }];
+    expect(computeOnboardingRate(rows, 2)).toBe(0);
   });
 
   it("user with duplicate onboarding_completed events counts once", () => {
     const rows = [
       { user_id: "u1", name: "onboarding_completed" },
       { user_id: "u1", name: "onboarding_completed" },
-      { user_id: "u2", name: "session_created" },
     ];
-    expect(computeOnboardingRate(rows)).toBe(50);
+    expect(computeOnboardingRate(rows, 2)).toBe(50);
   });
 });
 
@@ -187,15 +174,66 @@ describe("computeSessionCompletionRate", () => {
   });
 });
 
+describe("computeActivatedUsers", () => {
+  it("returns 0 for empty rows", () => {
+    expect(computeActivatedUsers([])).toBe(0);
+  });
+
+  it("counts unique users with session_completed", () => {
+    const rows = [
+      { user_id: "u1", name: "session_completed" },
+      { user_id: "u1", name: "session_completed" },
+      { user_id: "u2", name: "session_completed" },
+      { user_id: "u3", name: "session_created" },
+    ];
+    expect(computeActivatedUsers(rows)).toBe(2);
+  });
+});
+
+describe("computeSessionStats", () => {
+  it("returns 0 values when no data", () => {
+    expect(computeSessionStats([], 0)).toEqual({ avgPerUser: 0, returningUsers: 0 });
+  });
+
+  it("avgPerUser = session_created count / totalUsers (1 decimal)", () => {
+    const rows = [
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u2", name: "session_created" },
+    ];
+    expect(computeSessionStats(rows, 2).avgPerUser).toBe(1.5);
+  });
+
+  it("returningUsers counts users with ≥2 session_created", () => {
+    const rows = [
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u2", name: "session_created" },
+      { user_id: "u3", name: "session_completed" },
+    ];
+    expect(computeSessionStats(rows, 3).returningUsers).toBe(1);
+  });
+
+  it("ignores non-session_created events in counts", () => {
+    const rows = [
+      { user_id: "u1", name: "session_created" },
+      { user_id: "u1", name: "session_completed" },
+    ];
+    expect(computeSessionStats(rows, 2).avgPerUser).toBe(0.5);
+    expect(computeSessionStats(rows, 2).returningUsers).toBe(0);
+  });
+});
+
 describe("computeFunnel", () => {
   const make = (n: number, name: string) =>
     Array.from({ length: n }, (_, i) => ({ user_id: `${name}-u${i}`, name }));
 
-  it("empty input: 4 steps with count 0, first drop null", () => {
+  it("empty input: 4 steps, count 0, first conversionRate null", () => {
     const result = computeFunnel([]);
     expect(result).toHaveLength(4);
     result.forEach((s) => expect(s.count).toBe(0));
-    expect(result[0].drop).toBeNull();
+    expect(result[0].conversionRate).toBeNull();
+    expect(result[0].usersLost).toBeNull();
   });
 
   it("step labels are in correct order", () => {
@@ -207,76 +245,97 @@ describe("computeFunnel", () => {
     ]);
   });
 
-  it("all pct 0 when no onboarding_started", () => {
-    expect(computeFunnel([{ user_id: "u1", name: "session_created" }])[0].pct).toBe(0);
+  it("first step: conversionRate null, usersLost null", () => {
+    const rows = [{ user_id: "u1", name: "onboarding_started" }];
+    const [s0] = computeFunnel(rows);
+    expect(s0.conversionRate).toBeNull();
+    expect(s0.usersLost).toBeNull();
   });
 
   it("counts unique users per step and deduplicates", () => {
     const rows = [
       { user_id: "u1", name: "onboarding_started" },
-      { user_id: "u1", name: "onboarding_started" }, // dup
+      { user_id: "u1", name: "onboarding_started" },
       { user_id: "u2", name: "onboarding_started" },
       { user_id: "u1", name: "onboarding_completed" },
-      { user_id: "u1", name: "session_created" },
-      { user_id: "u1", name: "session_completed" },
     ];
-    const [s0, s1, s2, s3] = computeFunnel(rows);
-    expect([s0.count, s1.count, s2.count, s3.count]).toEqual([2, 1, 1, 1]);
+    const [s0, s1] = computeFunnel(rows);
+    expect(s0.count).toBe(2);
+    expect(s1.count).toBe(1);
   });
 
-  it("pct is relative to base and drop is step-over-step", () => {
-    const rows = [...make(4, "onboarding_started"), ...make(3, "onboarding_completed")];
-    const result = computeFunnel(rows);
-    expect(result[0]).toMatchObject({ pct: 100, drop: null });
-    expect(result[1]).toMatchObject({ pct: 75, drop: 25 });
-    expect(result[2]).toMatchObject({ pct: 0, drop: 75 });
-  });
-
-  it.each([
-    [3, 1, 33, 67],
-    [3, 2, 67, 33],
-  ])("rounding: %i started %i completed → pct %i%% drop %i%%", (started, completed, pct, drop) => {
-    const rows = [...make(started, "onboarding_started"), ...make(completed, "onboarding_completed")];
-    const result = computeFunnel(rows);
-    expect(result[1].pct).toBe(pct);
-    expect(result[1].drop).toBe(drop);
-  });
-
-  it("zero drop when all users proceed to next step", () => {
-    const rows = [...make(2, "onboarding_started"), ...make(2, "onboarding_completed")];
-    expect(computeFunnel(rows)[1]).toMatchObject({ pct: 100, drop: 0 });
-  });
-
-  it("realistic dropout: 100→74→58→31", () => {
+  it("conversionRate is step-over-step", () => {
     const rows = [
-      ...make(100, "onboarding_started"),
-      ...make(74, "onboarding_completed"),
-      ...make(58, "session_created"),
-      ...make(31, "session_completed"),
+      ...make(4, "onboarding_started"),
+      ...make(2, "onboarding_completed"),
+      ...make(1, "session_created"),
     ];
     const result = computeFunnel(rows);
-    expect(result[0]).toMatchObject({ count: 100, pct: 100, drop: null });
-    expect(result[1]).toMatchObject({ count: 74, pct: 74, drop: 26 });
-    expect(result[2]).toMatchObject({ count: 58, pct: 58, drop: 16 });
-    expect(result[3]).toMatchObject({ count: 31, pct: 31, drop: 27 });
+    expect(result[1].conversionRate).toBe(50); // 2/4
+    expect(result[2].conversionRate).toBe(50); // 1/2
   });
 
-  it("anomalous data: user in later step without earlier does not crash", () => {
+  it("usersLost is prev count minus current count", () => {
     const rows = [
-      { user_id: "u1", name: "onboarding_started" },
-      { user_id: "u99", name: "session_completed" },
+      ...make(10, "onboarding_started"),
+      ...make(7, "onboarding_completed"),
     ];
     const result = computeFunnel(rows);
-    expect(result[0].count).toBe(1);
-    expect(result[3].count).toBe(1);
-    expect(result[3].pct).toBe(100);
+    expect(result[1].usersLost).toBe(3);
   });
 
-  it("single user completes all steps: all pct 100, drops 0", () => {
-    const rows = ["onboarding_started", "onboarding_completed", "session_created", "session_completed"]
-      .map((name) => ({ user_id: "u1", name }));
+  it("conversionRate capped at 100 when current > previous", () => {
+    const rows = [
+      ...make(1, "onboarding_started"),
+      ...make(2, "onboarding_completed"),
+    ];
     const result = computeFunnel(rows);
-    result.forEach((s) => expect(s.pct).toBe(100));
-    result.slice(1).forEach((s) => expect(s.drop).toBe(0));
+    expect(result[1].conversionRate).toBe(100);
+    expect(result[1].usersLost).toBe(0);
+  });
+
+  it("conversionRate 0 when previous step has 0 users", () => {
+    const rows = [{ user_id: "u1", name: "session_created" }];
+    const result = computeFunnel(rows);
+    expect(result[1].conversionRate).toBe(0); // onboarding_completed: prev (onboarding_started) = 0
+    expect(result[2].conversionRate).toBe(0); // session_created: prev (onboarding_completed) = 0
+  });
+
+  it("barPct: max step gets 100%, others proportional", () => {
+    const rows = [
+      ...make(4, "onboarding_started"),
+      ...make(2, "onboarding_completed"),
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0].barPct).toBe(100); // 4/4
+    expect(result[1].barPct).toBe(50);  // 2/4
+    expect(result[2].barPct).toBe(0);
+  });
+
+  it("realistic dropout: 10→8→6→4", () => {
+    const rows = [
+      ...make(10, "onboarding_started"),
+      ...make(8, "onboarding_completed"),
+      ...make(6, "session_created"),
+      ...make(4, "session_completed"),
+    ];
+    const result = computeFunnel(rows);
+    expect(result[0]).toMatchObject({ count: 10, barPct: 100, conversionRate: null, usersLost: null });
+    expect(result[1]).toMatchObject({ count: 8, conversionRate: 80, usersLost: 2 });
+    expect(result[2]).toMatchObject({ count: 6, conversionRate: 75, usersLost: 2 });
+    expect(result[3]).toMatchObject({ count: 4, conversionRate: 67, usersLost: 2 });
+  });
+
+  it("all steps same count: barPct 100, conversionRate 100", () => {
+    const rows = [
+      ...make(3, "onboarding_started"),
+      ...make(3, "onboarding_completed"),
+      ...make(3, "session_created"),
+      ...make(3, "session_completed"),
+    ];
+    const result = computeFunnel(rows);
+    result.forEach((s) => expect(s.barPct).toBe(100));
+    result.slice(1).forEach((s) => expect(s.conversionRate).toBe(100));
+    result.slice(1).forEach((s) => expect(s.usersLost).toBe(0));
   });
 });

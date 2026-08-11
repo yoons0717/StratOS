@@ -40,7 +40,7 @@
 | 상태 관리 | Zustand |
 | 유효성 검사 | Zod |
 | 스타일링 | Tailwind CSS |
-| 테스트 | Vitest + Testing Library |
+| 테스트 | Vitest + Testing Library, Playwright (E2E) |
 
 ---
 
@@ -58,6 +58,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GROQ_API_KEY=
 RESEND_API_KEY=
+ADMIN_EMAIL=
 ADMIN_USERNAME=
 ADMIN_PASSWORD=
 ```
@@ -81,3 +82,5 @@ npm run dev
 `/admin/login` — username + password로 로그인 (Supabase auth와 분리). `ADMIN_USERNAME` / `ADMIN_PASSWORD` env var로 인증.
 
 `/admin` — 총 유저 수, Active(7d), 온보딩 완료율, 세션 완료율, 인게이지먼트 지표(Activated Users / Avg Sessions / Returning Users), DAU 차트, 퍼널, 리마인더 이메일 수동 발송.
+
+단 `/api/notifications/remind`(리마인더 발송 API)는 여전히 `ADMIN_EMAIL`로 지정된 Supabase 계정만 호출 가능 — `/admin` 쿠키 인증과는 별개의 인증 방식이 공존하는 상태.
